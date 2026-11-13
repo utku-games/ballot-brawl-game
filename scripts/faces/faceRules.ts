@@ -16,8 +16,8 @@ export const ALLOWED_LICENSES: readonly RegExp[] = [
 ];
 
 /** Head crop around a face box: side as a multiple of the box, and how far the centre moves up (fraction of side). */
-export const HEAD_CROP_SCALE = 1.9;
-export const HEAD_CROP_LIFT = 0.12;
+export const HEAD_CROP_SCALE = 1.5;
+export const HEAD_CROP_LIFT = 0.1;
 
 export interface FaceBox {
   /** Normalised 0..1, origin at the top-left corner of the image. */

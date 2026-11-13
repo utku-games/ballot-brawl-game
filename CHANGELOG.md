@@ -25,3 +25,10 @@ All notable changes to this project are documented here. The format follows
 - HUD with portraits and health bars for every fighter, timer, power and guard bars and announcements.
 - Keyboard (two players), gamepad and touch controls with Punch, Kick, Defend, Finisher and Swap buttons.
 - Synthesised sound effects for swings, hits, blocks, finishers and knockouts.
+- Title menu, pause menu and credits screen listing every face's author, source and licence.
+- Brawl mode: 1v1 up to 4v4, any fighter or Random per slot, Player 2 on any slot, CPU difficulty and arena.
+- Story mode: pick a league and a fighter, climb ten rising-difficulty opponents to the boss, three
+  continues, "You saved the world!" ending with a damage-based score, rank and saved best per league.
+- Menus work with mouse, touch, keyboard and gamepad; web manifest and icons for home-screen install.
+- Faces fill the whole front of the head: tighter crops, a near-solid mask, 320 px textures.
+- On-screen fight buttons on every device (mouse clicks work too) and one-tap 1v1 to 4v4 team size buttons.
