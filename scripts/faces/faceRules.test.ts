@@ -11,7 +11,7 @@ import {
 
 describe('isAllowedLicense', () => {
   it('accepts public domain and free licences', () => {
-    for (const name of ['Public domain', 'CC BY-SA 4.0', 'CC BY 2.0', 'CC0', 'OGL 3', 'CC BY 3.0 it', 'Attribution']) {
+    for (const name of ['Public domain', 'CC BY-SA 4.0', 'CC BY 2.0', 'CC0', 'OGL 3', 'OGL v1.0', 'CC BY 3.0 it', 'Attribution']) {
       expect(isAllowedLicense(name)).toBe(true);
     }
   });

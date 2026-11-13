@@ -20,6 +20,7 @@ const APPLE_RED = 0xc8202a;
 const STEM = 0x3a2a10;
 const BOLT_YELLOW = 0xffe040;
 const INK = 0x141414;
+const EGG_WHITE = 0xf4ecd8;
 const BALL_WHITE = 0xf4f4f4;
 const BULB_GLASS = 0xfff2a0;
 const PAN_BLACK = 0x222226;
@@ -74,6 +75,7 @@ const BUILDERS: Readonly<Record<Projectile, () => PartSpec[]>> = {
     at(Shape.Cylinder, [0, 0, 0], [0.4, 0.05, 0.4], PAN_BLACK, UPRIGHT),
     at(Shape.Box, [0, 0, -0.32], [0.05, 0.04, 0.26], HANDLE, UPRIGHT),
   ],
+  [Projectile.Egg]: () => [at(Shape.Sphere, [0, 0, 0], [0.24, 0.32, 0.24], EGG_WHITE, UPRIGHT)],
   [Projectile.Note]: () => [
     at(Shape.Sphere, [0, -0.12, 0], [0.2, 0.15, 0.15], INK, UPRIGHT),
     at(Shape.Box, [0.08, 0.06, 0], [0.03, 0.36, 0.03], INK, UPRIGHT),
