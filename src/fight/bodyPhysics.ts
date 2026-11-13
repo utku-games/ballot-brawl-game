@@ -11,7 +11,8 @@ import { isAlive } from './matchQueries';
 /** Distance below which two bodies are treated as coincident and pushed along X. */
 const COINCIDENT_EPSILON = 1e-6;
 
-function bodyRadius(f: Readonly<FighterState>): number {
+/** Radius of a fighter's body on the floor, scaled with their size. */
+export function bodyRadius(f: Readonly<FighterState>): number {
   return BODY_RADIUS * f.profile.sizeScale;
 }
 

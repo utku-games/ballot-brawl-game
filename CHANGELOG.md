@@ -5,6 +5,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-13
+
+### Changed
+- Online: both sides ping once a second, so a phone that loses signal or a frozen tab shows "Connection lost"
+  after 8 seconds instead of hanging. The host can start a rematch only once the guest is back in the lobby
+  (the lobby says so while waiting). The guest checks every streamed fight state in depth before drawing it.
+  Online protocol version 2: both players need the updated game.
+
+### Fixed
+- The goat and camel faces no longer carry background patches (the goat's white body behind its horn, a second
+  camel beside the first): the face pipeline takes hand-drawn erase polygons per face.
+- Phone HUD with four sides: health bars split two per side instead of one and three, rows shrink when a column
+  holds more than two fighters, and the touch pause button sits under the timer so no health bar covers it.
+- The Rooftop: a fighter left teetering past the wall line after a hit stays where the knockback left them instead
+  of snapping back inside; they still cannot walk off.
+
 ## [0.12.0] - 2026-11-13
 
 ### Added

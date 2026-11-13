@@ -5,6 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
+  isErased,
   alphaBounds, chinY, creditEntry, inHeadRegion, JAW_SIDE_PAD, paddedJaw, silhouetteRows, cropFromFaceBox, cropRect, DEFAULT_LANDMARKS, HEAD_FILL, headShape, isAllowedLicense,
   NECK_FADE, refitRect, stripHtml, toHex, toTexture,
 } from './faceRules.ts';
@@ -118,5 +119,17 @@ describe('silhouetteRows', () => {
     expect(rows[0]).toBe('80');
     expect(rows[7]).toBe('01');
     expect(rows[3]).toBe('00');
+  });
+});
+
+describe('erase polygons', () => {
+  it('tests points against polygons', () => {
+    const square = [{ x: 0.5, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 0.5 }, { x: 0.5, y: 0.5 }];
+    const triangle = [{ x: 0, y: 1 }, { x: 0.4, y: 1 }, { x: 0, y: 0.6 }];
+    expect(isErased(0.75, 0.25, [square])).toBe(true);
+    expect(isErased(0.25, 0.25, [square])).toBe(false);
+    expect(isErased(0.1, 0.9, [square, triangle])).toBe(true);
+    expect(isErased(0.35, 0.7, [square, triangle])).toBe(false);
+    expect(isErased(0.75, 0.25, [])).toBe(false);
   });
 });
