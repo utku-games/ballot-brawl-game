@@ -6,18 +6,23 @@
 import { describe, expect, it } from 'vitest';
 import { ActionKind } from '../fight/fightTypes';
 import { MoveKind, MOVES } from '../fight/moves';
+import { FinisherStyle, Gesture } from '../roster/signatureTypes';
 import { frameFighters, MAX_DISTANCE, MIN_DISTANCE } from './cameraFraming';
 import { RESTING_SPRING, kickSpring, stepSpring } from './headSpring';
+import { gesturePose } from './gesturePoses';
 import { attackPhase, computePose, KO_FALL_SECONDS, koFall, Mood, SKIRT_FOLD, skirtFold } from './poseLogic';
 
-const BASE = { frame: 0, duration: 0, move: null, moving: false, time: 0, mood: Mood.None, koSeconds: -1 };
+const BASE = {
+  frame: 0, duration: 0, move: null, moving: false, time: 0, mood: Mood.None, koSeconds: -1,
+  style: FinisherStyle.Smash, gesture: Gesture.Cheer, intro: false,
+};
 
 describe('computePose', () => {
   it('extends the punching arm on the active frames', () => {
     const active = MOVES[MoveKind.Punch].startup;
     const pose = computePose({ ...BASE, kind: ActionKind.Attack, move: MoveKind.Punch, frame: active });
     const wind = computePose({ ...BASE, kind: ActionKind.Attack, move: MoveKind.Punch, frame: 1 });
-    expect(attackPhase(MoveKind.Punch, active).phase).toBe('active');
+    expect(attackPhase(MOVES[MoveKind.Punch], active).phase).toBe('active');
     expect(pose.armR).toBeGreaterThan(wind.armR);
   });
 
@@ -89,5 +94,42 @@ describe('skirtFold', () => {
   it('clamps the fall amount', () => {
     expect(skirtFold(2, 0.5)).toEqual(skirtFold(1, 0.5));
     expect(skirtFold(-1, 0.5)).toEqual(skirtFold(0, 0.5));
+  });
+});
+
+describe('gestures', () => {
+  it('gives every gesture a finite pose that differs from standing', () => {
+    for (const g of Object.values(Gesture)) {
+      for (const t of [0, 0.4, 1.3]) {
+        const pose = gesturePose(g, t);
+        expect(Object.values(pose).every(Number.isFinite), g).toBe(true);
+      }
+      const pose = gesturePose(g, 0.4);
+      const standing = computePose({ ...BASE, kind: ActionKind.Idle });
+      expect(pose.armL !== standing.armL || pose.armR !== standing.armR || pose.lean !== standing.lean, g).toBe(true);
+    }
+  });
+
+  it('raises one arm for the V sign and holds both hands in front for the diamond', () => {
+    const v = gesturePose(Gesture.VSign, 0.5);
+    expect(v.armR).toBeGreaterThan(2.5);
+    expect(v.armL).toBeLessThan(0.5);
+    const d = gesturePose(Gesture.Diamond, 0.5);
+    expect(d.armL).toBeGreaterThan(0.6);
+    expect(d.armL).toBeLessThan(1.4);
+    expect(d.armR).toBeCloseTo(d.armL, 6);
+  });
+
+  it('plays the gesture for taunts, the intro and wins', () => {
+    const v = gesturePose(Gesture.VSign, 0.5);
+    expect(computePose({ ...BASE, gesture: Gesture.VSign, kind: ActionKind.Taunt, frame: 30 }).armR).toBeCloseTo(v.armR, 6);
+    expect(computePose({ ...BASE, gesture: Gesture.VSign, kind: ActionKind.Idle, intro: true, time: 0.5 }).armR).toBeCloseTo(v.armR, 6);
+    expect(computePose({ ...BASE, gesture: Gesture.VSign, kind: ActionKind.Idle, mood: Mood.Win, time: 0.5 }).armR).toBeCloseTo(v.armR, 6);
+  });
+
+  it('animates each finisher style differently', () => {
+    const at = (style: FinisherStyle): number => computePose({ ...BASE, style, kind: ActionKind.Attack, move: MoveKind.Finisher, frame: 8 }).armR;
+    const values = new Set(Object.values(FinisherStyle).map(at));
+    expect(values.size).toBe(Object.values(FinisherStyle).length);
   });
 });

@@ -51,6 +51,11 @@ export class MatchView {
     this.camera = new CameraRig(view.camera);
   }
 
+  /** Turns every fighter's intro gesture on or off. */
+  setIntro(on: boolean): void {
+    for (const fv of this.fighters.values()) fv.setIntro(on);
+  }
+
   /** Marks player-controlled fighters with a floating arrow of the player's colour. */
   setMarkers(markers: ReadonlyMap<string, number>): void {
     for (const [slot, fv] of this.fighters) fv.setMarker(markers.get(slot) ?? null);

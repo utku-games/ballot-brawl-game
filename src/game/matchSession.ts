@@ -1,6 +1,6 @@
 /**
  * Runs one match in the browser: fixed-step simulation, player and CPU control, rendering, HUD, sound and announcements.
- * It shows a short intro, plays the fight with slow motion after finishers, waits on the knockout, then reports the outcome.
+ * It shows a short intro with every fighter's gesture, plays the fight with slow motion after finishers, waits on the knockout, then reports the outcome.
  * Pausing simply stops the clock; the game app owns the pause menu and calls resume or dispose.
  */
 import { createRng, FixedStepClock, type GameRenderer, type Rng } from '@utku/engine';
@@ -36,7 +36,7 @@ export interface SessionDeps {
 }
 
 const MAX_CATCH_UP_STEPS = 5;
-const INTRO_SECONDS = 1.6;
+const INTRO_SECONDS = 2.2;
 const OUTRO_SECONDS = 2.6;
 const SLOWMO_SECONDS = 0.9;
 const SLOWMO_SCALE = 0.3;
@@ -68,6 +68,7 @@ export class MatchSession {
     this.view = new MatchView(deps.renderer, this.state, plan.arena);
     this.hud = new Hud(deps.hudParent, this.state);
     this.refreshMarkers();
+    this.view.setIntro(true);
     this.hud.announce('READY?', false, false);
   }
 
@@ -156,6 +157,7 @@ export class MatchSession {
     if (!this.started) {
       if (this.time >= INTRO_SECONDS) {
         this.started = true;
+        this.view.setIntro(false);
         this.hud.announce('FIGHT!', false, false);
       }
     } else if (this.state.phase === MatchPhase.Fighting) {
