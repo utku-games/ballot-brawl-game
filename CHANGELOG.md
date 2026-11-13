@@ -30,3 +30,4 @@ All notable changes to this project are documented here. The format follows
 - Story mode: pick a league and a fighter, climb ten rising-difficulty opponents to the boss, three
   continues, "You saved the world!" ending with a damage-based score, rank and saved best per league.
 - Menus work with mouse, touch, keyboard and gamepad; web manifest and icons for home-screen install.
+- On-screen fight buttons on every device (mouse clicks work too) and one-tap 1v1 to 4v4 team size buttons.

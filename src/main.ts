@@ -13,14 +13,13 @@ import { TouchControls } from './ui/touchControls';
 const APP_ELEMENT_ID = 'app';
 const MS_PER_SECOND = 1000;
 const MAX_FRAME_SECONDS = 0.1;
-const COARSE_POINTER = '(pointer: coarse)';
 
 const container = document.getElementById(APP_ELEMENT_ID);
 if (!container) throw new PlatformError(`Missing #${APP_ELEMENT_ID} element`);
 const renderer = createGameRenderer(container);
 const hub = new InputHub(window);
 const audio = new GameAudio();
-const touch = window.matchMedia(COARSE_POINTER).matches ? new TouchControls(container) : null;
+const touch = new TouchControls(container);
 hub.setTouch(touch);
 const unlock = (): void => audio.unlock();
 window.addEventListener('pointerdown', unlock);

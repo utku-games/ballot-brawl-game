@@ -15,7 +15,7 @@ export interface TitleActions {
 
 const DISCLAIMER = 'Unofficial parody. Not affiliated with or endorsed by anyone depicted. No gore: losers just fall over.';
 const KEYS_HINT = 'P1: WASD move, J punch, K kick, L defend, I finisher, U swap. P2: arrows and , . / Shift \' . Gamepads work too.';
-const TOUCH_HINT = 'Drag the left side to move. Punch, Kick, Defend and Finisher buttons on the right.';
+const BUTTONS_HINT = 'Or use the on-screen buttons: drag the left side to move; Punch, Kick, Defend and Finisher on the right.';
 
 export function titleScreen(parent: HTMLElement, actions: TitleActions, muted: boolean, touch: boolean): Screen {
   const root = openScreen(parent, false);
@@ -28,7 +28,8 @@ export function titleScreen(parent: HTMLElement, actions: TitleActions, muted: b
   const mute = button(col, muted ? 'Sound: Off' : 'Sound: On', () => {
     mute.textContent = actions.onToggleMute() ? 'Sound: Off' : 'Sound: On';
   }, 'small');
-  make('p', 'controls-hint', touch ? TOUCH_HINT : KEYS_HINT, root);
+  if (!touch) make('p', 'controls-hint', KEYS_HINT, root);
+  make('p', 'controls-hint', BUTTONS_HINT, root);
   make('p', 'disclaimer', DISCLAIMER, root);
   focusFirst(root);
   return { root };

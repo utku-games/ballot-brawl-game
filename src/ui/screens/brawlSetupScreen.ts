@@ -24,6 +24,16 @@ const TEAM_NAMES = ['Left team', 'Right team'] as const;
 const TEAM_CSS = [THEME.teamA, THEME.teamB] as const;
 const CONTROLLER_LABEL: Readonly<Record<Controller, string>> = { [Controller.P1]: 'P1', [Controller.P2]: 'P2', [Controller.Cpu]: 'CPU' };
 const DIFFICULTIES: readonly Difficulty[] = [Difficulty.Easy, Difficulty.Normal, Difficulty.Hard];
+const SIZE_PRESETS: readonly number[] = [1, 2, 3, 4];
+
+function sizePresets(parent: HTMLElement, config: BrawlConfig, actions: BrawlSetupActions): void {
+  make('p', 'tagline', 'Team size', parent);
+  const row = make('div', 'menu-row', null, parent);
+  for (const n of SIZE_PRESETS) {
+    const current = config.teams[0].length === n && config.teams[1].length === n;
+    button(row, `${n}v${n}`, () => actions.onChange(setTeamSize(setTeamSize(config, 0, n), 1, n)), `${current ? 'on' : ''}`);
+  }
+}
 
 function teamPanel(parent: HTMLElement, config: BrawlConfig, team: 0 | 1, actions: BrawlSetupActions): void {
   const panel = make('div', 'team', null, parent);
@@ -38,7 +48,7 @@ function teamPanel(parent: HTMLElement, config: BrawlConfig, team: 0 | 1, action
     const row = make('div', 'slot', null, panel);
     const pick = button(row, '', () => actions.onPickFighter(team, i));
     if (slot.fighterId === RANDOM_FIGHTER) {
-      make('span', '', 'Random fighter', pick);
+      make('span', '', 'Random fighter (tap to choose)', pick);
     } else {
       const def = fighterById(slot.fighterId);
       portrait(pick, def.id, def.name);
@@ -52,7 +62,9 @@ function teamPanel(parent: HTMLElement, config: BrawlConfig, team: 0 | 1, action
 export function brawlSetupScreen(parent: HTMLElement, config: BrawlConfig, actions: BrawlSetupActions): Screen {
   const root = openScreen(parent, false);
   make('h2', '', 'Brawl', root);
-  make('p', '', 'Up to 4 versus 4. Tap a fighter to change them; tap CPU to hand a slot to Player 2.', root);
+  sizePresets(root, config, actions);
+  make('p', '', 'You (P1) control the first fighter on the left; CPU teammates fight with you and Swap jumps between them. '
+    + 'Tap any fighter to choose who it is, use - and + for uneven teams, and tap CPU to give a slot to Player 2.', root);
   const teams = make('div', 'teams', null, root);
   teamPanel(teams, config, 0, actions);
   teamPanel(teams, config, 1, actions);

@@ -32,6 +32,8 @@ import { storyMatchPlan } from './storyPlan';
 /** Stick deflection that counts as a menu step, and the delay before it repeats. */
 const NAV_THRESHOLD = 0.6;
 const NAV_REPEAT_SECONDS = 0.25;
+/** Media query that is true on phones and tablets, where the keyboard hint is pointless. */
+const COARSE_POINTER = '(pointer: coarse)';
 /** Seconds after a menu appears during which confirm presses are ignored, so mashing at a knockout does not skip it. */
 const MENU_CONFIRM_LOCK_SECONDS = 0.7;
 const NAV_KEYS: Readonly<Record<string, number>> = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 };
@@ -175,7 +177,7 @@ export class GameApp {
       onBrawl: () => this.showBrawlSetup(),
       onCredits: () => this.show((q) => creditsScreen(q, () => this.showTitle()), null),
       onToggleMute: () => this.toggleMute(),
-    }, this.save.muted, this.deps.touch !== null), ArenaKind.Parliament);
+    }, this.save.muted, window.matchMedia(COARSE_POINTER).matches), ArenaKind.Parliament);
   }
 
   private toggleMute(): boolean {
