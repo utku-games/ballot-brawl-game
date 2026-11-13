@@ -105,6 +105,9 @@ function attackPose(move: MoveKind, frame: number, style: FinisherStyle): Pose {
   if (move === MoveKind.Kick) {
     return { ...STANDING_POSE, legR: swing(m, frame, -0.4, 1.5, 0), lean: swing(m, frame, 0.1, -0.3, 0), armL: 0.8, armR: -0.3 };
   }
+  if (move === MoveKind.Item) {
+    return { ...STANDING_POSE, armR: swing(m, frame, 3, 1.4, GUARD_ARM), lean: swing(m, frame, -0.2, 0.3, 0) };
+  }
   return finisherPose(style, frame);
 }
 

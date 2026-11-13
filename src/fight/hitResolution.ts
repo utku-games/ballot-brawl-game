@@ -9,7 +9,7 @@ import {
 } from './fightConstants';
 import { ActionKind, type FightEvent, type FighterAction, type FighterState } from './fightTypes';
 import { isAlive } from './matchQueries';
-import { isActiveFrame, isRanged, MoveKind, moveData, type MoveData } from './moves';
+import { hitsByProjectile, isActiveFrame, MoveKind, moveData, type MoveData } from './moves';
 
 /** Knockback kept when a hit is blocked. */
 const BLOCK_KNOCKBACK_SCALE = 0.4;
@@ -52,7 +52,7 @@ function collectContacts(fighters: readonly FighterState[]): Contact[] {
   for (const attacker of fighters) {
     const move = attacker.action.move;
     if (attacker.action.kind !== ActionKind.Attack || move === null) continue;
-    if (move === MoveKind.Finisher && isRanged(attacker.profile.finisher)) continue;
+    if (hitsByProjectile(move, attacker.profile.finisher)) continue;
     const data = moveData(move, attacker.profile.finisher);
     if (!isActiveFrame(data, attacker.action.frame)) continue;
     for (const target of fighters) {

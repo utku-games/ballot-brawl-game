@@ -26,10 +26,11 @@ export const TEAM_COLORS: readonly [number, number] = [0x3a8dff, 0xff4a4a];
 
 const HIT_HEIGHT = 1.4;
 const FLOOR_HEIGHT = 0.1;
-const HIT_WOBBLE: Readonly<Record<MoveKind, number>> = { [MoveKind.Punch]: 4, [MoveKind.Kick]: 6, [MoveKind.Finisher]: 10 };
-const HIT_SHAKE: Readonly<Record<MoveKind, number>> = { [MoveKind.Punch]: 0.05, [MoveKind.Kick]: 0.12, [MoveKind.Finisher]: 0.45 };
+const HIT_WOBBLE: Readonly<Record<MoveKind, number>> = { [MoveKind.Punch]: 4, [MoveKind.Kick]: 6, [MoveKind.Finisher]: 10, [MoveKind.Item]: 6 };
+const HIT_SHAKE: Readonly<Record<MoveKind, number>> = { [MoveKind.Punch]: 0.05, [MoveKind.Kick]: 0.12, [MoveKind.Finisher]: 0.45, [MoveKind.Item]: 0.15 };
 const HIT_BURST: Readonly<Record<MoveKind, BurstKind>> = {
   [MoveKind.Punch]: BurstKind.Punch, [MoveKind.Kick]: BurstKind.Kick, [MoveKind.Finisher]: BurstKind.Finisher,
+  [MoveKind.Item]: BurstKind.Kick,
 };
 const KO_SHAKE = 0.3;
 const QUAKE_SHAKE = 0.5;

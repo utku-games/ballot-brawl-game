@@ -1,16 +1,18 @@
 /**
  * The deterministic fight step: given a MatchState and one input per fighter, produce the next MatchState.
- * Order per tick: timers, control (facing, actions, walking), hit resolution, projectiles, knockback, body separation,
- * walls, end check.
+ * Order per tick: timers, control (facing, actions, walking), hit resolution, projectiles, items and hazards,
+ * knockback, body separation, walls, end check.
  * The input state is never mutated; fighters are cloned first, and the returned state lists this tick's events.
  */
 import {
-  EndReason, IDLE_INPUT, MatchPhase, type FightEvent, type FighterInput, type FighterState,
-  type MatchState, type TeamIndex,
+  EndReason, IDLE_INPUT, MatchPhase, type FightEvent, type FighterInput, type FighterState, type HazardState,
+  type ItemState, type MatchState, type TeamIndex,
 } from './fightTypes';
 import { keepInArena, separateBodies, slideKnockback } from './bodyPhysics';
 import { advanceTimers, controlFighter } from './fighterControl';
 import { resolveAttacks } from './hitResolution';
+import { spawnHazard, stepHazards } from './hazards';
+import { dropFromFallen, pickUpItems, spawnItem } from './items';
 import { spawnProjectiles, stepProjectiles } from './projectiles';
 import { isAlive, livingOnTeam, teamHealthFraction } from './matchQueries';
 
@@ -39,6 +41,16 @@ function decideOutcome(fighters: readonly FighterState[], timeUp: boolean): Outc
   return { over: true, winner: h0 > h1 ? 0 : 1, reason: time };
 }
 
+/** Items and hazards for this tick: lands falling anvils, drops items from fallen fighters, hands out and spawns items. */
+function stepExtras(state: Readonly<MatchState>, fighters: FighterState[], events: FightEvent[]): { items: ItemState[]; hazards: HazardState[] } {
+  const hazards = stepHazards(state.hazards, fighters, events);
+  const items = pickUpItems([...state.items, ...dropFromFallen(fighters, state.tick)], fighters, events);
+  if (!state.extras) return { items, hazards };
+  const item = spawnItem(items, state.tick, state.seed);
+  const hazard = spawnHazard(fighters, state.tick, state.seed, events);
+  return { items: item ? [...items, item] : items, hazards: hazard ? [...hazards, hazard] : hazards };
+}
+
 /** Advances the match by one tick; a finished match is returned unchanged except for cleared events. */
 export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly<FighterInput>[]): MatchState {
   if (state.phase === MatchPhase.Over) return { ...state, events: [] };
@@ -51,6 +63,7 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
   });
   resolveAttacks(fighters, events);
   const projectiles = [...stepProjectiles(state.projectiles, fighters, events), ...spawnProjectiles(fighters, state.tick, events)];
+  const extras = stepExtras(state, fighters, events);
   for (const f of fighters) slideKnockback(f);
   separateBodies(fighters);
   for (const f of fighters) keepInArena(f);
@@ -63,6 +76,10 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
     phase: result.over ? MatchPhase.Over : MatchPhase.Fighting,
     fighters,
     projectiles: result.over ? [] : projectiles,
+    items: result.over ? [] : extras.items,
+    hazards: result.over ? [] : extras.hazards,
+    extras: state.extras,
+    seed: state.seed,
     winner: result.winner,
     events,
   };

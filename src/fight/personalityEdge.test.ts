@@ -13,7 +13,7 @@ import { createMatch } from './matchSetup';
 import { stepMatch } from './matchStep';
 import { FINISHERS, MoveKind, moveDuration } from './moves';
 import { PROJECTILE_TICKS } from './projectiles';
-import { duel, entries, input, run, styled, tap } from './testFight';
+import { duel, entries, input, run, styled, tap, NO_EXTRAS } from './testFight';
 
 const SPECIAL = input({ special: true });
 
@@ -30,7 +30,7 @@ describe('personality edge cases', () => {
   });
 
   it('Rush into a crowd hits each enemy once and does not tunnel through them', () => {
-    const s = createMatch({ teams: [entries(1), entries(3)] });
+    const s = createMatch({ teams: [entries(1), entries(3)], ...NO_EXTRAS });
     const [a, e1, e2, e3] = s.fighters;
     a.profile = styled(FinisherStyle.Rush);
     a.meter = METER_MAX;
@@ -67,7 +67,7 @@ describe('personality edge cases', () => {
     const over = stepMatch(mid, [IDLE_INPUT, IDLE_INPUT]);
     expect(over.phase).toBe(MatchPhase.Over);
     expect(over.projectiles).toHaveLength(0);
-    expect(createMatch({ teams: [entries(1), entries(1)] }).projectiles).toHaveLength(0);
+    expect(createMatch({ teams: [entries(1), entries(1)], ...NO_EXTRAS }).projectiles).toHaveLength(0);
   });
 
   it('a taunt at full meter keeps the meter at the cap', () => {
