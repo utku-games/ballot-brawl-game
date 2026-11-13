@@ -1,0 +1,6 @@
+{
+  "commands": [
+    {"name": "typecheck", "run": "npm run typecheck", "timeout_s": 300},
+    {"name": "test", "run": "npm test", "timeout_s": 600}
+  ]
+}

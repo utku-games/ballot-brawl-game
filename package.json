@@ -1,0 +1,26 @@
+{
+  "name": "ballot-brawl",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "faces": "node scripts/faces/fetchFaces.mjs",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:preview": "bash scripts/deploy.sh --preview"
+  },
+  "dependencies": {
+    "@utku/engine": "github:UttyWotty/utku-engine#v0.2.0",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.186.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^4.1.11"
+  }
+}
