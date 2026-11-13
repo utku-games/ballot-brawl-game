@@ -11,6 +11,7 @@ export interface TitleActions {
   onRivalry: () => void;
   onBrawl: () => void;
   onParty: () => void;
+  onTrophies: () => void;
   onCredits: () => void;
   onToggleMute: () => boolean;
 }
@@ -28,6 +29,7 @@ export function titleScreen(parent: HTMLElement, actions: TitleActions, muted: b
   button(col, 'Rivalry Battles', actions.onRivalry);
   button(col, 'Brawl (up to 4v4)', actions.onBrawl);
   button(col, 'Party (free-for-all)', actions.onParty);
+  button(col, 'Trophies', actions.onTrophies);
   button(col, 'Credits', actions.onCredits);
   const mute = button(col, muted ? 'Sound: Off' : 'Sound: On', () => {
     mute.textContent = actions.onToggleMute() ? 'Sound: Off' : 'Sound: On';

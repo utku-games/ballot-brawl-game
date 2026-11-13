@@ -47,7 +47,7 @@ describe('rivalryMatchPlan', () => {
 
 describe('rivalry wins', () => {
   it('records a win once', () => {
-    const save = { best: {}, rivalriesWon: [], muted: false };
+    const save = { best: {}, rivalriesWon: [], leaguesWon: [], muted: false };
     expect(recordRivalryWin(save, 'currents')).toBe(true);
     expect(recordRivalryWin(save, 'currents')).toBe(false);
     expect(save.rivalriesWon).toEqual(['currents']);

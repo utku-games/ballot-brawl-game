@@ -38,7 +38,19 @@ describe('plain plans', () => {
     vi.stubGlobal('window', { localStorage: storage });
     const save = loadSave();
     expect(save.rivalriesWon).toEqual([]);
+    expect(save.leaguesWon).toEqual([]);
     expect(save.muted).toBe(true);
     expect(Object.keys(save.best)).toHaveLength(1);
+  });
+
+  it('keeps saved league wins and drops values that are not story leagues', () => {
+    const store = new Map<string, string>();
+    store.set('ballot-brawl-save-v1', JSON.stringify({ best: {}, leaguesWon: ['legends', 'specials', 'nonsense', 42], muted: false }));
+    const storage = {
+      getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v), removeItem: (k: string) => void store.delete(k),
+    };
+    vi.stubGlobal('localStorage', storage);
+    vi.stubGlobal('window', { localStorage: storage });
+    expect(loadSave().leaguesWon).toEqual(['legends']);
   });
 });
