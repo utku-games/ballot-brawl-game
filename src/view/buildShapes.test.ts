@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { Build } from '../roster/lookTypes';
-import { bodyDims, headPivotHeight } from './buildShapes';
+import { bodyDims, headPivotHeight, torsoFrontZ } from './buildShapes';
 
 const height = (b: Build): number => headPivotHeight(bodyDims(b));
 
@@ -39,5 +39,14 @@ describe('bodyDims', () => {
       expect(d.torsoHeight).toBeGreaterThan(d.torsoDepth);
       expect(d.legLength).toBeGreaterThan(d.legRadius * 2);
     }
+  });
+});
+
+describe('torsoFrontZ', () => {
+  it('is the full half depth along the straight middle and recedes over the shoulders', () => {
+    const d = bodyDims(Build.Average);
+    expect(torsoFrontZ(d, d.torsoHeight / 2)).toBeCloseTo(d.torsoDepth / 2, 6);
+    expect(torsoFrontZ(d, d.torsoHeight - 0.04)).toBeLessThan(d.torsoDepth / 2);
+    expect(torsoFrontZ(d, d.torsoHeight)).toBeCloseTo(0, 6);
   });
 });

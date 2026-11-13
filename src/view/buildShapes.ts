@@ -80,3 +80,11 @@ export function torsoPivotHeight(dims: Readonly<BodyDims>): number {
 export function headPivotHeight(dims: Readonly<BodyDims>): number {
   return torsoPivotHeight(dims) + dims.torsoHeight + NECK_HEIGHT;
 }
+
+/** Distance from the torso axis to its front surface at height y above the torso pivot (the torso is a capsule). */
+export function torsoFrontZ(dims: Readonly<BodyDims>, y: number): number {
+  const r = dims.torsoDepth / 2;
+  const capCentre = y < r ? r : y > dims.torsoHeight - r ? dims.torsoHeight - r : y;
+  const dy = Math.min(r, Math.abs(y - capCentre));
+  return Math.sqrt(r * r - dy * dy);
+}
