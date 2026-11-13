@@ -15,6 +15,8 @@ const WALL_HEIGHT = 7;
 const WALL_WIDTH = ARENA_HALF_WIDTH * 2 + 12;
 const PROP_COUNT = 7;
 const PROP_SPACING = (ARENA_HALF_WIDTH * 2) / (PROP_COUNT - 1);
+/** Width of the Studio's red carpet, meters. */
+const CARPET_WIDTH = 2.4;
 
 function box(w: number, h: number, d: number, color: number, emissive = 0): THREE.Mesh {
   const m = new THREE.Mesh(
@@ -75,10 +77,24 @@ function buildMuseum(group: THREE.Group, style: ArenaStyle): void {
   }
 }
 
+/** A talk-show set: a red carpet down the middle, glowing backdrop panels and stage lights on stands. */
+function buildStudio(group: THREE.Group, style: ArenaStyle): void {
+  place(group, box(CARPET_WIDTH, 0.02, ARENA_HALF_DEPTH * 2, style.accent), 0, 0.005, 0);
+  for (let i = 0; i < PROP_COUNT; i += 1) {
+    const x = -ARENA_HALF_WIDTH + i * PROP_SPACING;
+    place(group, box(1.5, 2.4, 0.1, 0x000000, i % 2 === 0 ? style.trim : style.wall), x, 2.6, BACK_Z - 0.6);
+  }
+  for (const side of [-1, 1]) {
+    place(group, box(0.12, 3, 0.12, style.floorEdge), side * (ARENA_HALF_WIDTH + 1.4), 1.5, -2);
+    place(group, box(0.7, 0.5, 0.5, 0x000000, style.trim), side * (ARENA_HALF_WIDTH + 1.4), 3.1, -2);
+  }
+}
+
 const BUILDERS: Readonly<Record<ArenaKind, (group: THREE.Group, style: ArenaStyle) => void>> = {
   [ArenaKind.Parliament]: buildParliament,
   [ArenaKind.TradingFloor]: buildTradingFloor,
   [ArenaKind.Museum]: buildMuseum,
+  [ArenaKind.Studio]: buildStudio,
 };
 
 export function buildArena(kind: ArenaKind): THREE.Group {

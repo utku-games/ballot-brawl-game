@@ -6,11 +6,14 @@
 import type { Build, Headwear, Neckwear, Outfit, Prop } from './lookTypes';
 import type { FighterSignature } from './signatureTypes';
 
-/** The three story categories; each has eleven regular fighters and one boss. */
+/** Fighter groups: four story categories, each with regulars and one boss, plus Specials for Brawl only. */
 export enum Category {
   Politicians = 'politicians',
   Tycoons = 'tycoons',
   Legends = 'legends',
+  Celebrities = 'celebrities',
+  /** Not a story category: animals and other extras for Brawl and Special Edition fights. */
+  Specials = 'specials',
 }
 
 /** Lowest and highest value of a combat stat. */

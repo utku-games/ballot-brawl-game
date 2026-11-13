@@ -1,5 +1,5 @@
 /**
- * The Legends category: eleven historical figures from science, art, literature and royalty, plus Napoleon as boss.
+ * The Legends category: historical figures from science, invention, art, literature and royalty, plus Napoleon as boss.
  * Their portraits are centuries old and in the public domain, so this is the safest category to extend.
  * Every regular fighter has the same stat total; the boss gets more and fights last in the story ladder.
  */
@@ -23,6 +23,7 @@ const ROWS: readonly FighterRow[] = [
   { id: 'marie-curie', name: 'Marie Curie', nickname: 'The Glow', finisher: 'Radiant Strike', stats: [4, 3, 2], colors: [0x1a1a1a, 0x7aff9a, 0xf2ccb0, 0x8a7a6a], kit: [Build.Average, Outfit.Gown, Neckwear.None, Headwear.None, Prop.Vial], signature: [FinisherStyle.Quake, Gesture.Thinker, Projectile.None], boss: REG },
   { id: 'nikola-tesla', name: 'Nikola Tesla', nickname: 'The Current', finisher: 'Alternating Current', stats: [4, 4, 1], colors: [0x2a2a32, 0x6ac8ff, 0xf0c8a8, 0x1a1a1a], kit: [Build.Lanky, Outfit.FrockCoat, Neckwear.Tie, Headwear.None, Prop.CoilWand], signature: [FinisherStyle.Throw, Gesture.Point, Projectile.Bolt], boss: REG },
   { id: 'wolfgang-amadeus-mozart', name: 'Wolfgang Amadeus Mozart', nickname: 'The Prodigy', finisher: 'Requiem Rondo', stats: [2, 5, 2], colors: [0xc03a3a, 0xe8d090, 0xf4d2bc, 0xe8e0d8], kit: [Build.Short, Outfit.FrockCoat, Neckwear.Cravat, Headwear.None, Prop.Baton], signature: [FinisherStyle.Throw, Gesture.Conduct, Projectile.Note], boss: REG },
+  { id: 'thomas-edison', name: 'Thomas Edison', nickname: 'Wizard of Menlo Park', finisher: 'Bright Idea', stats: [3, 3, 3], colors: [0x2a2a2a, 0x1a1a1a, 0xf0c8a8, 0xd8d8d8], kit: [Build.Average, Outfit.Suit, Neckwear.BowTie, Headwear.None, Prop.None], signature: [FinisherStyle.Throw, Gesture.Thinker, Projectile.LightBulb], boss: REG },
   { id: 'napoleon-bonaparte', name: 'Napoleon Bonaparte', nickname: 'Le Petit Caporal', finisher: 'Waterloo Reversal', stats: [5, 3, 3], colors: [0x1a2a5a, 0xd4af37, 0xf2d0b8, 0x3a2a1a], kit: [Build.Short, Outfit.MilitaryCoat, Neckwear.None, Headwear.Bicorne, Prop.Sword], signature: [FinisherStyle.Rush, Gesture.Salute, Projectile.None], boss: BOSS },
 ];
 

@@ -1,28 +1,35 @@
 /**
- * The full roster: all three categories, lookups by id and category, and a validation pass run at load.
- * Validation guarantees unique ids, eleven regulars and exactly one boss per category, a fair stat total and a
- * look and signature built only from their catalogues.
+ * The full roster: the four story categories plus the Specials, lookups by id and category, and a validation pass.
+ * Validation guarantees unique ids, at least ten regulars and exactly one boss per story category, no boss among the
+ * Specials, a fair stat total, and a look and signature built only from their catalogues.
  * Broken data raises RosterDataError immediately instead of failing later inside a match.
  */
 import { RosterDataError, UnknownEntityError } from '../core/errors';
+import { CELEBRITIES } from './celebrities';
 import { LEGENDS } from './legends';
 import { Build, Headwear, Neckwear, Outfit, Prop } from './lookTypes';
 import { POLITICIANS } from './politicians';
 import { Category, type FighterDef } from './rosterTypes';
 import { FinisherStyle, Gesture, Projectile } from './signatureTypes';
+import { SPECIALS } from './specials';
 import { TYCOONS } from './tycoons';
 
-/** Regular (non-boss) fighters each category must have: the player's pick plus ten ladder opponents. */
-export const REGULARS_PER_CATEGORY = 11;
+/** Fewest regular (non-boss) fighters a story category may have: the player's pick plus nine ladder opponents. */
+export const MIN_REGULARS = 10;
 /** Stat total (power + speed + toughness) of every regular fighter. */
 export const REGULAR_STAT_TOTAL = 9;
 
-export const CATEGORY_ORDER: readonly Category[] = [Category.Politicians, Category.Tycoons, Category.Legends];
+/** The story categories, in menu order. */
+export const CATEGORY_ORDER: readonly Category[] = [Category.Politicians, Category.Tycoons, Category.Legends, Category.Celebrities];
+/** Every group shown in Brawl: the story categories, then the Specials. */
+export const BRAWL_ORDER: readonly Category[] = [...CATEGORY_ORDER, Category.Specials];
 
 export const CATEGORY_LABEL: Readonly<Record<Category, string>> = {
   [Category.Politicians]: 'Politicians',
   [Category.Tycoons]: 'Tycoons',
   [Category.Legends]: 'Legends',
+  [Category.Celebrities]: 'Celebrities',
+  [Category.Specials]: 'Specials',
 };
 
 function statTotal(f: Readonly<FighterDef>): number {
@@ -71,13 +78,14 @@ export function validateRoster(fighters: readonly FighterDef[]): void {
     const members = fighters.filter((f) => f.category === category);
     const bosses = members.filter((f) => f.boss).length;
     if (bosses !== 1) throw new RosterDataError(`${category} has ${bosses} bosses, expected 1`);
-    if (members.length - bosses !== REGULARS_PER_CATEGORY) {
-      throw new RosterDataError(`${category} has ${members.length - bosses} regulars, expected ${REGULARS_PER_CATEGORY}`);
+    if (members.length - bosses < MIN_REGULARS) {
+      throw new RosterDataError(`${category} has ${members.length - bosses} regulars, expected at least ${MIN_REGULARS}`);
     }
   }
+  if (fighters.some((f) => f.category === Category.Specials && f.boss)) throw new RosterDataError('Specials cannot have a boss');
 }
 
-export const ROSTER: readonly FighterDef[] = [...POLITICIANS, ...TYCOONS, ...LEGENDS];
+export const ROSTER: readonly FighterDef[] = [...POLITICIANS, ...TYCOONS, ...LEGENDS, ...CELEBRITIES, ...SPECIALS];
 validateRoster(ROSTER);
 
 const BY_ID = new Map(ROSTER.map((f) => [f.id, f]));
