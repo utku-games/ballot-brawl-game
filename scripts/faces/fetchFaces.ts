@@ -71,7 +71,7 @@ async function main(): Promise<void> {
     const out = join(OUTPUT_DIR, `${source.id}.webp`);
     const result = await renderFace(paths.get(source.id) ?? '', existsSync(mask) ? mask : null, source.crop, source.landmarks, out);
     const info = infos.get(source.id);
-    if (info) credits.push(creditEntry(source.id, source.file, info.meta, result.tone, result.landmarks));
+    if (info) credits.push(creditEntry(source.id, source.file, info.meta, result.tone, result.landmarks, result.silhouette));
   }
   writeFileSync(CREDITS_PATH, `${JSON.stringify({ credits }, null, 2)}\n`);
   console.log(`wrote ${credits.length} faces`);

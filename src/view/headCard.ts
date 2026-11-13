@@ -1,16 +1,18 @@
 /**
  * The photo sticker head: a gently curved card carrying the cut-out face texture, warped live for expressions.
  * Each fighter owns its card geometry so vertices can move around the eyes and mouth; updates are skipped while neutral.
- * The card uses a hard alpha cut-out and is flagged transparent so the engine's ambient-occlusion pass skips it (that pass
- * ignores cut-outs and would darken a square around the head); it still writes depth and casts a head-shaped shadow.
+ * Only the grid cells inside the face silhouette are kept, so the card is solid, ambient occlusion sees the real head
+ * shape (no square, no see-through), and the alpha test only trims the last fraction of a cell at the edge.
  */
 import * as THREE from 'three';
 import type { FaceLandmarks } from '../roster/credits';
 import { isNeutral, warpPoint, type Expression } from './faceWarp';
+import { decodeSilhouette, dilate } from './silhouette';
 
 /** Card width and height in meters, and how far its edges curve back. */
 export const HEAD_CARD_SIZE = 1.1;
-const CARD_SEGMENTS = 24;
+/** Cells per side of the card grid; matches the face pipeline's silhouette grid. */
+export const HEAD_GRID = 48;
 const CARD_BEND = 0.28;
 const ALPHA_CUTOFF = 0.5;
 const SKIN_ROUGHNESS = 0.65;
@@ -23,8 +25,9 @@ export class HeadCard {
   private readonly base: Float32Array;
   private last: Expression = { hurt: 0, happy: 0, ko: 0 };
 
-  constructor(face: THREE.Texture, private readonly landmarks: Readonly<FaceLandmarks>) {
-    this.geometry = new THREE.PlaneGeometry(HEAD_CARD_SIZE, HEAD_CARD_SIZE, CARD_SEGMENTS, CARD_SEGMENTS);
+  constructor(face: THREE.Texture, private readonly landmarks: Readonly<FaceLandmarks>, silhouette: readonly string[]) {
+    this.geometry = new THREE.PlaneGeometry(HEAD_CARD_SIZE, HEAD_CARD_SIZE, HEAD_GRID, HEAD_GRID);
+    this.keepSilhouette(silhouette);
     const pos = this.geometry.getAttribute('position');
     for (let i = 0; i < pos.count; i += 1) {
       const nx = pos.getX(i) / (HEAD_CARD_SIZE / 2);
@@ -33,10 +36,26 @@ export class HeadCard {
     this.base = Float32Array.from(pos.array as Float32Array);
     this.geometry.computeVertexNormals();
     const material = new THREE.MeshStandardMaterial({
-      map: face, alphaTest: ALPHA_CUTOFF, transparent: true, depthWrite: true, side: THREE.DoubleSide, roughness: SKIN_ROUGHNESS,
+      map: face, alphaTest: ALPHA_CUTOFF, side: THREE.DoubleSide, roughness: SKIN_ROUGHNESS,
     });
     this.mesh = new THREE.Mesh(this.geometry, material);
     this.mesh.castShadow = true;
+  }
+
+  /** Drops the grid cells outside the head so the geometry itself has the head's shape. */
+  private keepSilhouette(silhouette: readonly string[]): void {
+    const cells = dilate(decodeSilhouette(silhouette, HEAD_GRID));
+    const stride = HEAD_GRID + 1;
+    const index: number[] = [];
+    for (let y = 0; y < HEAD_GRID; y += 1) {
+      for (let x = 0; x < HEAD_GRID; x += 1) {
+        if (!cells[y]?.[x]) continue;
+        const a = y * stride + x;
+        const b = a + stride;
+        index.push(a, b, a + 1, b, b + 1, a + 1);
+      }
+    }
+    this.geometry.setIndex(index);
   }
 
   /** Warps the face toward an expression; cheap no-op when nothing changed. */

@@ -4,7 +4,7 @@
  * materials that flash on hits. Colours come from the roster look; hands and neck use the photo's measured skin tone.
  */
 import * as THREE from 'three';
-import type { FaceLandmarks } from '../roster/credits';
+import type { FaceCredit } from '../roster/credits';
 import type { FighterDef } from '../roster/rosterTypes';
 import { HEAD_CARD_SIZE, HeadCard } from './headCard';
 import {
@@ -81,10 +81,10 @@ function buildStars(parent: THREE.Object3D): THREE.Group {
   return stars;
 }
 
-function buildHead(torso: THREE.Group, tone: number, face: THREE.Texture, landmarks: FaceLandmarks): { head: THREE.Group; card: HeadCard; stars: THREE.Group } {
+function buildHead(torso: THREE.Group, tone: number, face: THREE.Texture, credit: FaceCredit): { head: THREE.Group; card: HeadCard; stars: THREE.Group } {
   const head = pivot(torso, 0, TORSO_HEIGHT + NECK_HEIGHT);
   mesh(partGeometry('neck'), standard(tone, SKIN_ROUGHNESS), head).position.y = NECK_LIFT;
-  const card = new HeadCard(face, landmarks);
+  const card = new HeadCard(face, credit.landmarks, credit.silhouette);
   card.mesh.position.set(0, HEAD_CARD_SIZE * CARD_LIFT, CARD_FORWARD);
   head.add(card.mesh);
   return { head, card, stars: buildStars(head) };
@@ -105,7 +105,7 @@ function buildArm(torso: THREE.Group, x: number, suit: THREE.Material, skin: THR
   return shoulder;
 }
 
-export function buildFighterRig(def: FighterDef, tone: number, face: THREE.Texture, landmarks: FaceLandmarks, teamColor: number): FighterRig {
+export function buildFighterRig(def: FighterDef, tone: number, face: THREE.Texture, credit: FaceCredit, teamColor: number): FighterRig {
   const root = new THREE.Group();
   const body = pivot(root, 0, 0);
   const suit = standard(def.look.suitColor, SUIT_ROUGHNESS);
@@ -119,7 +119,7 @@ export function buildFighterRig(def: FighterDef, tone: number, face: THREE.Textu
   mesh(partGeometry('tie'), standard(def.look.accentColor, SUIT_ROUGHNESS), torso);
   const armL = buildArm(torso, -SHOULDER_WIDTH, suit, skin);
   const armR = buildArm(torso, SHOULDER_WIDTH, suit, skin);
-  const { head, card, stars } = buildHead(torso, tone, face, landmarks);
+  const { head, card, stars } = buildHead(torso, tone, face, credit);
   const ringMaterial = new THREE.MeshBasicMaterial({ color: teamColor, transparent: true, opacity: RING_OPACITY });
   const ring = new THREE.Mesh(partGeometry('ring'), ringMaterial);
   ring.position.y = RING_HEIGHT;

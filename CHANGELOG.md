@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Heads are solid again: each head's geometry is now cut to the face's own silhouette, so ambient occlusion sees the
+  real head shape without the see-through look or a square behind it.
+
 ## [0.2.2] - 2026-11-13
 
 ### Fixed

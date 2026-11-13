@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { dampAngle, dampValue } from '@utku/engine';
 import { ActionKind, type FighterState } from '../fight/fightTypes';
-import type { FaceLandmarks } from '../roster/credits';
+import type { FaceCredit } from '../roster/credits';
 import type { FighterDef } from '../roster/rosterTypes';
 import type { Expression } from './faceWarp';
 import { buildFighterRig, type FighterRig } from './fighterModel';
@@ -46,8 +46,8 @@ export class FighterView {
   private koStart = -1;
   private mood = Mood.None;
 
-  constructor(def: FighterDef, tone: number, face: THREE.Texture, landmarks: FaceLandmarks, teamColor: number, sizeScale: number) {
-    this.rig = buildFighterRig(def, tone, face, landmarks, teamColor);
+  constructor(def: FighterDef, tone: number, face: THREE.Texture, credit: FaceCredit, teamColor: number, sizeScale: number) {
+    this.rig = buildFighterRig(def, tone, face, credit, teamColor);
     this.rig.root.scale.setScalar(sizeScale);
   }
 

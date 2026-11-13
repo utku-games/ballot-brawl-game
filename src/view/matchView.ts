@@ -43,7 +43,7 @@ export class MatchView {
     view.scene.add(this.arena);
     for (const f of state.fighters) {
       const def = fighterById(f.fighterId);
-      const fv = new FighterView(def, toneOf(def.id), faceTexture(def.id), creditFor(def.id).landmarks, TEAM_COLORS[f.team], f.profile.sizeScale);
+      const fv = new FighterView(def, toneOf(def.id), faceTexture(def.id), creditFor(def.id), TEAM_COLORS[f.team], f.profile.sizeScale);
       this.fighters.set(f.slotId, fv);
       view.scene.add(fv.rig.root);
     }
