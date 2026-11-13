@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Rivalry Battles: a new mode of one-on-one grudge matches in two sections. Rivalries include The War of the
+  Currents (Edison vs Tesla), The Tariff Tussle (Trump vs Xi), The Cage Match (Musk vs Zuckerberg), The Space Race,
+  The Garage Rivals, The Rematch, Question Time, The G.O.A.T. Debate and The Feud. The Special Edition has The G.O.A.T.
+  Summit (Shehbaz Sharif vs a goat), Pigtanic (James Cameron vs a pig) and The Desert Derby (Erdoğan vs a camel).
+- Rivalry twists: Blackout (flickering lights), Turbo (faster fighters) and Heavy Hitters (harder hits).
+- The rivalry title opens each rivalry fight; won rivalries are saved as settled.
+- The title screen's controls hint now lists the Taunt keys.
+
 ## [0.5.0] - 2026-11-13
 
 ### Added

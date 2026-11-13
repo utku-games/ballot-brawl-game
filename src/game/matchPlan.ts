@@ -1,6 +1,7 @@
 /**
  * A MatchPlan describes a match before it starts: who stands in each slot, who controls them, CPU skill and the arena.
- * Both brawl and story mode produce a plan; buildMatchSetup turns it into the simulation's MatchSetup.
+ * Brawl, story and rivalry modes produce a plan; buildMatchSetup turns it into the simulation's MatchSetup, applying
+ * any rivalry twist to both teams' combat profiles.
  * Keeping this pure means mode logic can be tested without rendering anything.
  */
 import { combatProfile } from '../fight/combatProfile';
@@ -9,6 +10,8 @@ import type { MatchSetup, TeamEntry } from '../fight/matchSetup';
 import { slotIdFor } from '../fight/matchSetup';
 import type { PlayerId } from '../input/controlFrame';
 import { fighterById } from '../roster/roster';
+import { Twist } from '../rivalry/rivalryTypes';
+import { twistModifiers } from '../rivalry/twists';
 import type { ArenaKind } from '../view/arenaKinds';
 
 export interface SlotPlan {
@@ -25,19 +28,27 @@ export interface MatchPlan {
   teams: readonly [readonly SlotPlan[], readonly SlotPlan[]];
   arena: ArenaKind;
   seed: number;
+  /** Shown instead of "READY?" during the intro (a rivalry title), or null. */
+  banner: string | null;
+  /** Rule twist for both teams; Twist.None for a normal fight. */
+  twist: Twist;
 }
 
-function entry(slot: Readonly<SlotPlan>): TeamEntry {
+/** Plan fields for an ordinary fight with no banner and no twist. */
+export const PLAIN_FIGHT: Readonly<Pick<MatchPlan, 'banner' | 'twist'>> = { banner: null, twist: Twist.None };
+
+function entry(slot: Readonly<SlotPlan>, twist: Twist): TeamEntry {
+  const def = fighterById(slot.fighterId);
+  const base = combatProfile(def.stats, { boss: slot.boss, damageScale: slot.damageScale }, def.signature.style);
+  const mods = twistModifiers(twist);
   return {
     fighterId: slot.fighterId,
-    profile: combatProfile(
-      fighterById(slot.fighterId).stats, { boss: slot.boss, damageScale: slot.damageScale }, fighterById(slot.fighterId).signature.style,
-    ),
+    profile: { ...base, speedScale: base.speedScale * mods.speedScale, damageScale: base.damageScale * mods.damageScale },
   };
 }
 
 export function buildMatchSetup(plan: Readonly<MatchPlan>): MatchSetup {
-  return { teams: [plan.teams[0].map(entry), plan.teams[1].map(entry)] };
+  return { teams: [plan.teams[0].map((s) => entry(s, plan.twist)), plan.teams[1].map((s) => entry(s, plan.twist))] };
 }
 
 /** Initial player assignment: each player's first slot. */

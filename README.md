@@ -14,6 +14,10 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
 
 ## Modes
 
+- **Rivalry Battles**: famous one-on-one feuds (Edison vs Tesla, Trump vs Xi, Musk vs Zuckerberg, Ronaldo vs
+  Messi and more) and a Special Edition of joke matchups (Shehbaz Sharif vs a goat, James Cameron vs a pig,
+  Erdoğan vs a camel). Pick a side and a CPU difficulty; some rivalries add a twist such as a blackout, turbo speed
+  or heavy hits. Won rivalries are marked as settled.
 - **Brawl**: 1v1 up to 4v4, every slot set to Player 1, Player 2 or CPU. Brawl also lists the Specials: a goat,
   a pig and a camel.
 - **Story**: choose Politicians, Tycoons, Legends or Celebrities, pick a fighter and beat 10 opponents in a row,

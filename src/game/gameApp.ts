@@ -1,6 +1,6 @@
 /**
- * The game's top-level state machine: title, story (category, fighter, ladder, fights, ending), brawl setup and matches,
- * pause and credits.
+ * The game's top-level state machine: title, story (category, fighter, ladder, fights, ending), rivalry battles, brawl
+ * setup and matches, pause and credits.
  * It owns the current screen or match session, the menu backdrop and the save data, and routes each frame to whichever is active.
  * Menus are navigable by mouse, touch, keyboard arrows and gamepad; touch fight buttons appear only during matches.
  */
@@ -9,6 +9,8 @@ import type { GameAudio } from '../audio/gameAudio';
 import { Sfx } from '../audio/sfxTable';
 import { PlayerId, type ControlFrame } from '../input/controlFrame';
 import type { InputHub } from '../input/inputHub';
+import { Difficulty } from '../ai/aiProfile';
+import type { Rivalry } from '../rivalry/rivalryTypes';
 import { BRAWL_ORDER, fightersIn } from '../roster/roster';
 import type { Category } from '../roster/rosterTypes';
 import { buildLadder } from '../story/ladder';
@@ -18,6 +20,7 @@ import type { Screen } from '../ui/screenKit';
 import { brawlSetupScreen } from '../ui/screens/brawlSetupScreen';
 import { brawlResultScreen, creditsScreen, pauseScreen } from '../ui/screens/miscScreens';
 import { categoryScreen, fighterPickScreen } from '../ui/screens/pickScreens';
+import { rivalryListScreen, rivalryResultScreen, rivalrySideScreen } from '../ui/screens/rivalryScreens';
 import { fightResultScreen, ladderScreen, storyEndScreen } from '../ui/screens/storyScreens';
 import { titleScreen } from '../ui/screens/titleScreen';
 import type { TouchControls } from '../ui/touchControls';
@@ -26,7 +29,8 @@ import { MenuBackdrop } from '../view/menuBackdrop';
 import { defaultBrawl, RANDOM_FIGHTER, setFighter, toMatchPlan, type BrawlConfig } from './brawlConfig';
 import type { MatchPlan } from './matchPlan';
 import { MatchSession, type MatchOutcome } from './matchSession';
-import { loadSave, recordBest, storeSave } from './saveData';
+import { rivalryMatchPlan, type RivalrySide } from './rivalryPlan';
+import { loadSave, recordBest, recordRivalryWin, storeSave } from './saveData';
 import { storyMatchPlan } from './storyPlan';
 
 /** Stick deflection that counts as a menu step, and the delay before it repeats. */
@@ -39,6 +43,8 @@ const MENU_CONFIRM_LOCK_SECONDS = 0.7;
 const NAV_KEYS: Readonly<Record<string, number>> = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 };
 /** Keys that click the focused menu button (the key tracker suppresses their default action). */
 const CONFIRM_KEYS: ReadonlySet<string> = new Set(['Enter', ' ']);
+/** Range of random seeds for rivalry fights. */
+const RIVALRY_SEED_RANGE = 1_000_000;
 
 export interface AppDeps {
   container: HTMLElement;
@@ -57,6 +63,7 @@ export class GameApp {
   private readonly rng: Rng = createRng(Date.now());
   private brawl: BrawlConfig = defaultBrawl(ArenaKind.Parliament);
   private run: StoryRun | null = null;
+  private rivalryDifficulty = Difficulty.Normal;
   private attempt = 0;
   private navCooldown = 0;
   private confirmLock = 0;
@@ -174,6 +181,7 @@ export class GameApp {
     this.run = null;
     this.show((p) => titleScreen(p, {
       onStory: () => this.showCategories(),
+      onRivalry: () => this.showRivalries(),
       onBrawl: () => this.showBrawlSetup(),
       onCredits: () => this.show((q) => creditsScreen(q, () => this.showTitle()), null),
       onToggleMute: () => this.toggleMute(),
@@ -232,6 +240,35 @@ export class GameApp {
     const newBest = recordBest(this.save, run.category, run.fighterId, runScore(run));
     if (won) this.deps.audio.play(Sfx.Victory);
     this.show((p) => storyEndScreen(p, run, won, newBest, () => this.showTitle()), ARENA_FOR_CATEGORY[run.category]);
+  }
+
+  // ---- rivalry battles ----
+
+  private showRivalries(): void {
+    this.show((p) => rivalryListScreen(p, this.save.rivalriesWon, (r) => this.showRivalrySides(r), () => this.showTitle()), ArenaKind.Studio);
+  }
+
+  private showRivalrySides(r: Rivalry): void {
+    this.show((p) => rivalrySideScreen(p, r, this.rivalryDifficulty, {
+      onFight: (side) => this.playRivalry(r, side),
+      onDifficulty: (d) => {
+        this.rivalryDifficulty = d;
+        this.showRivalrySides(r);
+      },
+      onBack: () => this.showRivalries(),
+    }), r.arena);
+  }
+
+  private playRivalry(r: Rivalry, side: RivalrySide): void {
+    const plan = rivalryMatchPlan(r, side, this.rivalryDifficulty, Math.floor(this.rng() * RIVALRY_SEED_RANGE));
+    this.startMatch(plan, (o) => {
+      const won = o.winner === 0;
+      if (won) {
+        recordRivalryWin(this.save, r.id);
+        this.deps.audio.play(Sfx.Victory);
+      }
+      this.showOverlay((p) => rivalryResultScreen(p, won, () => this.playRivalry(r, side), () => this.showRivalries(), () => this.showTitle()));
+    });
   }
 
   // ---- brawl ----
