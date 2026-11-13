@@ -31,6 +31,14 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
   screen tracks leagues won, rivalries settled and bosses unlocked. The score comes from the damage you take
   across the run (plus stage clears and perfect fights), with an S to D rank and a saved best score.
 
+## Online (beta)
+
+Online 1v1 connects two browsers directly (WebRTC through [PeerJS](https://peerjs.com) and its free public
+signalling server; no game server of our own). One player hosts a room and shares the code or the invite link,
+the other joins; both pick fighters and the host picks the arena. The host's page runs the fight and streams every
+tick to the guest, which sends its controls back, so the guest feels the network delay and the host does not.
+A few strict networks (some offices and mobile carriers) block direct connections.
+
 ## Sharing
 
 Every result screen has a Share button: on phones it opens the share sheet with a result card image, and on desktops

@@ -1,25 +1,29 @@
 /**
- * Share links as pure data: a link either opens one rivalry's side picker or a one-on-one Brawl between two fighters.
+ * Share links as pure data: a link opens one rivalry's side picker, a one-on-one Brawl, or an online room to join.
  * shareUrl writes the target into a query string on the game's address, and parseShareTarget reads it back.
- * Parsing accepts only known rivalries and two different, non-boss roster fighters, so a bad link falls back to the title.
+ * Parsing accepts only known rivalries, two different non-boss fighters and valid room codes; anything else opens the title.
  */
 import { RIVALRIES } from '../rivalry/rivalries';
+import { normalizeRoomCode } from '../net/roomCode';
 import { ROSTER } from '../roster/roster';
 
 export enum ShareKind {
   Rivalry = 'rivalry',
   Duel = 'duel',
+  Join = 'join',
 }
 
 /** What a shared link opens: a rivalry by id, or a duel of two fighter ids (left is Player 1). */
 export type ShareTarget =
   | { kind: ShareKind.Rivalry; rivalryId: string }
-  | { kind: ShareKind.Duel; left: string; right: string };
+  | { kind: ShareKind.Duel; left: string; right: string }
+  | { kind: ShareKind.Join; code: string };
 
 /** Query parameter names and the separator between the two duel fighters. */
 export const RIVALRY_PARAM = 'rivalry';
 export const DUEL_PARAM = 'duel';
 export const DUEL_SEPARATOR = '~';
+export const JOIN_PARAM = 'join';
 
 function isRivalry(id: string): boolean {
   return RIVALRIES.some((r) => r.id === id);
@@ -33,7 +37,9 @@ function isDuelFighter(id: string): boolean {
 export function shareUrl(base: string, target: Readonly<ShareTarget>): string {
   const [name, value] = target.kind === ShareKind.Rivalry
     ? [RIVALRY_PARAM, target.rivalryId]
-    : [DUEL_PARAM, `${target.left}${DUEL_SEPARATOR}${target.right}`];
+    : target.kind === ShareKind.Join
+      ? [JOIN_PARAM, target.code]
+      : [DUEL_PARAM, `${target.left}${DUEL_SEPARATOR}${target.right}`];
   return `${base}?${name}=${encodeURIComponent(value)}`;
 }
 
@@ -42,6 +48,11 @@ export function parseShareTarget(search: string): ShareTarget | null {
   const params = new URLSearchParams(search);
   const rivalryId = params.get(RIVALRY_PARAM);
   if (rivalryId !== null) return isRivalry(rivalryId) ? { kind: ShareKind.Rivalry, rivalryId } : null;
+  const join = params.get(JOIN_PARAM);
+  if (join !== null) {
+    const code = normalizeRoomCode(join);
+    return code ? { kind: ShareKind.Join, code } : null;
+  }
   const duel = params.get(DUEL_PARAM);
   if (duel === null) return null;
   const parts = duel.split(DUEL_SEPARATOR);
