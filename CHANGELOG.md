@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-13
+
 ### Added
 - Photo heads are now background-free sticker cut-outs with a white outline that always face the camera.
 - Live facial expressions: fighters wince and squash when hit, shut their eyes under circling stars when knocked out
