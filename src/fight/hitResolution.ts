@@ -115,7 +115,6 @@ export function applyContact(c: Contact, events: FightEvent[]): void {
   else applyHit(c, events);
 }
 
-/** True when the target can currently take a hit (alive, not invulnerable, not lying down). */
 /** Applies every contact of this tick; mutates the fighters (already cloned by the caller). */
 export function resolveAttacks(fighters: FighterState[], events: FightEvent[]): void {
   const contacts = collectContacts(fighters);
