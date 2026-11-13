@@ -6,8 +6,8 @@
 import type { FinisherStyle } from '../roster/signatureTypes';
 import type { MoveKind } from './moves';
 
-/** Side index: 0 is the left team (players by default), 1 the right team. */
-export type TeamIndex = 0 | 1;
+/** Side index: 0 is the left team (players by default), 1 the right team; party free-for-alls add sides 2 and 3. */
+export type TeamIndex = 0 | 1 | 2 | 3;
 
 /** One tick of control for one fighter, from a player or the CPU. */
 export interface FighterInput {

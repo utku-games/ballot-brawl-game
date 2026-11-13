@@ -10,8 +10,11 @@ export const TICK_RATE = 60;
 export const TICK_SECONDS = 1 / TICK_RATE;
 /** Fighters per team at most (4 versus 4). */
 export const MAX_TEAM_SIZE = 4;
-/** Number of sides in a match. */
-export const TEAM_COUNT = 2;
+/** Fewest and most sides in a match: two teams normally, up to four in a party free-for-all. */
+export const MIN_TEAMS = 2;
+export const MAX_TEAMS = 4;
+/** With more than two sides, fighters spawn on a circle of this radius around the centre, meters. */
+export const PARTY_SPAWN_RADIUS = 3.6;
 /** Round length in ticks (99 seconds). */
 export const MATCH_TIME_TICKS = 99 * TICK_RATE;
 

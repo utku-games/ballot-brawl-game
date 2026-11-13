@@ -14,6 +14,8 @@ export const THEME = {
   gold: '#ffd23a',
   teamA: '#3a8dff',
   teamB: '#ff4a4a',
+  teamC: '#3ac86a',
+  teamD: '#f2c23a',
   health: '#52e07a',
   healthLow: '#ff5a3a',
   meter: '#ffd23a',
