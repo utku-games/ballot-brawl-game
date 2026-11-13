@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-13
+
 ### Added
 - Sharing: every result screen (Rivalry Battles, Brawl, Party and the end of a Story run) has a Share button. On
   phones it opens the share sheet with a result card image (the fighters' faces, the winner ringed in gold, the
