@@ -9,13 +9,25 @@ anyone depicted. There is no gore: knocked-out fighters just fall over.
 
 ## Status
 
-Early development; see [ROADMAP.md](ROADMAP.md). Currently: playable 2v2 demo brawls; menus and story mode are next.
+Playable: Story and Brawl modes, 36 fighters, three arenas. See [ROADMAP.md](ROADMAP.md).
 
-## Modes (planned)
+## Modes
 
 - **Brawl**: 1v1 up to 4v4, every slot set to Player 1, Player 2 or CPU.
 - **Story**: choose Politicians, Tycoons or Legends, pick a fighter and beat 10 opponents in a row,
-  ending with the boss. The score comes from the damage you take.
+  ending with the boss (Churchill, Rockefeller or Napoleon). Each fight is harder than the last; you
+  get three continues. Beat the boss and you saved the world. The score comes from the damage you take
+  across the run (plus stage clears and perfect fights), with an S to D rank and a saved best score.
+
+## Fighting
+
+- **Punch** is quick, **Kick** is slower with more reach and knockback.
+- **Defend** (hold) takes no damage at all, but blocked hits drain your guard; an empty guard breaks
+  and leaves you dizzy.
+- Dealing, taking and blocking hits fills the **power meter**. When it is full, **Finisher** unleashes a
+  slow, heavy signature move that does several times a kick's damage (no gore, just a big hit).
+- In team fights, **Swap** jumps to your next teammate; if your fighter is knocked out you switch
+  automatically.
 
 ## Controls
 

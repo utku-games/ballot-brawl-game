@@ -1,13 +1,12 @@
 /**
- * Browser entry point of Ballot Brawl: creates the renderer, input, audio and touch controls, then runs matches.
- * Until the menus land it plays endless 2 versus 2 demo brawls with Player 1 on the left team.
+ * Browser entry point of Ballot Brawl: creates the renderer, input hub, audio and touch controls, then starts the game app.
+ * Audio is unlocked on the first tap or key press, as browsers require, and the canvas follows window resizes.
  * It is the only module that touches the page at startup; a missing container is reported through PlatformError.
  */
-import { createGameRenderer, createRng } from '@utku/engine';
+import { createGameRenderer } from '@utku/engine';
 import { GameAudio } from './audio/gameAudio';
 import { PlatformError } from './core/errors';
-import { demoPlan } from './game/demoPlan';
-import { MatchSession } from './game/matchSession';
+import { GameApp } from './game/gameApp';
 import { InputHub } from './input/inputHub';
 import { TouchControls } from './ui/touchControls';
 
@@ -27,22 +26,13 @@ const unlock = (): void => audio.unlock();
 window.addEventListener('pointerdown', unlock);
 window.addEventListener('keydown', unlock);
 window.addEventListener('resize', () => renderer.resize());
-const rng = createRng(Date.now());
-let session: MatchSession;
 
-function startMatch(): void {
-  session = new MatchSession(demoPlan(rng), { renderer, hudParent: container as HTMLElement, audio, touch }, () => {
-    session.dispose();
-    startMatch();
-  }, () => session.resume());
-}
-
-startMatch();
+const app = new GameApp({ container, renderer, hub, audio, touch });
+app.start();
 let last = performance.now();
 const frame = (now: number): void => {
-  const dt = Math.min(MAX_FRAME_SECONDS, (now - last) / MS_PER_SECOND);
+  app.frame(Math.min(MAX_FRAME_SECONDS, (now - last) / MS_PER_SECOND));
   last = now;
-  session.frame(dt, hub.poll());
   requestAnimationFrame(frame);
 };
 requestAnimationFrame(frame);

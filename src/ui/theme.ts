@@ -27,5 +27,3 @@ export const PLAYER_COLORS: Readonly<Record<PlayerId, { css: string; hex: number
   [PlayerId.One]: { css: '#ffd23a', hex: 0xffd23a, label: 'P1' },
   [PlayerId.Two]: { css: '#50e080', hex: 0x50e080, label: 'P2' },
 };
-
-export const TITLE_FONT_URL = 'https://fonts.googleapis.com/css2?family=Bungee&display=swap';

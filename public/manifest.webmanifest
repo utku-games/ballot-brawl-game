@@ -1,0 +1,14 @@
+{
+  "name": "Ballot Brawl",
+  "short_name": "Ballot Brawl",
+  "description": "Unofficial slapstick parody brawler with bobblehead politicians, tycoons and legends.",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#14122b",
+  "theme_color": "#14122b",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
