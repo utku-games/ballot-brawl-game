@@ -1,10 +1,12 @@
 /**
  * The full roster: all three categories, lookups by id and category, and a validation pass run at load.
- * Validation guarantees unique ids, eleven regulars and exactly one boss per category, and a fair stat total.
+ * Validation guarantees unique ids, eleven regulars and exactly one boss per category, a fair stat total and a
+ * look built only from the catalogue.
  * Broken data raises RosterDataError immediately instead of failing later inside a match.
  */
 import { RosterDataError, UnknownEntityError } from '../core/errors';
 import { LEGENDS } from './legends';
+import { Build, Headwear, Neckwear, Outfit, Prop } from './lookTypes';
 import { POLITICIANS } from './politicians';
 import { Category, type FighterDef } from './rosterTypes';
 import { TYCOONS } from './tycoons';
@@ -26,12 +28,28 @@ function statTotal(f: Readonly<FighterDef>): number {
   return f.stats.power + f.stats.speed + f.stats.toughness;
 }
 
+const LOOK_CATALOGUE: Readonly<Record<'build' | 'outfit' | 'neckwear' | 'headwear' | 'prop', readonly string[]>> = {
+  build: Object.values(Build),
+  outfit: Object.values(Outfit),
+  neckwear: Object.values(Neckwear),
+  headwear: Object.values(Headwear),
+  prop: Object.values(Prop),
+};
+
+function validateLook(f: Readonly<FighterDef>): void {
+  for (const [field, values] of Object.entries(LOOK_CATALOGUE)) {
+    const value = f.look[field as keyof typeof LOOK_CATALOGUE];
+    if (!values.includes(value)) throw new RosterDataError(`${f.id} has unknown ${field} ${value}`);
+  }
+}
+
 /** Throws RosterDataError when the list breaks a roster rule; exported for tests. */
 export function validateRoster(fighters: readonly FighterDef[]): void {
   const ids = new Set<string>();
   for (const f of fighters) {
     if (ids.has(f.id)) throw new RosterDataError(`Duplicate fighter id ${f.id}`);
     ids.add(f.id);
+    validateLook(f);
     if (!f.boss && statTotal(f) !== REGULAR_STAT_TOTAL) {
       throw new RosterDataError(`${f.id} has stat total ${statTotal(f)}, expected ${REGULAR_STAT_TOTAL}`);
     }

@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-13
+
+### Added
+- Every fighter has their own body type (average, tall, lanky, short, round or stocky) and costume: suits, frock
+  coats, a toga, gowns, a lab coat, a parka, hoodies and more, with neckwear, hats and a signature hand prop such as
+  Lincoln's top hat, Napoleon's bicorne and sword, Churchill's homburg and cigar, and Sanders' mittens.
+- Costumes flash on hits, swing with punches and stay on through knockouts.
+- A development lineup page (`lineup.html`) to check every fighter's costume side by side.
+
 ## [0.2.3] - 2026-11-13
 
 ### Fixed
