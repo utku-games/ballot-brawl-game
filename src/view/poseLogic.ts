@@ -181,3 +181,22 @@ export function skirtFold(fall: number, radius: number): SkirtFold {
   const scale = 1 - (1 - SKIRT_FOLD) * f;
   return { scale, lift: radius * SKIRT_FOLD * f * 0.5 };
 }
+
+/** Seconds a launched knockout spends in the air, its peak height and its spin. */
+export const LAUNCH_SECONDS = 0.8;
+export const LAUNCH_PEAK = 1.6;
+const LAUNCH_SPINS = 1.5;
+
+export interface Launch {
+  /** Height above the floor, meters. */
+  height: number;
+  /** Spin around the facing axis, radians. */
+  spin: number;
+}
+
+/** Flight of a fighter launched by a big knockout, `seconds` after the hit: a parabola up and back down with a spin. */
+export function launchArc(seconds: number): Launch {
+  if (seconds < 0 || seconds >= LAUNCH_SECONDS) return { height: 0, spin: 0 };
+  const t = seconds / LAUNCH_SECONDS;
+  return { height: 4 * LAUNCH_PEAK * t * (1 - t), spin: t * LAUNCH_SPINS * Math.PI * 2 };
+}

@@ -6,6 +6,7 @@
  */
 import * as THREE from 'three';
 import { RigBuildError } from '../core/errors';
+import { Build, Headwear, Neckwear, Outfit, Prop } from '../roster/lookTypes';
 import type { FighterLook } from '../roster/rosterTypes';
 import { Anchor, ColorSlot, Shape, type Paint, type PartSpec } from './partSpec';
 
@@ -102,4 +103,15 @@ export function attachParts(parts: readonly PartSpec[], anchors: ReadonlyMap<Anc
     mesh.castShadow = true;
     parent.add(mesh);
   }
+}
+
+/** A look with no colours of its own, for objects such as items and anvils that only use fixed colours. */
+const FIXED_ONLY_LOOK: Readonly<FighterLook> = {
+  build: Build.Average, outfit: Outfit.Suit, neckwear: Neckwear.None, headwear: Headwear.None, prop: Prop.None,
+  suitColor: 0, accentColor: 0, skinColor: 0, hairColor: 0,
+};
+
+/** Materials for an object built only from fixed-colour parts. */
+export function fixedColorMaterials(): MaterialSet {
+  return new MaterialSet(FIXED_ONLY_LOOK, 0);
 }

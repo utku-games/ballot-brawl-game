@@ -21,6 +21,8 @@ import { FighterView } from './fighterView';
 import { BurstKind, HitEffects } from './hitEffects';
 import { Mood } from './poseLogic';
 import { ProjectileView } from './projectileView';
+import { ExtrasView } from './extrasView';
+import { HAZARD_SOURCE } from '../fight/hazards';
 
 export const TEAM_COLORS: readonly [number, number] = [0x3a8dff, 0xff4a4a];
 
@@ -47,6 +49,10 @@ export class MatchView {
   private readonly effects: HitEffects;
   private readonly camera: CameraRig;
   private readonly projectiles: ProjectileView;
+  private readonly extras: ExtrasView;
+  /** Fighters hit by a finisher during the tick being handled, so their knockout can launch them. */
+  private readonly finisherTargets = new Set<string>();
+  private time = 0;
   private firstFrame = true;
 
   constructor(private readonly view: GameRenderer, state: Readonly<MatchState>, arena: ArenaKind) {
@@ -60,6 +66,7 @@ export class MatchView {
       view.scene.add(fv.rig.root);
     }
     this.effects = new HitEffects(view.scene);
+    this.extras = new ExtrasView(view.scene);
     this.projectiles = new ProjectileView(view.scene, new Map(state.fighters.map((f) => [f.slotId, fighterById(f.fighterId)])));
     this.camera = new CameraRig(view.camera);
   }
@@ -67,6 +74,11 @@ export class MatchView {
   /** Sets the arena light level (0 dark .. 1 normal) for the Blackout twist. */
   setLight(level: number): void {
     this.view.setLightLevels(level, Math.max(level, MIN_AMBIENT), 0);
+  }
+
+  /** Clears every fighter's end-of-match mood, before a replay shows the fight again. */
+  clearMoods(): void {
+    for (const fv of this.fighters.values()) fv.setMood(Mood.None);
   }
 
   /** Turns every fighter's intro gesture on or off. */
@@ -88,11 +100,15 @@ export class MatchView {
     this.firstFrame = false;
     this.effects.update(dt);
     this.projectiles.update(prev.projectiles, cur.projectiles, alpha, time);
+    this.extras.update(cur.items, cur.hazards, time);
+    this.time = time;
     this.view.render(dt);
   }
 
   handleEvents(events: readonly FightEvent[], state: Readonly<MatchState>): void {
     const bySlot = new Map(state.fighters.map((f) => [f.slotId, f]));
+    this.finisherTargets.clear();
+    for (const e of events) if (e.kind === 'hit' && e.move === MoveKind.Finisher) this.finisherTargets.add(e.target);
     for (const e of events) this.handleEvent(e, bySlot);
     for (const f of state.fighters) this.styleEffects(f);
   }
@@ -135,7 +151,16 @@ export class MatchView {
     } else if (e.kind === 'ko' || e.kind === 'knockdown') {
       const t = bySlot.get(e.target);
       if (t) this.effects.burst(BurstKind.Dust, t.x, FLOOR_HEIGHT, t.z);
-      if (e.kind === 'ko') this.camera.addShake(KO_SHAKE);
+      if (e.kind === 'ko') {
+        this.camera.addShake(KO_SHAKE);
+        if (e.by === HAZARD_SOURCE || this.finisherTargets.has(e.target)) this.fighters.get(e.target)?.launch(this.time);
+      }
+    } else if (e.kind === 'crash') {
+      this.effects.burst(BurstKind.Shockwave, e.x, FLOOR_HEIGHT, e.z);
+      this.camera.addShake(QUAKE_SHAKE);
+      this.extras.land(e.x, e.z, this.time);
+    } else if (e.kind === 'hazardHit') {
+      this.effects.burst(BurstKind.Kick, e.x, HIT_HEIGHT, e.z);
     }
   }
 
@@ -148,6 +173,7 @@ export class MatchView {
     }
     this.effects.dispose();
     this.projectiles.dispose();
+    this.extras.dispose();
     this.setLight(FULL_LIGHT);
   }
 }
