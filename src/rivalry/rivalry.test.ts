@@ -24,7 +24,7 @@ describe('rivalries', () => {
     const pairs = new Set(RIVALRIES.map(pairOf));
     for (const [a, b] of [
       ['thomas-edison', 'nikola-tesla'], ['donald-trump', 'xi-jinping'], ['elon-musk', 'mark-zuckerberg'],
-      ['shehbaz-sharif', 'goat'], ['james-cameron', 'pig'], ['recep-tayyip-erdogan', 'camel'],
+      ['shehbaz-sharif', 'goat'], ['david-cameron', 'pig'], ['recep-tayyip-erdogan', 'camel'],
     ]) expect(pairs.has([a, b].sort().join('|')), `${a} vs ${b}`).toBe(true);
     const special = rivalriesIn(RivalrySection.SpecialEdition).map(pairOf);
     expect(special).toContain(['shehbaz-sharif', 'goat'].sort().join('|'));

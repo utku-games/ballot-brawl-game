@@ -12,6 +12,10 @@ All notable changes to this project are documented here. The format follows
 - Flying knockouts: a knockout from a finisher or an anvil launches the loser into the air with a spin.
 - Knockout replay: the last seconds before the final knockout play back in slow motion; attack buttons skip it.
 
+### Changed
+- David Cameron, former UK prime minister, joins the Politicians and takes the pig matchup in the Special Edition
+  (now The Pork Barrel). James Cameron, added by mistake, leaves the Celebrities.
+
 ## [0.6.0] - 2026-11-13
 
 ### Added

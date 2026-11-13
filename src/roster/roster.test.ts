@@ -27,7 +27,8 @@ describe('roster', () => {
       expect(fighterById(id).category, id).toBe(Category.Politicians);
     }
     expect(fighterById('thomas-edison').signature.projectile).toBe(Projectile.LightBulb);
-    expect(fighterById('james-cameron').category).toBe(Category.Celebrities);
+    expect(fighterById('david-cameron').category).toBe(Category.Politicians);
+    expect(() => fighterById('james-cameron')).toThrow(UnknownEntityError);
     expect(bossOf(Category.Celebrities).id).toBe('arnold-schwarzenegger');
   });
 

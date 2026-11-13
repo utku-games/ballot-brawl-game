@@ -6,7 +6,7 @@ Piece 3 of the enhancement roadmap adds 21 fighters:
 - **Celebrities:** a new story category of eleven plus a boss, with its own arena.
 - **Specials:** a group of three animals for Brawl and the Special Edition matchups in piece 4.
 
-The user chose Netanyahu, Khamenei, Edison, Xi, Pakistan's prime minister Shehbaz Sharif, Erdoğan, James Cameron, a goat, a pig and a camel. They delegated the rest of the design, including the celebrity list, so those choices were made without a review round and can be swapped later by editing the roster table and the face sources.
+The user chose Netanyahu, Khamenei, Edison, Xi, Pakistan's prime minister Shehbaz Sharif, Erdoğan, David Cameron (first written as James Cameron, then corrected by the user), a goat, a pig and a camel. They delegated the rest of the design, including the celebrity list, so those choices were made without a review round and can be swapped later by editing the roster table and the face sources.
 
 ## Rules that do not change
 
@@ -28,6 +28,7 @@ The user chose Netanyahu, Khamenei, Edison, Xi, Pakistan's prime minister Shehba
 | Ali Khamenei | Politicians | The Ayatollah | Final Word | 3,2,4 | Average, Robe (the photo shows his turban) | Quake, Wave |
 | Xi Jinping | Politicians | The Chairman | Great Wall | 3,2,4 | Average, Suit, Tie | Quake, Wave |
 | Shehbaz Sharif | Politicians | Shehbaz Speed | Speed Run | 3,4,2 | Average, Suit, Tie | Rush, Point |
+| David Cameron | Politicians | Call Me Dave | The Referendum | 3,3,3 | Average, Suit, Tie | Quake, Wave |
 | Recep Tayyip Erdoğan | Politicians | The Reis | One Minute | 4,2,3 | Tall, Suit, Tie | Smash, Wave |
 | Thomas Edison | Legends | Wizard of Menlo Park | Bright Idea | 3,3,3 | Average, Suit, BowTie | Throw Light bulb, Thinker |
 | Taylor Swift | Celebrities | The Eras | Shake It Off | 3,4,2 | Tall, Gown, Microphone | Rush, Cheer |
@@ -39,7 +40,6 @@ The user chose Netanyahu, Khamenei, Edison, Xi, Pakistan's prime minister Shehba
 | Lady Gaga | Celebrities | Mother Monster | Bad Romance | 3,4,2 | Average, Gown | Throw Note, Bow |
 | Gordon Ramsay | Celebrities | The Chef | Kitchen Nightmare | 4,3,2 | Average, Lab coat | Throw Frying pan, Point |
 | Keanu Reeves | Celebrities | The One | Matrix Rush | 3,4,2 | Lanky, Frock coat, Aviators | Rush, Bow |
-| James Cameron | Celebrities | The Director | Deep Dive | 3,3,3 | Tall, Casual | Rush, Point |
 | Kim Kardashian | Celebrities | The Influencer | Break the Internet | 2,4,3 | Average, Gown, Phone | Quake, Wave |
 | Arnold Schwarzenegger (boss) | Celebrities | The Governator | Judgment Day | 5,3,3 | Stocky, Leather jacket, Aviators | Smash, Flex |
 | Goat | Specials | The G.O.A.T. | Headbutt Supreme | 4,3,2 | Short, Fur | Rush, Cheer |

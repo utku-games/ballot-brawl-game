@@ -4,7 +4,7 @@ Piece 4 of the enhancement roadmap: a new main-menu mode of hand-picked 1v1 grud
 - **Rivalries:** famous real rivalries and feuds.
 - **Special Edition:** the user's joke matchups. More will be added later.
 
-The user chose some of the matchups: Edison vs Tesla, Trump vs Xi, Musk vs Zuckerberg, Shehbaz Sharif vs a goat, James Cameron vs a pig, and Erdoğan vs a camel. They delegated the rest of the design, so the other choices were made without a review round.
+The user chose some of the matchups: Edison vs Tesla, Trump vs Xi, Musk vs Zuckerberg, Shehbaz Sharif vs a goat, David Cameron vs a pig, and Erdoğan vs a camel. They delegated the rest of the design, so the other choices were made without a review round.
 
 ## Rules
 
@@ -30,7 +30,7 @@ The user chose some of the matchups: Edison vs Tesla, Trump vs Xi, Musk vs Zucke
 | Rivalries | Cristiano Ronaldo | Lionel Messi | The G.O.A.T. Debate | Studio | Turbo |
 | Rivalries | Taylor Swift | Kim Kardashian | The Feud | Studio | None |
 | Special Edition | Shehbaz Sharif | Goat | The G.O.A.T. Summit | Parliament | None |
-| Special Edition | James Cameron | Pig | Pigtanic | Studio | Heavy Hitters |
+| Special Edition | David Cameron | Pig | The Pork Barrel | Parliament | Heavy Hitters |
 | Special Edition | Recep Tayyip Erdoğan | Camel | The Desert Derby | Museum | Turbo |
 
 **Twists:**
