@@ -1,9 +1,11 @@
 /**
  * Ballot Brawl's audio front end: wraps the engine SynthAudio, plays named sound effects, and maps fight events to sounds.
+ * It also plays the soundtrack: a menu theme and one song per arena whose intensity follows the fight.
  * The audio context is unlocked on the first user gesture, as browsers require, and a mute flag silences everything.
  * Only the sound choices live here; synthesis and mixing stay in the engine.
  */
-import { SynthAudio } from '@utku/engine';
+import { MusicIntensity, SynthAudio } from '@utku/engine';
+import type { Track } from './songs';
 import type { FightEvent } from '../fight/fightTypes';
 import { MoveKind } from '../fight/moves';
 import { Sfx, SFX } from './sfxTable';
@@ -17,16 +19,49 @@ const HIT_SOUND: Readonly<Record<MoveKind, Sfx>> = {
   [MoveKind.Item]: Sfx.Kick,
 };
 
+const FULL_VOLUME = 1;
+const SILENT = 0;
+const MS_PER_SECOND = 1000;
+
 export class GameAudio {
   private readonly synth = new SynthAudio();
-  muted = false;
+  private muteState = false;
+  private track: Readonly<Track> | null = null;
+  private trackStart = 0;
+
+  get muted(): boolean {
+    return this.muteState;
+  }
+
+  /** Mutes or unmutes sound effects and music together. */
+  set muted(value: boolean) {
+    this.muteState = value;
+    this.synth.setMasterVolume(value ? SILENT : FULL_VOLUME);
+  }
+
+  /** Starts a track from its beginning unless it is already playing. */
+  playTrack(track: Readonly<Track>): void {
+    if (this.track === track) return;
+    this.track = track;
+    this.trackStart = performance.now();
+    this.synth.startSong(track.song, track.bpm, 0);
+  }
+
+  setIntensity(intensity: MusicIntensity): void {
+    this.synth.setMusicIntensity(intensity);
+  }
+
+  /** Keeps the music on its beat; call once per frame. */
+  update(): void {
+    if (this.track) this.synth.syncMusic((performance.now() - this.trackStart) / MS_PER_SECOND);
+  }
 
   unlock(): void {
     void this.synth.unlock();
   }
 
   play(sfx: Sfx): void {
-    if (!this.muted) this.synth.playLayers(SFX[sfx], SFX_VOLUME);
+    if (!this.muteState) this.synth.playLayers(SFX[sfx], SFX_VOLUME);
   }
 
   playEvents(events: readonly FightEvent[]): void {

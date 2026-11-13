@@ -16,6 +16,8 @@ import { EMPTY_FRAME, PlayerId, toFighterInput, type ControlFrame } from '../inp
 import { fighterById } from '../roster/roster';
 import type { Twist } from '../rivalry/rivalryTypes';
 import { blackoutLight } from '../rivalry/twists';
+import { musicIntensity } from '../audio/musicMood';
+import { ARENA_TRACKS } from '../audio/songs';
 import type { GameAudio } from '../audio/gameAudio';
 import { Hud } from '../ui/hud';
 import { PLAYER_COLORS } from '../ui/theme';
@@ -85,6 +87,7 @@ export class MatchSession {
     this.hud = new Hud(deps.hudParent, this.state);
     this.refreshMarkers();
     this.view.setIntro(true);
+    deps.audio.playTrack(ARENA_TRACKS[plan.arena]);
     this.hud.announce(plan.banner ?? 'READY?', plan.banner !== null, false);
   }
 
@@ -191,6 +194,7 @@ export class MatchSession {
     } else {
       this.prev = this.state;
     }
+    this.deps.audio.setIntensity(musicIntensity(this.state, this.started));
     const fighting = this.started && this.state.phase === MatchPhase.Fighting;
     this.view.setLight(fighting ? blackoutLight(this.twist, this.time) : FULL_LIGHT);
     this.view.render(this.prev, this.state, alpha, this.time, dt * (this.slowmo > 0 ? SLOWMO_SCALE : 1));

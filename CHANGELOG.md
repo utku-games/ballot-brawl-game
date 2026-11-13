@@ -6,6 +6,9 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Music: a menu theme and one song per arena (a march for The Chamber, an electronic run for The Trading Floor, a
+  waltz for The Grand Gallery, disco for The Studio and rock for The Rooftop). Fights start calm, drive during the
+  fight and peak in the last 15 seconds or when a side is close to defeat. The Sound toggle mutes music too.
 - Unlocks: each league's boss (Churchill, Rockefeller, Napoleon, Schwarzenegger) becomes playable in Brawl and Party
   once you win that league's story; locked bosses show greyed out with a hint, and the victory screen announces the
   unlock.
