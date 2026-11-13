@@ -61,5 +61,7 @@ export const MENU_CSS = `
 .credit { display: flex; gap: 10px; align-items: center; background: ${THEME.panel}; border-radius: 10px; padding: 6px 10px; }
 .credit img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: none; }
 .credit a { color: ${THEME.guard}; }
+@media (max-height: 500px) { .screen h1 { font-size: 40px; margin: 0; } .screen { gap: 8px; } .menu-btn { padding: 8px 14px; }
+  .card img { width: 52px; height: 52px; } .versus img { width: 72px; height: 72px; } .rank { font-size: 48px; } }
 .controls-hint { font-size: 12px; color: ${THEME.inkSoft}; text-align: center; }
 `;

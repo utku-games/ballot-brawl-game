@@ -44,6 +44,7 @@ describe('brawl config', () => {
     expect(plan.teams[1][3].fighterId).toBe('napoleon-bonaparte');
     expect(plan.teams[0][0].player).toBe(PlayerId.One);
     expect(plan.teams[1][0].cpuLevel).toBe(DIFFICULTY_LEVEL[Difficulty.Hard]);
+    expect(plan.arena).toBe(ArenaKind.Parliament);
   });
 });
 

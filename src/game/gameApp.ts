@@ -35,6 +35,8 @@ const NAV_REPEAT_SECONDS = 0.25;
 /** Seconds after a menu appears during which confirm presses are ignored, so mashing at a knockout does not skip it. */
 const MENU_CONFIRM_LOCK_SECONDS = 0.7;
 const NAV_KEYS: Readonly<Record<string, number>> = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 };
+/** Keys that click the focused menu button (the key tracker suppresses their default action). */
+const CONFIRM_KEYS: ReadonlySet<string> = new Set(['Enter', ' ']);
 
 export interface AppDeps {
   container: HTMLElement;
@@ -84,8 +86,13 @@ export class GameApp {
 
   private onMenuKey(e: KeyboardEvent): void {
     const root = this.menuRoot();
+    if (!root) return;
+    if (CONFIRM_KEYS.has(e.key)) {
+      if (!e.repeat && this.confirmLock === 0) activateFocus(root);
+      return;
+    }
     const step = NAV_KEYS[e.key];
-    if (!root || step === undefined) return;
+    if (step === undefined) return;
     moveFocus(root, step);
     this.deps.audio.play(Sfx.MenuMove);
   }
