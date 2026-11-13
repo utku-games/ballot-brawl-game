@@ -83,6 +83,21 @@ export interface FighterState {
   damageTaken: number;
 }
 
+/** A thrown finisher in flight. */
+export interface ProjectileState {
+  /** Unique within the match: thrower slot and tick. */
+  id: string;
+  /** Slot id of the thrower. */
+  owner: string;
+  team: TeamIndex;
+  x: number;
+  z: number;
+  /** Unit flight direction on the floor. */
+  dirX: number;
+  dirZ: number;
+  ticksLeft: number;
+}
+
 export enum MatchPhase {
   Fighting = 'fighting',
   Over = 'over',
@@ -95,6 +110,7 @@ export enum EndReason {
 
 export type FightEvent =
   | { kind: 'swing'; attacker: string; move: MoveKind }
+  | { kind: 'throw'; attacker: string; projectile: string }
   | { kind: 'hit'; attacker: string; target: string; move: MoveKind; damage: number; x: number; z: number }
   | { kind: 'block'; attacker: string; target: string; move: MoveKind; x: number; z: number }
   | { kind: 'guardBreak'; target: string }
@@ -107,6 +123,8 @@ export interface MatchState {
   ticksLeft: number;
   phase: MatchPhase;
   fighters: FighterState[];
+  /** Thrown finishers in flight. */
+  projectiles: ProjectileState[];
   winner: TeamIndex | null;
   events: FightEvent[];
 }

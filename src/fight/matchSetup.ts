@@ -60,5 +60,5 @@ export function createMatch(setup: Readonly<MatchSetup>): MatchState {
     const team = teamIndex as TeamIndex;
     entries.forEach((entry, i) => fighters.push(spawnFighter(entry, team, i, entries.length)));
   });
-  return { tick: 0, ticksLeft: MATCH_TIME_TICKS, phase: MatchPhase.Fighting, fighters, winner: null, events: [] };
+  return { tick: 0, ticksLeft: MATCH_TIME_TICKS, phase: MatchPhase.Fighting, fighters, projectiles: [], winner: null, events: [] };
 }

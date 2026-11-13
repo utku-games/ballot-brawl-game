@@ -1,6 +1,7 @@
 /**
  * The deterministic fight step: given a MatchState and one input per fighter, produce the next MatchState.
- * Order per tick: timers, control (facing, actions, walking), hit resolution, knockback, body separation, walls, end check.
+ * Order per tick: timers, control (facing, actions, walking), hit resolution, projectiles, knockback, body separation,
+ * walls, end check.
  * The input state is never mutated; fighters are cloned first, and the returned state lists this tick's events.
  */
 import {
@@ -10,6 +11,7 @@ import {
 import { keepInArena, separateBodies, slideKnockback } from './bodyPhysics';
 import { advanceTimers, controlFighter } from './fighterControl';
 import { resolveAttacks } from './hitResolution';
+import { spawnProjectiles, stepProjectiles } from './projectiles';
 import { isAlive, livingOnTeam, teamHealthFraction } from './matchQueries';
 
 function cloneFighter(f: Readonly<FighterState>): FighterState {
@@ -48,6 +50,7 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
     else f.moving = false;
   });
   resolveAttacks(fighters, events);
+  const projectiles = [...stepProjectiles(state.projectiles, fighters, events), ...spawnProjectiles(fighters, state.tick, events)];
   for (const f of fighters) slideKnockback(f);
   separateBodies(fighters);
   for (const f of fighters) keepInArena(f);
@@ -59,6 +62,7 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
     ticksLeft,
     phase: result.over ? MatchPhase.Over : MatchPhase.Fighting,
     fighters,
+    projectiles: result.over ? [] : projectiles,
     winner: result.winner,
     events,
   };
