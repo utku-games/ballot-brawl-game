@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-13
+
 ### Added
 - Party: a free-for-all mode for three or four fighters, each on their own side in their own colour (blue, red,
   green, gold); the last one standing wins, or the healthiest at time over. Items, hazards and every arena are
