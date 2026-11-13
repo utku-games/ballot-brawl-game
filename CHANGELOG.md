@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-13
+
 ### Added
 - Online 1v1 (beta): play a friend on another device. One player hosts a room and shares its five-character code
   or an invite link (`?join=CODE`); the other joins. In the lobby both pick fighters and the host picks the arena
