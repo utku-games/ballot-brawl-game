@@ -36,6 +36,9 @@ export class GameAudio {
       else if (e.kind === 'guardBreak') this.play(Sfx.GuardBreak);
       else if (e.kind === 'ko') this.play(Sfx.Knockout);
       else if (e.kind === 'matchOver') this.play(Sfx.Bell);
+      else if (e.kind === 'throw') this.play(Sfx.Throw);
+      else if (e.kind === 'taunt') this.play(Sfx.Taunt);
+      else if (e.kind === 'tauntDone') this.play(Sfx.PowerUp);
     }
   }
 }

@@ -118,6 +118,8 @@ export class MatchSession {
         if (f) this.hud.announce(`${fighterById(f.fighterId).finisher}!`, true, false);
       } else if (e.kind === 'hit' && e.move === 'finisher') {
         this.slowmo = SLOWMO_SECONDS;
+      } else if (e.kind === 'tauntDone' && playerSlots(this.assignment).has(e.fighter) && e.meter > 0) {
+        this.hud.announce('+POWER', true, false);
       } else if (e.kind === 'matchOver') {
         this.hud.announce(e.reason === EndReason.KnockOut ? 'K.O.!' : 'TIME!', false, true);
         this.outro = OUTRO_SECONDS;
