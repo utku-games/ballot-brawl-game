@@ -5,6 +5,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Story mode: the third lost fight now ends the run and shows the score; before, "See score" started a hidden
+  fourth fight. Continues are shown as lives.
+- No more dark square behind the photo heads: the ambient-occlusion pass skips the head cards.
+- Heads are cut along the face outline: necks, collars and raised shoulders are removed, and hair tapers into the face.
+
 ## [0.2.1] - 2026-11-13
 
 ### Fixed
