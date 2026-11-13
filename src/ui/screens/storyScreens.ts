@@ -54,13 +54,15 @@ function scoreTable(parent: HTMLElement, run: Readonly<StoryRun>): void {
   }
 }
 
-export function storyEndScreen(parent: HTMLElement, run: Readonly<StoryRun>, won: boolean, newBest: boolean, onDone: () => void): Screen {
+/** The end of a story run; `unlocked` names a boss the win just made playable, or null. */
+export function storyEndScreen(parent: HTMLElement, run: Readonly<StoryRun>, won: boolean, newBest: boolean, unlocked: string | null, onDone: () => void): Screen {
   const root = openScreen(parent, false);
   make('h1', '', won ? VICTORY_TEXT : 'GAME OVER', root);
   if (won) make('p', 'tagline', `${fighterById(run.fighterId).name} beat the whole ladder.`, root);
   make('div', 'rank', runScore(run).rank, root);
   scoreTable(root, run);
   if (newBest) make('p', 'tagline', 'New best score!', root);
+  if (unlocked) make('p', 'tagline', `Unlocked: ${unlocked} is now playable in Brawl and Party!`, root);
   button(root, 'Continue', onDone, 'primary');
   focusFirst(root);
   return { root };
