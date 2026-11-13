@@ -1,6 +1,7 @@
 /**
- * The four arenas, one per story category, with their lighting environments and colour palettes.
- * Parliament for politicians, a trading floor for tycoons, a museum hall for legends and a TV studio for celebrities.
+ * The arenas with their lighting environments and colour palettes: one per story category plus The Rooftop.
+ * Parliament for politicians, a trading floor for tycoons, a museum hall for legends, a TV studio for celebrities, and
+ * an open rooftop without walls, the only arena with ring-outs.
  * Kept as data so the arena builder and the menus share the same names and colours.
  */
 import type { RenderEnvironment } from '@utku/engine';
@@ -11,6 +12,8 @@ export enum ArenaKind {
   TradingFloor = 'tradingFloor',
   Museum = 'museum',
   Studio = 'studio',
+  /** An open platform with no walls: hard hits knock fighters off. */
+  Rooftop = 'rooftop',
 }
 
 export interface ArenaStyle {
@@ -32,7 +35,12 @@ export const ARENA_FOR_CATEGORY: Readonly<Record<Category, ArenaKind>> = {
   [Category.Specials]: ArenaKind.Studio,
 };
 
-export const ARENA_ORDER: readonly ArenaKind[] = [ArenaKind.Parliament, ArenaKind.TradingFloor, ArenaKind.Museum, ArenaKind.Studio];
+export const ARENA_ORDER: readonly ArenaKind[] = [ArenaKind.Parliament, ArenaKind.TradingFloor, ArenaKind.Museum, ArenaKind.Studio, ArenaKind.Rooftop];
+
+/** True for arenas without walls, where fighters can be knocked off. */
+export function arenaHasRingOuts(kind: ArenaKind): boolean {
+  return kind === ArenaKind.Rooftop;
+}
 
 export const ARENA_STYLES: Readonly<Record<ArenaKind, ArenaStyle>> = {
   [ArenaKind.Parliament]: {
@@ -54,6 +62,13 @@ export const ARENA_STYLES: Readonly<Record<ArenaKind, ArenaStyle>> = {
     environment: {
       skyTopColor: 0x0a0812, skyBottomColor: 0x2a1a3a, fogColor: 0x120e1a, fogNear: 25, fogFar: 70,
       sunDirection: { x: 0.1, y: 1, z: 0.8 }, sunColor: 0xfff0e0, ambientColor: 0x9a88b8,
+    },
+  },
+  [ArenaKind.Rooftop]: {
+    label: 'The Rooftop', floor: 0x5a5e66, floorEdge: 0xffc84a, wall: 0x1c2233, trim: 0xffc84a, accent: 0x8a93a6,
+    environment: {
+      skyTopColor: 0x1a2a5a, skyBottomColor: 0xe88a5a, fogColor: 0x6a5a7a, fogNear: 30, fogFar: 90,
+      sunDirection: { x: -0.6, y: 0.7, z: 0.4 }, sunColor: 0xffd0a0, ambientColor: 0xa090b0,
     },
   },
   [ArenaKind.Museum]: {

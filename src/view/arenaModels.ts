@@ -6,7 +6,7 @@
  */
 import * as THREE from 'three';
 import { ARENA_HALF_DEPTH, ARENA_HALF_WIDTH } from '../core/arena';
-import { ArenaKind, ARENA_STYLES, type ArenaStyle } from './arenaKinds';
+import { arenaHasRingOuts, ArenaKind, ARENA_STYLES, type ArenaStyle } from './arenaKinds';
 
 const FLOOR_THICKNESS = 0.3;
 const BORDER = 0.6;
@@ -17,6 +17,16 @@ const PROP_COUNT = 7;
 const PROP_SPACING = (ARENA_HALF_WIDTH * 2) / (PROP_COUNT - 1);
 /** Width of the Studio's red carpet, meters. */
 const CARPET_WIDTH = 2.4;
+/** The Rooftop: depth of the platform slab, width of its painted edge line, and the skyline far below and behind. */
+const ROOF_SLAB = 1.6;
+const EDGE_LINE = 0.18;
+const SKYLINE_COUNT = 14;
+const SKYLINE_RADIUS = 26;
+const SKYLINE_SPREAD = Math.PI * 1.2;
+const SKYLINE_MIN_TOP = -10;
+const SKYLINE_TOP_RANGE = 14;
+const BUILDING_WIDTH = 4;
+const BUILDING_HEIGHT = 40;
 
 function box(w: number, h: number, d: number, color: number, emissive = 0): THREE.Mesh {
   const m = new THREE.Mesh(
@@ -90,17 +100,35 @@ function buildStudio(group: THREE.Group, style: ArenaStyle): void {
   }
 }
 
+/** An open platform: a thick slab with a painted edge line and a city skyline around and below it, and no walls. */
+function buildRooftop(group: THREE.Group, style: ArenaStyle): void {
+  place(group, box(ARENA_HALF_WIDTH * 2, ROOF_SLAB, ARENA_HALF_DEPTH * 2, style.floor), 0, -ROOF_SLAB / 2, 0);
+  for (const side of [-1, 1]) {
+    place(group, box(ARENA_HALF_WIDTH * 2, 0.02, EDGE_LINE, style.floorEdge), 0, 0.005, side * (ARENA_HALF_DEPTH - EDGE_LINE / 2));
+    place(group, box(EDGE_LINE, 0.02, ARENA_HALF_DEPTH * 2, style.floorEdge), side * (ARENA_HALF_WIDTH - EDGE_LINE / 2), 0.005, 0);
+  }
+  for (let i = 0; i < SKYLINE_COUNT; i += 1) {
+    const angle = Math.PI + (i / (SKYLINE_COUNT - 1) - 0.5) * SKYLINE_SPREAD;
+    const top = SKYLINE_MIN_TOP + ((i * 7) % SKYLINE_COUNT) / SKYLINE_COUNT * SKYLINE_TOP_RANGE;
+    const x = Math.sin(angle) * SKYLINE_RADIUS;
+    const z = Math.cos(angle) * SKYLINE_RADIUS;
+    place(group, box(BUILDING_WIDTH, BUILDING_HEIGHT, BUILDING_WIDTH, i % 2 === 0 ? style.wall : style.accent), x, top - BUILDING_HEIGHT / 2, z);
+    place(group, box(BUILDING_WIDTH * 0.7, 0.3, 0.05, 0x000000, style.trim), x, top - 1.5, z + BUILDING_WIDTH / 2 + 0.03);
+  }
+}
+
 const BUILDERS: Readonly<Record<ArenaKind, (group: THREE.Group, style: ArenaStyle) => void>> = {
   [ArenaKind.Parliament]: buildParliament,
   [ArenaKind.TradingFloor]: buildTradingFloor,
   [ArenaKind.Museum]: buildMuseum,
   [ArenaKind.Studio]: buildStudio,
+  [ArenaKind.Rooftop]: buildRooftop,
 };
 
 export function buildArena(kind: ArenaKind): THREE.Group {
   const group = new THREE.Group();
   const style = ARENA_STYLES[kind];
-  buildFloor(group, style);
+  if (!arenaHasRingOuts(kind)) buildFloor(group, style);
   BUILDERS[kind](group, style);
   return group;
 }

@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- The Rooftop: a new Brawl arena, an open platform above the city with no walls. Hard hits near the edge knock
+  fighters off for a ring-out, which counts as a knockout; walking never takes anyone over.
+
 ## [0.7.0] - 2026-11-13
 
 ### Added

@@ -12,7 +12,7 @@ import type { PlayerId } from '../input/controlFrame';
 import { fighterById } from '../roster/roster';
 import { Twist } from '../rivalry/rivalryTypes';
 import { twistModifiers } from '../rivalry/twists';
-import type { ArenaKind } from '../view/arenaKinds';
+import { arenaHasRingOuts, type ArenaKind } from '../view/arenaKinds';
 
 export interface SlotPlan {
   fighterId: string;
@@ -54,6 +54,7 @@ export function buildMatchSetup(plan: Readonly<MatchPlan>): MatchSetup {
     teams: [plan.teams[0].map((s) => entry(s, plan.twist)), plan.teams[1].map((s) => entry(s, plan.twist))],
     extras: plan.extras,
     seed: plan.seed,
+    ringOuts: arenaHasRingOuts(plan.arena),
   };
 }
 

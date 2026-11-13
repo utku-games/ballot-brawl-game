@@ -128,6 +128,7 @@ export class MatchSession {
   }
 
   private announceEvents(state: Readonly<MatchState>): void {
+    const ringOut = state.events.some((e) => e.kind === 'ringOut');
     for (const e of state.events) {
       if (e.kind === 'swing' && e.move === 'finisher') {
         const f = state.fighters.find((x) => x.slotId === e.attacker);
@@ -136,8 +137,10 @@ export class MatchSession {
         this.slowmo = SLOWMO_SECONDS;
       } else if (e.kind === 'tauntDone' && playerSlots(this.assignment).has(e.fighter) && e.meter > 0) {
         this.hud.announce('+POWER', true, false);
+      } else if (e.kind === 'ringOut') {
+        this.hud.announce('RING OUT!', false, false);
       } else if (e.kind === 'matchOver') {
-        this.hud.announce(e.reason === EndReason.KnockOut ? 'K.O.!' : 'TIME!', false, true);
+        this.hud.announce(e.reason === EndReason.KnockOut ? (ringOut ? 'RING OUT!' : 'K.O.!') : 'TIME!', false, true);
         this.outro = OUTRO_SECONDS;
         if (e.reason === EndReason.KnockOut) this.replayWait = KO_PAUSE_SECONDS;
       }

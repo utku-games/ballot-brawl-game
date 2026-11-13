@@ -200,3 +200,19 @@ export function launchArc(seconds: number): Launch {
   const t = seconds / LAUNCH_SECONDS;
   return { height: 4 * LAUNCH_PEAK * t * (1 - t), spin: t * LAUNCH_SPINS * Math.PI * 2 };
 }
+
+/** Gravity for a fighter falling off the platform, m/s², and how fast they tumble. */
+export const RING_OUT_GRAVITY = 14;
+const RING_OUT_SPIN_RATE = 5;
+
+export interface Drop {
+  /** Distance fallen below the platform, meters. */
+  depth: number;
+  spin: number;
+}
+
+/** Fall of a rung-out fighter `seconds` after going over the edge; nothing before that. */
+export function ringOutDrop(seconds: number): Drop {
+  if (seconds < 0) return { depth: 0, spin: 0 };
+  return { depth: 0.5 * RING_OUT_GRAVITY * seconds * seconds, spin: seconds * RING_OUT_SPIN_RATE };
+}

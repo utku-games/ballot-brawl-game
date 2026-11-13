@@ -86,6 +86,8 @@ export interface FighterState {
   damageTaken: number;
   /** Item in hand, thrown by the next punch. */
   holding: ItemKind | null;
+  /** True once knocked off an open platform; such a fighter is out of the match. */
+  ringedOut: boolean;
 }
 
 /** Throwable items that appear on the floor when extras are on; the kind only changes the look. */
@@ -148,6 +150,7 @@ export type FightEvent =
   | { kind: 'pickup'; fighter: string; item: ItemKind }
   | { kind: 'hazard'; id: string; x: number; z: number }
   | { kind: 'crash'; id: string; x: number; z: number }
+  | { kind: 'ringOut'; target: string; x: number; z: number }
   | { kind: 'hazardHit'; target: string; damage: number; x: number; z: number }
   | { kind: 'tauntDone'; fighter: string; meter: number }
   | { kind: 'hit'; attacker: string; target: string; move: MoveKind; damage: number; x: number; z: number }
@@ -170,6 +173,8 @@ export interface MatchState {
   hazards: HazardState[];
   /** True when items and hazards are on. */
   extras: boolean;
+  /** True on an open platform where hard hits can knock fighters off. */
+  ringOuts: boolean;
   /** Seed for the deterministic placement of items and hazards. */
   seed: number;
   winner: TeamIndex | null;
