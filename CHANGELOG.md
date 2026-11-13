@@ -5,6 +5,19 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Signature finishers: every fighter's finisher now has a style. Smash hits hard in a wide arc, Rush dashes through
+  everyone in its path, Throw sends a themed projectile flying (Newton's apple, Musk's rocket, Tesla's lightning bolt,
+  Mozart's music note and more), and Quake slams the ground to hit everyone nearby.
+- Taunt: a new button (H, ;, gamepad B, on-screen Taunt). A taunt that ends without being hit earns power.
+- Personal gestures: each fighter has one (Churchill's V sign, Merkel's hand diamond, Mozart conducting, Napoleon's
+  salute and more), shown in the match intro, while taunting and as their win celebration.
+- Quake shockwaves, rush dust trails, and new throw, taunt and power-up sounds.
+
+### Changed
+- Gamepad B is now Taunt; Y stays Finisher.
+- The match intro is a little longer so every fighter can show off.
+
 ## [0.3.0] - 2026-11-13
 
 ### Added
