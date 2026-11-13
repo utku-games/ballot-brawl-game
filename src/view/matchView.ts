@@ -24,7 +24,8 @@ import { ProjectileView } from './projectileView';
 import { ExtrasView } from './extrasView';
 import { HAZARD_SOURCE } from '../fight/hazards';
 
-export const TEAM_COLORS: readonly [number, number] = [0x3a8dff, 0xff4a4a];
+/** Floor ring colour per side: blue, red, then green and gold for party free-for-alls; mirrored by the HUD theme. */
+export const TEAM_COLORS: readonly [number, number, number, number] = [0x3a8dff, 0xff4a4a, 0x3ac86a, 0xf2c23a];
 
 const HIT_HEIGHT = 1.4;
 const FLOOR_HEIGHT = 0.1;

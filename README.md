@@ -18,6 +18,8 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
   Messi and more) and a Special Edition of joke matchups (Shehbaz Sharif vs a goat, David Cameron vs a pig,
   Erdoğan vs a camel). Pick a side and a CPU difficulty; some rivalries add a twist such as a blackout, turbo speed
   or heavy hits. Won rivalries are marked as settled.
+- **Party**: a free-for-all for three or four fighters, each on their own side; the last one standing wins. Every
+  slot can be Player 1, Player 2 or CPU, with items and hazards and any arena (The Rooftop adds ring-outs).
 - **Brawl**: 1v1 up to 4v4, every slot set to Player 1, Player 2 or CPU. Pick The Rooftop arena for ring-outs:
   it has no walls, and a hard hit near the edge knocks a fighter off the platform. Items and hazards (on by default) drop
   briefcases, gavels and money bags to pick up and throw with Punch, and send cartoon anvils down where a red ring

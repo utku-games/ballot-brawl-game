@@ -23,7 +23,7 @@ export function brawlResultScreen(parent: HTMLElement, title: string, onAgain: (
   make('h2', '', title, root);
   const col = make('div', 'menu-col', null, root);
   button(col, 'Rematch', onAgain, 'primary');
-  button(col, 'Change teams', onSetup);
+  button(col, 'Change setup', onSetup);
   button(col, 'Main menu', onMenu);
   focusFirst(root);
   return { root };

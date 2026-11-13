@@ -10,10 +10,6 @@ export function isAlive(f: Readonly<FighterState>): boolean {
   return f.action.kind !== ActionKind.KnockedOut;
 }
 
-export function otherTeam(team: TeamIndex): TeamIndex {
-  return team === 0 ? 1 : 0;
-}
-
 export function livingOnTeam(fighters: readonly FighterState[], team: TeamIndex): FighterState[] {
   return fighters.filter((f) => f.team === team && isAlive(f));
 }
