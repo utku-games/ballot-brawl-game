@@ -34,7 +34,7 @@ const HIT_BURST: Readonly<Record<MoveKind, BurstKind>> = {
 const KO_SHAKE = 0.3;
 const QUAKE_SHAKE = 0.5;
 /** Ambient light never drops below this, so fighters stay faintly visible in a blackout. */
-const MIN_AMBIENT = 0.3;
+const MIN_AMBIENT = 0.15;
 /** Normal light level, restored when the match ends. */
 const FULL_LIGHT = 1;
 /** A rush drops a dust puff every this many ticks. */
