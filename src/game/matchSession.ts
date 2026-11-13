@@ -42,6 +42,8 @@ const INTRO_SECONDS = 2.2;
 const OUTRO_SECONDS = 2.6;
 const SLOWMO_SECONDS = 0.9;
 const SLOWMO_SCALE = 0.3;
+/** Normal arena light, used outside the fight itself (intro, knockout outro, result screen). */
+const FULL_LIGHT = 1;
 const PLAYERS: readonly PlayerId[] = [PlayerId.One, PlayerId.Two];
 
 export class MatchSession {
@@ -173,7 +175,8 @@ export class MatchSession {
       this.outro -= dt;
       if (this.outro <= 0) this.finish();
     }
-    this.view.setLight(this.started ? blackoutLight(this.twist, this.time) : 1);
+    const fighting = this.started && this.state.phase === MatchPhase.Fighting;
+    this.view.setLight(fighting ? blackoutLight(this.twist, this.time) : FULL_LIGHT);
     this.view.render(this.prev, this.state, alpha, this.time, dt * (this.slowmo > 0 ? SLOWMO_SCALE : 1));
     this.updateHud();
   }
