@@ -32,6 +32,8 @@ export enum Anchor {
   Card = 'card',
   /** Centre of the right hand. */
   HandR = 'handR',
+  /** Centre of a thrown projectile, +z along its flight. */
+  Projectile = 'projectile',
 }
 
 export enum ColorSlot {

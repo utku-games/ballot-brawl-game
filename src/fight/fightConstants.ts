@@ -50,6 +50,9 @@ export const METER_MAX = 100;
 export const METER_GAIN_DEAL = 1.1;
 export const METER_GAIN_TAKE = 0.7;
 export const METER_GAIN_BLOCK = 0.3;
+/** Length of a taunt in ticks, and the meter it earns when it ends without being hit. */
+export const TAUNT_TICKS = 54;
+export const TAUNT_METER = 30;
 
 /** Hits in one combo after which the target is knocked down instead of stunned again. */
 export const KNOCKDOWN_COMBO = 4;

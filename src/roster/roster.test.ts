@@ -8,6 +8,7 @@ import { RosterDataError, UnknownEntityError } from '../core/errors';
 import { bossOf, CATEGORY_ORDER, fighterById, fightersIn, REGULARS_PER_CATEGORY, ROSTER, validateRoster } from './roster';
 import { Build, Headwear, Neckwear, Outfit, Prop } from './lookTypes';
 import { Category } from './rosterTypes';
+import { FinisherStyle, Gesture, Projectile } from './signatureTypes';
 
 describe('roster', () => {
   it('has eleven regulars and one boss per category', () => {
@@ -59,5 +60,28 @@ describe('roster', () => {
   it('rejects a look value outside the catalogue', () => {
     const broken = ROSTER.map((f, i) => (i === 0 ? { ...f, look: { ...f.look, outfit: 'cape' as Outfit } } : f));
     expect(() => validateRoster(broken)).toThrow(RosterDataError);
+  });
+
+  it('gives every fighter a valid signature', () => {
+    for (const f of ROSTER) {
+      expect(Object.values(FinisherStyle), f.id).toContain(f.signature.style);
+      expect(Object.values(Gesture), f.id).toContain(f.signature.gesture);
+      expect(f.signature.projectile !== Projectile.None, f.id).toBe(f.signature.style === FinisherStyle.Throw);
+    }
+  });
+
+  it('matches the spec for signature moves', () => {
+    expect(fighterById('winston-churchill').signature).toEqual({ style: FinisherStyle.Smash, gesture: Gesture.VSign, projectile: Projectile.None });
+    expect(fighterById('isaac-newton').signature).toEqual({ style: FinisherStyle.Throw, gesture: Gesture.Point, projectile: Projectile.Apple });
+    expect(fighterById('wolfgang-amadeus-mozart').signature).toEqual({ style: FinisherStyle.Throw, gesture: Gesture.Conduct, projectile: Projectile.Note });
+    expect(fighterById('napoleon-bonaparte').signature.style).toBe(FinisherStyle.Rush);
+    expect(fighterById('giorgia-meloni').signature.gesture).not.toBe(Gesture.Salute);
+  });
+
+  it('rejects a thrower without a projectile and a projectile without a throw', () => {
+    const swap = (i: number, signature: object): typeof ROSTER => ROSTER.map((f, j) => (j === i ? { ...f, signature: { ...f.signature, ...signature } } : f));
+    expect(() => validateRoster(swap(0, { style: FinisherStyle.Throw, projectile: Projectile.None }))).toThrow(RosterDataError);
+    expect(() => validateRoster(swap(0, { style: FinisherStyle.Smash, projectile: Projectile.Apple }))).toThrow(RosterDataError);
+    expect(() => validateRoster(swap(0, { gesture: 'moonwalk' }))).toThrow(RosterDataError);
   });
 });

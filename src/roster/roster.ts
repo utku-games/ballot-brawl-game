@@ -1,7 +1,7 @@
 /**
  * The full roster: all three categories, lookups by id and category, and a validation pass run at load.
  * Validation guarantees unique ids, eleven regulars and exactly one boss per category, a fair stat total and a
- * look built only from the catalogue.
+ * look and signature built only from their catalogues.
  * Broken data raises RosterDataError immediately instead of failing later inside a match.
  */
 import { RosterDataError, UnknownEntityError } from '../core/errors';
@@ -9,6 +9,7 @@ import { LEGENDS } from './legends';
 import { Build, Headwear, Neckwear, Outfit, Prop } from './lookTypes';
 import { POLITICIANS } from './politicians';
 import { Category, type FighterDef } from './rosterTypes';
+import { FinisherStyle, Gesture, Projectile } from './signatureTypes';
 import { TYCOONS } from './tycoons';
 
 /** Regular (non-boss) fighters each category must have: the player's pick plus ten ladder opponents. */
@@ -43,6 +44,17 @@ function validateLook(f: Readonly<FighterDef>): void {
   }
 }
 
+function validateSignature(f: Readonly<FighterDef>): void {
+  const { style, gesture, projectile } = f.signature;
+  if (!Object.values(FinisherStyle).includes(style)) throw new RosterDataError(`${f.id} has unknown finisher style ${style}`);
+  if (!Object.values(Gesture).includes(gesture)) throw new RosterDataError(`${f.id} has unknown gesture ${gesture}`);
+  if (!Object.values(Projectile).includes(projectile)) throw new RosterDataError(`${f.id} has unknown projectile ${projectile}`);
+  const throws = style === FinisherStyle.Throw;
+  if (throws !== (projectile !== Projectile.None)) {
+    throw new RosterDataError(`${f.id} needs a projectile exactly when its finisher style is throw`);
+  }
+}
+
 /** Throws RosterDataError when the list breaks a roster rule; exported for tests. */
 export function validateRoster(fighters: readonly FighterDef[]): void {
   const ids = new Set<string>();
@@ -50,6 +62,7 @@ export function validateRoster(fighters: readonly FighterDef[]): void {
     if (ids.has(f.id)) throw new RosterDataError(`Duplicate fighter id ${f.id}`);
     ids.add(f.id);
     validateLook(f);
+    validateSignature(f);
     if (!f.boss && statTotal(f) !== REGULAR_STAT_TOTAL) {
       throw new RosterDataError(`${f.id} has stat total ${statTotal(f)}, expected ${REGULAR_STAT_TOTAL}`);
     }

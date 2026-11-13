@@ -7,7 +7,8 @@ import type { Rng } from '@utku/engine';
 import { BODY_RADIUS, GUARD_MAX, METER_MAX } from '../fight/fightConstants';
 import { ActionKind, IDLE_INPUT, type FighterInput, type FighterState, type MatchState } from '../fight/fightTypes';
 import { distanceBetween, isAlive, nearestEnemy } from '../fight/matchQueries';
-import { MoveKind, MOVES } from '../fight/moves';
+import { MoveKind, moveData } from '../fight/moves';
+import { FinisherStyle } from '../roster/signatureTypes';
 import type { AiProfile } from './aiProfile';
 
 /** What the brain remembers between ticks. */
@@ -33,6 +34,13 @@ const THREAT_RANGE = 2.6;
 const FLANK_WEIGHT = 0.45;
 /** Fraction of reach the CPU closes to before swinging, so it does not swing at the very edge. */
 const REACH_MARGIN = 0.9;
+/** Distances from which each finisher style is worth firing, meters between body centres (Smash and Quake use reach). */
+const THROW_RANGE = 6;
+const RUSH_RANGE = 3;
+/** With no enemy closer than this, the CPU may taunt to build power. */
+const TAUNT_DISTANCE = 4;
+/** Chance to taunt per decision when alone. */
+const TAUNT_CHANCE = 0.02;
 /** Prefix before the slot number in a slot id such as "t1s3". */
 const SLOT_MARKER = 's';
 
@@ -55,7 +63,14 @@ function underThreat(state: Readonly<MatchState>, self: Readonly<FighterState>):
 }
 
 function reachTo(self: Readonly<FighterState>, target: Readonly<FighterState>, move: MoveKind): number {
-  return (MOVES[move].reach + BODY_RADIUS * (self.profile.sizeScale + target.profile.sizeScale)) * REACH_MARGIN;
+  return (moveData(move, self.profile.finisher).reach + BODY_RADIUS * (self.profile.sizeScale + target.profile.sizeScale)) * REACH_MARGIN;
+}
+
+/** How close the target must be before this fighter's finisher style is worth firing. */
+export function finisherRange(self: Readonly<FighterState>, target: Readonly<FighterState>): number {
+  if (self.profile.finisher === FinisherStyle.Throw) return THROW_RANGE;
+  if (self.profile.finisher === FinisherStyle.Rush) return RUSH_RANGE;
+  return reachTo(self, target, MoveKind.Finisher);
 }
 
 function slotNumber(slotId: string): number {
@@ -84,13 +99,16 @@ function decide(state: Readonly<MatchState>, self: Readonly<FighterState>, profi
   if (underThreat(state, self) && !guardLow && rng() < profile.defendChance) {
     return { input: { ...IDLE_INPUT, defend: true }, memory: { ...memory, defending: true } };
   }
-  if (self.meter >= METER_MAX && dist <= reachTo(self, target, MoveKind.Finisher) && rng() < profile.finisherChance) {
+  if (self.meter >= METER_MAX && dist <= finisherRange(self, target) && rng() < profile.finisherChance) {
     return { input: { ...IDLE_INPUT, special: true }, memory };
   }
   const kick = rng() < profile.kickBias;
   if (dist <= reachTo(self, target, kick ? MoveKind.Kick : MoveKind.Punch)) {
     if (rng() < profile.attackChance) return { input: { ...IDLE_INPUT, punch: !kick, kick }, memory };
     return { input: { ...IDLE_INPUT }, memory };
+  }
+  if (dist > TAUNT_DISTANCE && self.meter < METER_MAX && rng() < TAUNT_CHANCE) {
+    return { input: { ...IDLE_INPUT, taunt: true }, memory };
   }
   const dir = approach(self, target);
   const sign = guardLow ? -1 : 1;

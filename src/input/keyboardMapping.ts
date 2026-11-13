@@ -1,6 +1,7 @@
 /**
  * Keyboard layouts for the two local players and the pure conversion from held and pressed key codes to a ControlFrame.
- * Player 1 uses WASD with J, K, L, I and U; Player 2 uses the arrows with comma, period, slash, right shift and quote.
+ * Player 1 uses WASD with J, K, L, I, H and U; Player 2 uses the arrows with comma, period, slash, right shift,
+ * semicolon and quote.
  * Codes follow KeyboardEvent.code, so the layout works on any keyboard language.
  */
 import { EMPTY_FRAME, PlayerId, type ControlFrame } from './controlFrame';
@@ -14,17 +15,18 @@ export interface KeyLayout {
   kick: string;
   defend: string;
   special: string;
+  taunt: string;
   swap: string;
 }
 
 export const KEY_LAYOUTS: Readonly<Record<PlayerId, KeyLayout>> = {
   [PlayerId.One]: {
     up: 'KeyW', down: 'KeyS', left: 'KeyA', right: 'KeyD',
-    punch: 'KeyJ', kick: 'KeyK', defend: 'KeyL', special: 'KeyI', swap: 'KeyU',
+    punch: 'KeyJ', kick: 'KeyK', defend: 'KeyL', special: 'KeyI', taunt: 'KeyH', swap: 'KeyU',
   },
   [PlayerId.Two]: {
     up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
-    punch: 'Comma', kick: 'Period', defend: 'Slash', special: 'ShiftRight', swap: 'Quote',
+    punch: 'Comma', kick: 'Period', defend: 'Slash', special: 'ShiftRight', taunt: 'Semicolon', swap: 'Quote',
   },
 };
 
@@ -55,6 +57,7 @@ export function keyboardFrame(
     punch: presses.has(layout.punch),
     kick: presses.has(layout.kick),
     special: presses.has(layout.special),
+    taunt: presses.has(layout.taunt),
     swap: presses.has(layout.swap),
     pause: PAUSE_KEYS.some((key) => presses.has(key)),
     defend: held.has(layout.defend),

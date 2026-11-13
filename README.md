@@ -25,8 +25,15 @@ Playable: Story and Brawl modes, 36 fighters with their own body types and costu
 - **Punch** is quick, **Kick** is slower with more reach and knockback.
 - **Defend** (hold) takes no damage at all, but blocked hits drain your guard; an empty guard breaks
   and leaves you dizzy.
-- Dealing, taking and blocking hits fills the **power meter**. When it is full, **Finisher** unleashes a
-  slow, heavy signature move that does several times a kick's damage (no gore, just a big hit).
+- Dealing, taking and blocking hits fills the **power meter**. When it is full, **Finisher** unleashes the
+  fighter's signature move (no gore, just a big hit), in one of four styles:
+  - **Smash**: a heavy close hit in a wide arc.
+  - **Rush**: a dash that ploughs through everyone in its path.
+  - **Throw**: a themed projectile (an apple, a rocket, a burger, a lightning bolt...) that hits the first enemy it
+    reaches; defending blocks it.
+  - **Quake**: a ground slam that hits every enemy close by, even behind you.
+- **Taunt** shows off your fighter's personal gesture. Finish it without being hit and you earn a chunk of power;
+  get hit and you earn nothing. The same gesture plays in the match intro and when your team wins.
 - In team fights, **Swap** jumps to your next teammate; if your fighter is knocked out you switch
   automatically.
 
@@ -39,6 +46,7 @@ Playable: Story and Brawl modes, 36 fighters with their own body types and costu
 | Kick | K | . | A | Kick button |
 | Defend (hold) | L | / | RB | Defend button |
 | Finisher (meter full) | I | Right Shift | Y | Finisher button |
+| Taunt | H | ; | B | Taunt button |
 | Swap teammate | U | ' | LB | Swap button |
 
 ## Setup
@@ -60,7 +68,8 @@ Each roster entry has a `kit`: build, outfit, neckwear, headwear and hand prop, 
 Looks are visual only and never change the fight.
 
 With `npm run dev` running, `http://localhost:5175/lineup.html?category=legends&half=0&pose=idle` shows six fighters
-of a category side by side (`half` 0 or 1, `pose` idle, punch or ko) to check costumes. The page is never part of
+of a category side by side (`half` 0 or 1, `pose` idle, punch, ko, gesture or finisher) to check costumes, gestures
+and finisher poses. The page is never part of
 the production build.
 
 ## Deploy

@@ -18,6 +18,7 @@ export interface ControlFrame {
   punch: boolean;
   kick: boolean;
   special: boolean;
+  taunt: boolean;
   swap: boolean;
   pause: boolean;
   /** Held. */
@@ -25,7 +26,7 @@ export interface ControlFrame {
 }
 
 export const EMPTY_FRAME: Readonly<ControlFrame> = {
-  moveX: 0, moveY: 0, punch: false, kick: false, special: false, swap: false, pause: false, defend: false,
+  moveX: 0, moveY: 0, punch: false, kick: false, special: false, taunt: false, swap: false, pause: false, defend: false,
 };
 
 /** Merges two frames: presses and holds are OR-ed, the stronger stick wins. */
@@ -37,6 +38,7 @@ export function mergeFrames(a: Readonly<ControlFrame>, b: Readonly<ControlFrame>
     punch: a.punch || b.punch,
     kick: a.kick || b.kick,
     special: a.special || b.special,
+    taunt: a.taunt || b.taunt,
     swap: a.swap || b.swap,
     pause: a.pause || b.pause,
     defend: a.defend || b.defend,
@@ -52,6 +54,7 @@ export function toFighterInput(frame: Readonly<ControlFrame>): FighterInput {
     punch: frame.punch,
     kick: frame.kick,
     special: frame.special,
+    taunt: frame.taunt,
     defend: frame.defend,
   };
 }

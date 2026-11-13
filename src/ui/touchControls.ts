@@ -1,6 +1,7 @@
 /**
  * On-screen touch controls for phones and tablets: a floating joystick on the left half and big action buttons on the right.
- * Punch, Kick and Finisher register a press per tap; Defend counts while held; Swap and Pause are small extra buttons.
+ * Punch, Kick and Finisher register a press per tap; Defend counts while held; Taunt, Swap and Pause are small extra
+ * buttons.
  * The controls produce the same ControlFrame as the keyboard, so the match code does not know a touch screen is used.
  */
 import { make } from '@utku/engine';
@@ -9,7 +10,7 @@ import { inStickZone, knobOffset, stickVector, type ScreenPoint } from '../input
 import { injectStyle } from './injectStyle';
 import { TOUCH_CSS } from './touchStyles';
 
-type Action = 'punch' | 'kick' | 'special' | 'swap' | 'pause';
+type Action = 'punch' | 'kick' | 'special' | 'taunt' | 'swap' | 'pause';
 
 export class TouchControls {
   readonly root: HTMLElement;
@@ -34,6 +35,7 @@ export class TouchControls {
     this.holdButton(pad, 'touch-btn defend', 'DEFEND');
     this.button(pad, 'touch-btn kick', 'KICK', 'kick');
     this.button(pad, 'touch-btn punch', 'PUNCH', 'punch');
+    this.button(this.root, 'touch-btn touch-small touch-taunt', 'TAUNT', 'taunt');
     this.swapButton = this.button(this.root, 'touch-btn touch-small touch-swap', 'SWAP', 'swap');
     this.button(this.root, 'touch-btn touch-small touch-pause', 'II', 'pause');
     this.root.addEventListener('pointerdown', (e) => this.stickDown(e));
@@ -119,6 +121,7 @@ export class TouchControls {
       punch: p.has('punch'),
       kick: p.has('kick'),
       special: p.has('special'),
+      taunt: p.has('taunt'),
       swap: p.has('swap'),
       pause: p.has('pause'),
       defend: this.defendTouches.size > 0,
