@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-13
+
 ### Added
 - Music: a menu theme and one song per arena (a march for The Chamber, an electronic run for The Trading Floor, a
   waltz for The Grand Gallery, disco for The Studio and rock for The Rooftop). Fights start calm, drive during the
