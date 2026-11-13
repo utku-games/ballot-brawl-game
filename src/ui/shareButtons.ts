@@ -9,7 +9,6 @@ import type { ShareTarget } from '../share/shareLink';
 import { button } from './screenKit';
 
 const SHARE_LABEL = 'Share';
-const CHALLENGE_LABEL = 'Share challenge';
 const BUSY_LABEL = 'Sharing...';
 
 function wire(b: HTMLButtonElement, idle: string, run: () => Promise<ShareOutcome>): void {
@@ -36,9 +35,9 @@ export function shareResultButton(parent: HTMLElement, card: Readonly<ShareCard>
   return b;
 }
 
-/** Adds a button that shares a link opening target, with an invitation text. */
-export function shareChallengeButton(parent: HTMLElement, text: string, target: Readonly<ShareTarget>): HTMLButtonElement {
-  const b = button(parent, CHALLENGE_LABEL, () => undefined, 'small');
-  wire(b, CHALLENGE_LABEL, () => shareChallenge(text, target));
+/** Adds a button labelled label that shares a link opening target, with an invitation text. */
+export function shareChallengeButton(parent: HTMLElement, label: string, text: string, target: Readonly<ShareTarget>): HTMLButtonElement {
+  const b = button(parent, label, () => undefined, 'small');
+  wire(b, label, () => shareChallenge(text, target));
   return b;
 }

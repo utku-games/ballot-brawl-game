@@ -5,6 +5,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Online 1v1 (beta): play a friend on another device. One player hosts a room and shares its five-character code
+  or an invite link (`?join=CODE`); the other joins. In the lobby both pick fighters and the host picks the arena
+  and items, then starts the fight; after each fight both return to the lobby. Connections are peer-to-peer
+  (WebRTC through PeerJS and its free public signalling server); the host runs the fight and streams it to the
+  guest, so a phone and a laptop always see the same fight. Leaving or closing the page tells the other player.
+
 ## [0.11.0] - 2026-11-13
 
 ### Added

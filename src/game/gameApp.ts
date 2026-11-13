@@ -1,6 +1,6 @@
 /**
  * The game's top-level state machine: title, story (category, fighter, ladder, fights, ending), rivalry battles, brawl
- * and party setup and matches, pause and credits.
+ * and party setup and matches, pause and credits; online duels run through OnlineFlow.
  * It owns the current screen or match session, the menu backdrop and the save data, and routes each frame to whichever is active.
  * Menus are navigable by mouse, touch, keyboard arrows and gamepad; touch fight buttons appear only during matches.
  */
@@ -8,7 +8,7 @@ import { createRng, MusicIntensity, type GameRenderer, type Rng } from '@utku/en
 import type { GameAudio } from '../audio/gameAudio';
 import { Sfx } from '../audio/sfxTable';
 import { MENU_TRACK } from '../audio/songs';
-import { PlayerId, type ControlFrame } from '../input/controlFrame';
+import { EMPTY_FRAME, PlayerId, type ControlFrame } from '../input/controlFrame';
 import type { InputHub } from '../input/inputHub';
 import { Difficulty } from '../ai/aiProfile';
 import { RIVALRIES } from '../rivalry/rivalries';
@@ -33,8 +33,10 @@ import type { TouchControls } from '../ui/touchControls';
 import { ARENA_FOR_CATEGORY, ArenaKind } from '../view/arenaKinds';
 import { MenuBackdrop } from '../view/menuBackdrop';
 import { defaultBrawl, defaultParty, RANDOM_FIGHTER, setFighter, toMatchPlan, type BrawlConfig } from './brawlConfig';
+import type { MatchNet } from './matchNet';
 import type { MatchPlan } from './matchPlan';
 import { MatchSession, type MatchOutcome } from './matchSession';
+import { OnlineFlow } from './onlineFlow';
 import { rivalryMatchPlan, RivalrySide } from './rivalryPlan';
 import { loadSave, recordBest, recordLeagueWin, recordRivalryWin, storeSave } from './saveData';
 import { lockReason, newlyUnlocked } from './unlocks';
@@ -52,6 +54,8 @@ const NAV_KEYS: Readonly<Record<string, number>> = { ArrowUp: -1, ArrowLeft: -1,
 const CONFIRM_KEYS: ReadonlySet<string> = new Set(['Enter', ' ']);
 /** Range of random seeds for rivalry fights. */
 const RIVALRY_SEED_RANGE = 1_000_000;
+/** What an online match sees while its pause menu is open: no buttons held, since the fight goes on. */
+const IDLE_FRAMES: Readonly<Record<PlayerId, ControlFrame>> = { [PlayerId.One]: EMPTY_FRAME, [PlayerId.Two]: EMPTY_FRAME };
 
 /** The share card for a finished Brawl or Party match, built from the plan's fighters and the winning side. */
 function resultCard(plan: Readonly<MatchPlan>, outcome: Readonly<MatchOutcome>, party: boolean): ShareCard {
@@ -82,17 +86,27 @@ export class GameApp {
   private attempt = 0;
   private navCooldown = 0;
   private confirmLock = 0;
+  private readonly online: OnlineFlow;
 
   constructor(private readonly deps: AppDeps) {
     this.backdrop = new MenuBackdrop(deps.renderer);
     deps.audio.muted = this.save.muted;
     this.setTouchVisible(false);
+    this.online = new OnlineFlow({
+      show: (make, arena) => this.show(make, arena),
+      showOverlay: (make) => this.showOverlay(make),
+      startMatch: (plan, onEnd, net, onQuit) => this.launchMatch(plan, onEnd, net, onQuit),
+      pickFighter: (onPick, onBack) => this.pickOnlineFighter(onPick, onBack),
+      showTitle: () => this.showTitle(),
+    }, this.rng);
     window.addEventListener('keydown', (e) => this.onMenuKey(e));
+    window.addEventListener('pagehide', () => this.online.disconnect());
   }
 
   /** Opens the title, or what a shared link points at when target is not null. */
   start(target: Readonly<ShareTarget> | null): void {
     if (!target) return this.showTitle();
+    if (target.kind === ShareKind.Join) return void this.online.join(target.code);
     if (target.kind === ShareKind.Duel) {
       this.brawl = setFighter(setFighter(defaultBrawl(this.brawl.arena), 0, 0, target.left), 1, 0, target.right);
       return this.showBrawlSetup();
@@ -107,6 +121,7 @@ export class GameApp {
   frame(dt: number): void {
     const frames = this.deps.hub.poll();
     if (this.session && !this.overlay) this.session.frame(dt, frames);
+    else if (this.session?.online) this.session.frame(dt, IDLE_FRAMES);
     else if (this.session) this.session.frame(0, frames);
     else this.backdrop.render(dt);
     this.padMenu(dt, frames[PlayerId.One]);
@@ -181,6 +196,10 @@ export class GameApp {
   }
 
   private startMatch(plan: MatchPlan, onEnd: (o: MatchOutcome) => void): void {
+    this.launchMatch(plan, onEnd, null, () => this.showTitle());
+  }
+
+  private launchMatch(plan: MatchPlan, onEnd: (o: MatchOutcome) => void, net: MatchNet | null, onQuit: () => void): void {
     this.closeOverlay();
     this.screen?.root.remove();
     this.screen = null;
@@ -188,11 +207,11 @@ export class GameApp {
     this.backdrop.hide();
     this.deps.hub.flush();
     this.setTouchVisible(true);
-    const deps = { renderer: this.deps.renderer, hudParent: this.deps.container, audio: this.deps.audio, touch: this.deps.touch };
+    const deps = { renderer: this.deps.renderer, hudParent: this.deps.container, audio: this.deps.audio, touch: this.deps.touch, net };
     this.session = new MatchSession(plan, deps, (o) => {
       this.setTouchVisible(false);
       onEnd(o);
-    }, () => this.showOverlay((p) => pauseScreen(p, () => this.resume(), () => this.showTitle())));
+    }, () => this.showOverlay((p) => pauseScreen(p, () => this.resume(), onQuit)));
   }
 
   private resume(): void {
@@ -210,6 +229,7 @@ export class GameApp {
       onRivalry: () => this.showRivalries(),
       onBrawl: () => this.showBrawlSetup(),
       onParty: () => this.showPartySetup(),
+      onOnline: () => this.online.open(null),
       onCredits: () => this.show((q) => creditsScreen(q, () => this.showTitle()), null),
       onTrophies: () => this.show((q) => trophiesScreen(q, this.save, () => this.showTitle()), ArenaKind.Museum),
       onToggleMute: () => this.toggleMute(),
@@ -364,6 +384,16 @@ export class GameApp {
       this.party = setFighter(this.party, side, 0, id ?? RANDOM_FIGHTER);
       this.showPartySetup();
     }, () => this.showPartySetup()), this.party.arena);
+  }
+
+  // ---- online ----
+
+  private pickOnlineFighter(onPick: (fighterId: string) => void, onBack: () => void): void {
+    const fighters = BRAWL_ORDER.flatMap((c) => fightersIn(c));
+    const open = fighters.filter((f) => lockReason(f, this.save) === null);
+    this.show((p) => fighterPickScreen(p, { title: 'Choose your fighter', fighters, allowRandom: true, lockReason: (def) => lockReason(def, this.save) }, (id) => {
+      onPick(id ?? open[Math.floor(this.rng() * open.length)].id);
+    }, onBack), ArenaKind.Rooftop);
   }
 
   private startParty(plan: MatchPlan): void {

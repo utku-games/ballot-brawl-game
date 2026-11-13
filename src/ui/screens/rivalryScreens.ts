@@ -75,7 +75,7 @@ export function rivalrySideScreen(parent: HTMLElement, r: Readonly<Rivalry>, dif
   }
   const foot = make('div', 'menu-row', null, root);
   button(foot, 'Back', actions.onBack, 'small');
-  shareChallengeButton(foot, `Settle ${r.title} with me in Ballot Brawl.`, { kind: ShareKind.Rivalry, rivalryId: r.id });
+  shareChallengeButton(foot, 'Share challenge', `Settle ${r.title} with me in Ballot Brawl.`, { kind: ShareKind.Rivalry, rivalryId: r.id });
   focusFirst(root);
   return { root };
 }

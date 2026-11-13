@@ -2,7 +2,7 @@
  * Runs one match in the browser: fixed-step simulation, player and CPU control, rendering, HUD, sound and announcements.
  * It shows a short intro with every fighter's gesture, plays the fight with slow motion after finishers, replays a
  * knockout in slow motion, then reports the outcome.
- * Pausing simply stops the clock; the game app owns the pause menu and calls resume or dispose.
+ * Pausing stops the clock offline; online, the host streams the fight through a MatchNet and the guest shows it.
  */
 import { createRng, FixedStepClock, type GameRenderer, type Rng } from '@utku/engine';
 import { type AiMemory, FRESH_MEMORY, thinkAi } from '../ai/aiBrain';
@@ -24,6 +24,7 @@ import { PLAYER_COLORS } from '../ui/theme';
 import type { TouchControls } from '../ui/touchControls';
 import { MatchView } from '../view/matchView';
 import { playerSlots, updateAssignment } from './controlAssignment';
+import { NetRole, type MatchNet } from './matchNet';
 import { buildMatchSetup, cpuLevels, initialAssignment, type MatchPlan } from './matchPlan';
 import { pushCapped, REPLAY_SPEED, REPLAY_TICKS, replayIndex } from './replayBuffer';
 
@@ -39,6 +40,8 @@ export interface SessionDeps {
   hudParent: HTMLElement;
   audio: GameAudio;
   touch: TouchControls | null;
+  /** The connection for an online duel, or null for a local match. */
+  net: MatchNet | null;
 }
 
 const MAX_CATCH_UP_STEPS = 5;
@@ -150,19 +153,35 @@ export class MatchSession {
     }
   }
 
+  /** True for an online duel, which never stops for the pause menu. */
+  get online(): boolean {
+    return this.deps.net !== null;
+  }
+
+  private apply(next: MatchState): void {
+    this.prev = this.state;
+    this.state = next;
+    this.history = pushCapped(this.history, next, REPLAY_TICKS);
+    this.view.handleEvents(next.events, next);
+    this.deps.audio.playEvents(next.events);
+    this.announceEvents(next);
+  }
+
   private simulate(dt: number, frames: Readonly<Record<PlayerId, ControlFrame>>): number {
     const scale = this.slowmo > 0 ? SLOWMO_SCALE : 1;
     this.slowmo = Math.max(0, this.slowmo - dt);
     const plan = this.clock.advance(dt * scale);
+    const net = this.deps.net;
+    if (net?.role === NetRole.Guest) {
+      net.sendFrame(frames[PlayerId.One]);
+      for (const s of net.takeStates(plan.steps)) this.apply(s);
+      return plan.alpha;
+    }
+    const stepFrames = net && plan.steps > 0 ? { ...frames, [PlayerId.Two]: net.takeRemoteFrame() } : frames;
     for (let i = 0; i < plan.steps && this.state.phase === MatchPhase.Fighting; i += 1) {
-      if (i === 0) this.updateAssignments(frames);
-      const inputs = this.inputsFor(frames, i === 0);
-      this.prev = this.state;
-      this.state = stepMatch(this.state, inputs);
-      this.history = pushCapped(this.history, this.state, REPLAY_TICKS);
-      this.view.handleEvents(this.state.events, this.state);
-      this.deps.audio.playEvents(this.state.events);
-      this.announceEvents(this.state);
+      if (i === 0) this.updateAssignments(stepFrames);
+      this.apply(stepMatch(this.state, this.inputsFor(stepFrames, i === 0)));
+      net?.publish(this.state);
     }
     return plan.alpha;
   }
@@ -174,7 +193,7 @@ export class MatchSession {
       this.paused = true;
       this.onPause();
     }
-    if (this.paused) {
+    if (this.paused && !this.online) {
       this.view.render(this.prev, this.state, 1, this.time, 0);
       return;
     }
