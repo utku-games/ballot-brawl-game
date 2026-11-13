@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-13
+
 ### Added
 - Every fighter has their own body type (average, tall, lanky, short, round or stocky) and costume: suits, frock
   coats, a toga, gowns, a lab coat, a parka, hoodies and more, with neckwear, hats and a signature hand prop such as
