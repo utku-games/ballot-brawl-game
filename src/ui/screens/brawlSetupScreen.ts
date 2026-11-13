@@ -73,6 +73,10 @@ export function brawlSetupScreen(parent: HTMLElement, config: BrawlConfig, actio
   for (const d of DIFFICULTIES) {
     button(diff, d.toUpperCase(), () => actions.onChange({ ...config, difficulty: d }), `small${config.difficulty === d ? ' on' : ''}`);
   }
+  make('p', 'tagline', 'Items and hazards', root);
+  const extras = make('div', 'menu-row', null, root);
+  button(extras, 'ON', () => actions.onChange({ ...config, extras: true }), `small${config.extras ? ' on' : ''}`);
+  button(extras, 'OFF', () => actions.onChange({ ...config, extras: false }), `small${config.extras ? '' : ' on'}`);
   make('p', 'tagline', 'Arena', root);
   const arenas = make('div', 'menu-row', null, root);
   for (const a of ARENA_ORDER) {

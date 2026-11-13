@@ -105,6 +105,9 @@ function attackPose(move: MoveKind, frame: number, style: FinisherStyle): Pose {
   if (move === MoveKind.Kick) {
     return { ...STANDING_POSE, legR: swing(m, frame, -0.4, 1.5, 0), lean: swing(m, frame, 0.1, -0.3, 0), armL: 0.8, armR: -0.3 };
   }
+  if (move === MoveKind.Item) {
+    return { ...STANDING_POSE, armR: swing(m, frame, 3, 1.4, GUARD_ARM), lean: swing(m, frame, -0.2, 0.3, 0) };
+  }
   return finisherPose(style, frame);
 }
 
@@ -177,4 +180,23 @@ export function skirtFold(fall: number, radius: number): SkirtFold {
   const f = Math.min(1, Math.max(0, fall));
   const scale = 1 - (1 - SKIRT_FOLD) * f;
   return { scale, lift: radius * SKIRT_FOLD * f * 0.5 };
+}
+
+/** Seconds a launched knockout spends in the air, its peak height and its spin. */
+export const LAUNCH_SECONDS = 0.8;
+export const LAUNCH_PEAK = 1.6;
+const LAUNCH_SPINS = 1.5;
+
+export interface Launch {
+  /** Height above the floor, meters. */
+  height: number;
+  /** Spin around the facing axis, radians. */
+  spin: number;
+}
+
+/** Flight of a fighter launched by a big knockout, `seconds` after the hit: a parabola up and back down with a spin. */
+export function launchArc(seconds: number): Launch {
+  if (seconds < 0 || seconds >= LAUNCH_SECONDS) return { height: 0, spin: 0 };
+  const t = seconds / LAUNCH_SECONDS;
+  return { height: 4 * LAUNCH_PEAK * t * (1 - t), spin: t * LAUNCH_SPINS * Math.PI * 2 };
 }

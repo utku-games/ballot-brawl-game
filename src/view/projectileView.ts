@@ -1,5 +1,6 @@
 /**
- * Draws thrown finishers: one spinning group per projectile in flight, built from the thrower's projectile parts.
+ * Draws thrown finishers and items: one spinning group per projectile in flight, built from the thrown item's parts or
+ * the thrower's projectile parts.
  * Positions are blended between the previous and current simulation states so flight stays smooth above 60 Hz.
  * Groups and their materials are created when a projectile appears and freed as soon as it is gone.
  */
@@ -8,6 +9,7 @@ import type { ProjectileState } from '../fight/fightTypes';
 import type { FighterDef } from '../roster/rosterTypes';
 import { attachParts, MaterialSet } from './outfitMeshes';
 import { Anchor } from './partSpec';
+import { itemParts } from './extraParts';
 import { projectileParts } from './projectileParts';
 
 /** Flight height above the floor, meters. */
@@ -36,7 +38,8 @@ export class ProjectileView {
     const spinner = new THREE.Group();
     group.add(spinner);
     const materials = new MaterialSet(def.look, NO_TONE);
-    attachParts(projectileParts(def.signature.projectile), new Map([[Anchor.Projectile, spinner]]), materials);
+    const parts = p.item ? itemParts(p.item) : projectileParts(def.signature.projectile);
+    attachParts(parts, new Map([[Anchor.Projectile, spinner]]), materials);
     this.scene.add(group);
     const entry = { group, spinner, materials };
     this.flying.set(p.id, entry);

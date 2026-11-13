@@ -32,10 +32,12 @@ export interface MatchPlan {
   banner: string | null;
   /** Rule twist for both teams; Twist.None for a normal fight. */
   twist: Twist;
+  /** True to spawn throwable items and hazards. */
+  extras: boolean;
 }
 
 /** Plan fields for an ordinary fight with no banner and no twist. */
-export const PLAIN_FIGHT: Readonly<Pick<MatchPlan, 'banner' | 'twist'>> = { banner: null, twist: Twist.None };
+export const PLAIN_FIGHT: Readonly<Pick<MatchPlan, 'banner' | 'twist' | 'extras'>> = { banner: null, twist: Twist.None, extras: false };
 
 function entry(slot: Readonly<SlotPlan>, twist: Twist): TeamEntry {
   const def = fighterById(slot.fighterId);
@@ -48,7 +50,11 @@ function entry(slot: Readonly<SlotPlan>, twist: Twist): TeamEntry {
 }
 
 export function buildMatchSetup(plan: Readonly<MatchPlan>): MatchSetup {
-  return { teams: [plan.teams[0].map((s) => entry(s, plan.twist)), plan.teams[1].map((s) => entry(s, plan.twist))] };
+  return {
+    teams: [plan.teams[0].map((s) => entry(s, plan.twist)), plan.teams[1].map((s) => entry(s, plan.twist))],
+    extras: plan.extras,
+    seed: plan.seed,
+  };
 }
 
 /** Initial player assignment: each player's first slot. */

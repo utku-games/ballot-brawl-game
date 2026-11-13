@@ -25,7 +25,7 @@ export const RIVALRIES: readonly Rivalry[] = [
   { id: 'goat-debate', section: R, left: 'cristiano-ronaldo', right: 'lionel-messi', title: 'The G.O.A.T. Debate', tagline: 'Settle the argument every football fan has.', arena: ArenaKind.Studio, twist: Twist.Turbo },
   { id: 'the-feud', section: R, left: 'taylor-swift', right: 'kim-kardashian', title: 'The Feud', tagline: 'Look what you made them do.', arena: ArenaKind.Studio, twist: Twist.None },
   { id: 'goat-summit', section: S, left: 'shehbaz-sharif', right: 'goat', title: 'The G.O.A.T. Summit', tagline: 'A prime minister meets the greatest of all time.', arena: ArenaKind.Parliament, twist: Twist.None },
-  { id: 'pigtanic', section: S, left: 'james-cameron', right: 'pig', title: 'Pigtanic', tagline: 'The director goes deep. The pig goes deeper.', arena: ArenaKind.Studio, twist: Twist.HeavyHitters },
+  { id: 'pork-barrel', section: S, left: 'david-cameron', right: 'pig', title: 'The Pork Barrel', tagline: 'A former prime minister meets the opposition he never saw coming.', arena: ArenaKind.Parliament, twist: Twist.HeavyHitters },
   { id: 'desert-derby', section: S, left: 'recep-tayyip-erdogan', right: 'camel', title: 'The Desert Derby', tagline: 'One has humps, the other has a long walk home.', arena: ArenaKind.Museum, twist: Twist.Turbo },
 ];
 

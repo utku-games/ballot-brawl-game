@@ -35,5 +35,6 @@ export function rivalryMatchPlan(rivalry: Readonly<Rivalry>, side: RivalrySide, 
     seed,
     banner: rivalry.title,
     twist: rivalry.twist,
+    extras: false,
   };
 }
