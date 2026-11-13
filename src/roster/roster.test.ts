@@ -18,7 +18,7 @@ describe('roster', () => {
     }
     expect(CATEGORY_ORDER).not.toContain(Category.Specials);
     expect(BRAWL_ORDER).toContain(Category.Specials);
-    expect(fightersIn(Category.Specials).map((f) => f.id).sort()).toEqual(['camel', 'goat', 'pig']);
+    expect(fightersIn(Category.Specials).map((f) => f.id).sort()).toEqual(['bull', 'camel', 'chicken', 'goat', 'larry', 'pig']);
     expect(fightersIn(Category.Specials).some((f) => f.boss)).toBe(false);
   });
 

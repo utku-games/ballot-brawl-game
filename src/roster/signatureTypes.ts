@@ -45,6 +45,7 @@ export enum Projectile {
   Football = 'football',
   LightBulb = 'light-bulb',
   FryingPan = 'frying-pan',
+  Egg = 'egg',
 }
 
 /** A fighter's signature in roster-table order: finisher style, gesture, projectile. */

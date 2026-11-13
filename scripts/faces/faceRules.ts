@@ -11,7 +11,7 @@ export const ALLOWED_LICENSES: readonly RegExp[] = [
   /^pd\b/i,
   /^cc0/i,
   /^cc by(-sa)? \d/i,
-  /^ogl \d/i,
+  /^ogl v?\d/i,
   /^attribution$/i,
 ];
 
