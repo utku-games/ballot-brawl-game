@@ -31,6 +31,13 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
   screen tracks leagues won, rivalries settled and bosses unlocked. The score comes from the damage you take
   across the run (plus stage clears and perfect fights), with an S to D rank and a saved best score.
 
+## Sharing
+
+Every result screen has a Share button: on phones it opens the share sheet with a result card image, and on desktops
+it copies the message and link and saves the card image. Links can open a fight directly:
+`?rivalry=currents` opens The War of the Currents side picker, and `?duel=goat~pig` opens a one-on-one Brawl setup
+with those two fighters (bosses cannot be linked, so they stay unlocked only through Story).
+
 ## Fighting
 
 - **Punch** is quick, **Kick** is slower with more reach and knockback.

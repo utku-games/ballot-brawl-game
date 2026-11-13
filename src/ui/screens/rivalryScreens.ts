@@ -1,15 +1,18 @@
 /**
  * Rivalry Battles screens: the list of rivalries in two sections, and the side picker before a rivalry fight.
  * Each rivalry card shows both portraits, its title, tagline and twist, and a "Settled" mark once the player has won it.
- * The side picker lets the player fight as either rival and choose the CPU difficulty.
+ * The side picker lets the player fight as either rival, choose the CPU difficulty or share a challenge link to it.
  */
 import { make } from '@utku/engine';
 import { Difficulty } from '../../ai/aiProfile';
 import { RivalrySide } from '../../game/rivalryPlan';
 import { rivalriesIn } from '../../rivalry/rivalries';
 import { RivalrySection, Twist, type Rivalry } from '../../rivalry/rivalryTypes';
+import type { ShareCard } from '../../share/shareCards';
+import { ShareKind } from '../../share/shareLink';
 import { fighterById } from '../../roster/roster';
 import { button, fighterCard, focusFirst, openScreen, portrait, type Screen } from '../screenKit';
+import { shareChallengeButton, shareResultButton } from '../shareButtons';
 
 const SECTION_TITLE: Readonly<Record<RivalrySection, string>> = {
   [RivalrySection.Rivalries]: 'Rivalries',
@@ -70,18 +73,27 @@ export function rivalrySideScreen(parent: HTMLElement, r: Readonly<Rivalry>, dif
   for (const d of DIFFICULTIES) {
     button(diff, d.toUpperCase(), () => actions.onDifficulty(d), `small${difficulty === d ? ' on' : ''}`);
   }
-  button(root, 'Back', actions.onBack, 'small');
+  const foot = make('div', 'menu-row', null, root);
+  button(foot, 'Back', actions.onBack, 'small');
+  shareChallengeButton(foot, `Settle ${r.title} with me in Ballot Brawl.`, { kind: ShareKind.Rivalry, rivalryId: r.id });
   focusFirst(root);
   return { root };
 }
 
-export function rivalryResultScreen(parent: HTMLElement, won: boolean, onAgain: () => void, onList: () => void, onMenu: () => void): Screen {
+export interface RivalryResultActions {
+  onAgain: () => void;
+  onList: () => void;
+  onMenu: () => void;
+}
+
+export function rivalryResultScreen(parent: HTMLElement, won: boolean, card: Readonly<ShareCard>, actions: RivalryResultActions): Screen {
   const root = openScreen(parent, true);
   make('h2', '', won ? 'RIVALRY SETTLED!' : 'RIVALRY CONTINUES...', root);
   const col = make('div', 'menu-col', null, root);
-  button(col, 'Rematch', onAgain, 'primary');
-  button(col, 'Other rivalries', onList);
-  button(col, 'Main menu', onMenu);
+  button(col, 'Rematch', actions.onAgain, 'primary');
+  shareResultButton(col, card);
+  button(col, 'Other rivalries', actions.onList);
+  button(col, 'Main menu', actions.onMenu);
   focusFirst(root);
   return { root };
 }
