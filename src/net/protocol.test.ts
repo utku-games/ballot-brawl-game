@@ -21,6 +21,8 @@ describe('protocol', () => {
       { kind: MsgKind.Settings, arena: ArenaKind.Rooftop, extras: false },
       { kind: MsgKind.Start, hostFighter: 'goat', guestFighter: 'pig', arena: ArenaKind.Museum, extras: true, seed: 42 },
       { kind: MsgKind.Leave },
+      { kind: MsgKind.Ping },
+      { kind: MsgKind.Here, inLobby: false },
     ];
     for (const m of msgs) expect(roundTrip(m)).toEqual(m);
   });
@@ -45,6 +47,7 @@ describe('protocol', () => {
       { kind: MsgKind.Input, frame: { ...EMPTY_FRAME, punch: 1 } },
       { kind: MsgKind.Input, frame: { ...EMPTY_FRAME, moveX: Number.NaN } },
       { kind: MsgKind.State, state: { tick: 1 } },
+      { kind: MsgKind.Here, inLobby: 'yes' },
     ];
     for (const b of bad) expect(() => parseMessage(b)).toThrow(NetProtocolError);
   });

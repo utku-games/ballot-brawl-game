@@ -14,6 +14,8 @@ export enum LinkFailure {
   RoomNotFound = 'room-not-found',
   Network = 'network',
   Protocol = 'protocol',
+  /** Nothing arrived for several seconds. */
+  Silent = 'silent',
 }
 
 /** A room could not be opened or joined; failure says why. */

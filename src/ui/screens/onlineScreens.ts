@@ -89,6 +89,8 @@ export interface LobbyView {
   host: boolean;
   mine: string | null;
   theirs: string | null;
+  /** False while the opponent is still on the result screen. */
+  theirsHere: boolean;
   arena: ArenaKind;
   extras: boolean;
 }
@@ -129,7 +131,8 @@ export function lobbyScreen(parent: HTMLElement, view: Readonly<LobbyView>, acti
   if (view.host) {
     hostSettings(root, view, actions);
     const start = button(root, 'Start fight', actions.onStart, 'primary');
-    start.disabled = !view.mine || !view.theirs;
+    start.disabled = !view.mine || !view.theirs || !view.theirsHere;
+    if (!view.theirsHere) make('p', '', 'Waiting for your opponent to come back to the lobby...', root);
   } else {
     const items = view.extras ? 'items on' : 'items off';
     make('p', 'tagline', `${ARENA_STYLES[view.arena].label}, ${items}. The host starts the fight.`, root);

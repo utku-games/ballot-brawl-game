@@ -1,7 +1,7 @@
 /**
  * The online protocol: every message the host and guest exchange, and parseMessage, which checks an incoming value.
- * Lobby messages carry fighter picks, the host's arena and items choice and the start of a match; during a match the
- * guest sends control frames and the host sends match states.
+ * Lobby messages carry fighter picks, lobby presence, the host's arena and items choice and the start of a match; during
+ * a match the guest sends control frames and the host sends match states, and both ping to stay alive.
  * Parsing rejects unknown kinds, wrong field types, unknown fighters or arenas and other protocol versions with NetProtocolError.
  */
 import { NetProtocolError } from '../core/errors';
@@ -11,7 +11,7 @@ import { ROSTER } from '../roster/roster';
 import { ArenaKind } from '../view/arenaKinds';
 
 /** Bumped whenever a message or the match state changes shape; both sides must match. */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 export enum MsgKind {
   Hello = 'hello',
@@ -21,6 +21,10 @@ export enum MsgKind {
   Input = 'input',
   State = 'state',
   Leave = 'leave',
+  /** Keep-alive, sent once a second. */
+  Ping = 'ping',
+  /** Whether the sender is in the lobby (or choosing a fighter there), so the host only starts when both are. */
+  Here = 'here',
 }
 
 /** Everything both sides need to build the same match. */
@@ -39,7 +43,9 @@ export type NetMessage =
   | ({ kind: MsgKind.Start } & StartInfo)
   | { kind: MsgKind.Input; frame: ControlFrame }
   | { kind: MsgKind.State; state: MatchState }
-  | { kind: MsgKind.Leave };
+  | { kind: MsgKind.Leave }
+  | { kind: MsgKind.Ping }
+  | { kind: MsgKind.Here; inLobby: boolean };
 
 type Fields = Record<string, unknown>;
 
@@ -114,6 +120,8 @@ export function parseMessage(data: unknown): NetMessage {
     case MsgKind.Input: return { kind: MsgKind.Input, frame: frame(m.frame) };
     case MsgKind.State: return { kind: MsgKind.State, state: state(m.state) };
     case MsgKind.Leave: return { kind: MsgKind.Leave };
+    case MsgKind.Ping: return { kind: MsgKind.Ping };
+    case MsgKind.Here: return { kind: MsgKind.Here, inLobby: flag(m.inLobby) };
     default: return fail('unknown kind');
   }
 }

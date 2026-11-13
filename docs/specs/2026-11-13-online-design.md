@@ -15,6 +15,10 @@ server) and delegated the rest of the design ("go without waiting").
   The host simulates with the guest as Player 2 and sends every tick's state (about 1.5 KB, 60 per second, about
   90 KB/s); the guest sends its controls every frame and shows the states with a three-state jitter buffer.
 - **Pause:** the menu opens with Resume and Quit, but the fight goes on underneath.
+- **Keep-alive:** both sides ping once a second; eight silent seconds count as a lost connection.
+- **Rematches:** each side tells the other when it is in the lobby; the host's Start waits for the guest.
+- **Trusting the host:** the guest checks each streamed state in depth (`net/stateCheck.ts`) and drops the link
+  on a malformed one.
 - **Leaving:** Leave, Quit, closing the page or a dropped connection tell the other side, which returns to the
   online menu with a message. A different protocol version is reported as "reload the page".
 
