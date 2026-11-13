@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p scripts",
     "test": "vitest run",
-    "faces": "node scripts/faces/fetchFaces.mjs",
+    "faces": "node scripts/faces/fetchFaces.ts",
     "deploy": "bash scripts/deploy.sh",
     "deploy:preview": "bash scripts/deploy.sh --preview"
   },
@@ -18,7 +18,9 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@types/node": "^24.19.2",
     "@types/three": "^0.186.0",
+    "sharp": "^0.34.5",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
     "vitest": "^4.1.11"
