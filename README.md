@@ -9,7 +9,7 @@ anyone depicted. There is no gore: knocked-out fighters just fall over.
 
 ## Status
 
-Early development; see [ROADMAP.md](ROADMAP.md). Currently: project scaffold with a placeholder arena.
+Early development; see [ROADMAP.md](ROADMAP.md). Currently: playable 2v2 demo brawls; menus and story mode are next.
 
 ## Modes (planned)
 
@@ -17,7 +17,7 @@ Early development; see [ROADMAP.md](ROADMAP.md). Currently: project scaffold wit
 - **Story**: choose Politicians, Tycoons or Legends, pick a fighter and beat 10 opponents in a row,
   ending with the boss. The score comes from the damage you take.
 
-## Controls (planned)
+## Controls
 
 | Action | Keyboard P1 | Keyboard P2 | Gamepad | Touch |
 |---|---|---|---|---|

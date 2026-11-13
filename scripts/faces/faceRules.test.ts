@@ -14,7 +14,7 @@ describe('isAllowedLicense', () => {
   });
 
   it('rejects non-free and unknown licences', () => {
-    for (const name of ['CC BY-NC 2.0', 'CC BY-ND 4.0', 'Fair use', 'All rights reserved', '']) {
+    for (const name of ['CC BY-NC 2.0', 'CC BY-ND 4.0', 'CC BY 4.0 ND', 'PD-NC', 'Fair use', 'All rights reserved', '']) {
       expect(isAllowedLicense(name)).toBe(false);
     }
   });
