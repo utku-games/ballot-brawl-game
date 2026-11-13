@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-13
+
 ### Fixed
 - Story mode: the third lost fight now ends the run and shows the score; before, "See score" started a hidden
   fourth fight. Continues are shown as lives.
