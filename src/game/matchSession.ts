@@ -1,0 +1,194 @@
+/**
+ * Runs one match in the browser: fixed-step simulation, player and CPU control, rendering, HUD, sound and announcements.
+ * It shows a short intro, plays the fight with slow motion after finishers, waits on the knockout, then reports the outcome.
+ * Pausing simply stops the clock; the game app owns the pause menu and calls resume or dispose.
+ */
+import { createRng, FixedStepClock, type GameRenderer, type Rng } from '@utku/engine';
+import { type AiMemory, FRESH_MEMORY, thinkAi } from '../ai/aiBrain';
+import { profileForLevel, type AiProfile } from '../ai/aiProfile';
+import { METER_MAX, TICK_SECONDS } from '../fight/fightConstants';
+import { EndReason, MatchPhase, type FighterInput, type MatchState, type TeamIndex } from '../fight/fightTypes';
+import { isAlive } from '../fight/matchQueries';
+import { createMatch } from '../fight/matchSetup';
+import { stepMatch } from '../fight/matchStep';
+import { EMPTY_FRAME, PlayerId, toFighterInput, type ControlFrame } from '../input/controlFrame';
+import { fighterById } from '../roster/roster';
+import type { GameAudio } from '../audio/gameAudio';
+import { Hud } from '../ui/hud';
+import { PLAYER_COLORS } from '../ui/theme';
+import type { TouchControls } from '../ui/touchControls';
+import { MatchView } from '../view/matchView';
+import { playerSlots, updateAssignment } from './controlAssignment';
+import { buildMatchSetup, cpuLevels, initialAssignment, type MatchPlan } from './matchPlan';
+
+export interface MatchOutcome {
+  winner: TeamIndex | null;
+  /** Damage taken by the human team (team 0) this match. */
+  playerTeamDamage: number;
+  final: MatchState;
+}
+
+export interface SessionDeps {
+  renderer: GameRenderer;
+  hudParent: HTMLElement;
+  audio: GameAudio;
+  touch: TouchControls | null;
+}
+
+const MAX_CATCH_UP_STEPS = 5;
+const INTRO_SECONDS = 1.6;
+const OUTRO_SECONDS = 2.6;
+const SLOWMO_SECONDS = 0.9;
+const SLOWMO_SCALE = 0.3;
+const PLAYERS: readonly PlayerId[] = [PlayerId.One, PlayerId.Two];
+
+export class MatchSession {
+  private state: MatchState;
+  private prev: MatchState;
+  private readonly view: MatchView;
+  private readonly hud: Hud;
+  private readonly clock = new FixedStepClock(TICK_SECONDS, MAX_CATCH_UP_STEPS);
+  private readonly rng: Rng;
+  private readonly profiles = new Map<string, AiProfile>();
+  private memories = new Map<string, AiMemory>();
+  private assignment: Map<PlayerId, string>;
+  private time = 0;
+  private slowmo = 0;
+  private outro = -1;
+  private started = false;
+  private finished = false;
+  paused = false;
+
+  constructor(plan: MatchPlan, private readonly deps: SessionDeps, private readonly onEnd: (o: MatchOutcome) => void, private readonly onPause: () => void) {
+    this.state = createMatch(buildMatchSetup(plan));
+    this.prev = this.state;
+    this.rng = createRng(plan.seed);
+    for (const [slot, level] of cpuLevels(plan)) this.profiles.set(slot, profileForLevel(level));
+    this.assignment = initialAssignment(plan);
+    this.view = new MatchView(deps.renderer, this.state, plan.arena);
+    this.hud = new Hud(deps.hudParent, this.state);
+    this.refreshMarkers();
+    this.hud.announce('READY?', false, false);
+  }
+
+  private refreshMarkers(): void {
+    const markers = new Map<string, number>();
+    const css = new Map<string, string>();
+    for (const [player, slot] of this.assignment) {
+      markers.set(slot, PLAYER_COLORS[player].hex);
+      css.set(slot, PLAYER_COLORS[player].css);
+    }
+    this.view.setMarkers(markers);
+    this.hud.setPlayers(css);
+  }
+
+  private inputsFor(frames: Readonly<Record<PlayerId, ControlFrame>>, first: boolean): FighterInput[] {
+    const bySlot = new Map<string, ControlFrame>();
+    for (const [player, slot] of this.assignment) {
+      const f = frames[player];
+      bySlot.set(slot, first ? f : { ...EMPTY_FRAME, moveX: f.moveX, moveY: f.moveY, defend: f.defend });
+    }
+    return this.state.fighters.map((f) => {
+      const frame = bySlot.get(f.slotId);
+      if (frame) return toFighterInput(frame);
+      const d = thinkAi(this.state, f, this.profiles.get(f.slotId) ?? profileForLevel(0.5), this.memories.get(f.slotId) ?? FRESH_MEMORY, this.rng);
+      this.memories.set(f.slotId, d.memory);
+      return d.input;
+    });
+  }
+
+  private updateAssignments(frames: Readonly<Record<PlayerId, ControlFrame>>): void {
+    let changed = false;
+    for (const player of PLAYERS) {
+      const before = this.assignment.get(player);
+      this.assignment = updateAssignment(this.assignment, this.state.fighters, player, frames[player].swap);
+      if (this.assignment.get(player) !== before) changed = true;
+    }
+    if (changed) {
+      this.memories = new Map([...this.memories].filter(([slot]) => !playerSlots(this.assignment).has(slot)));
+      this.refreshMarkers();
+    }
+  }
+
+  private announceEvents(state: Readonly<MatchState>): void {
+    for (const e of state.events) {
+      if (e.kind === 'swing' && e.move === 'finisher') {
+        const f = state.fighters.find((x) => x.slotId === e.attacker);
+        if (f) this.hud.announce(`${fighterById(f.fighterId).finisher}!`, true, false);
+      } else if (e.kind === 'hit' && e.move === 'finisher') {
+        this.slowmo = SLOWMO_SECONDS;
+      } else if (e.kind === 'matchOver') {
+        this.hud.announce(e.reason === EndReason.KnockOut ? 'K.O.!' : 'TIME!', false, true);
+        this.outro = OUTRO_SECONDS;
+      }
+    }
+  }
+
+  private simulate(dt: number, frames: Readonly<Record<PlayerId, ControlFrame>>): number {
+    const scale = this.slowmo > 0 ? SLOWMO_SCALE : 1;
+    this.slowmo = Math.max(0, this.slowmo - dt);
+    const plan = this.clock.advance(dt * scale);
+    for (let i = 0; i < plan.steps && this.state.phase === MatchPhase.Fighting; i += 1) {
+      if (i === 0) this.updateAssignments(frames);
+      const inputs = this.inputsFor(frames, i === 0);
+      this.prev = this.state;
+      this.state = stepMatch(this.state, inputs);
+      this.view.handleEvents(this.state.events, this.state);
+      this.deps.audio.playEvents(this.state.events);
+      this.announceEvents(this.state);
+    }
+    return plan.alpha;
+  }
+
+  /** Advances the session by one rendered frame. */
+  frame(dt: number, frames: Readonly<Record<PlayerId, ControlFrame>>): void {
+    if (this.finished) return;
+    if (PLAYERS.some((p) => frames[p].pause) && !this.paused && this.outro < 0) {
+      this.paused = true;
+      this.onPause();
+    }
+    if (this.paused) {
+      this.view.render(this.prev, this.state, 1, this.time, 0);
+      return;
+    }
+    this.time += dt;
+    let alpha = 1;
+    if (!this.started) {
+      if (this.time >= INTRO_SECONDS) {
+        this.started = true;
+        this.hud.announce('FIGHT!', false, false);
+      }
+    } else if (this.state.phase === MatchPhase.Fighting) {
+      alpha = this.simulate(dt, frames);
+    } else {
+      this.prev = this.state;
+      this.outro -= dt;
+      if (this.outro <= 0) this.finish();
+    }
+    this.view.render(this.prev, this.state, alpha, this.time, dt * (this.slowmo > 0 ? SLOWMO_SCALE : 1));
+    this.updateHud();
+  }
+
+  private updateHud(): void {
+    const focus = this.assignment.get(PlayerId.One) ?? null;
+    this.hud.update(this.state, focus);
+    const f = this.state.fighters.find((x) => x.slotId === focus);
+    const mates = f ? this.state.fighters.filter((x) => x.team === f.team && isAlive(x)).length : 0;
+    this.deps.touch?.setState(!!f && f.meter >= METER_MAX, mates > 1);
+  }
+
+  private finish(): void {
+    this.finished = true;
+    const damage = this.state.fighters.filter((f) => f.team === 0).reduce((sum, f) => sum + f.damageTaken, 0);
+    this.onEnd({ winner: this.state.winner, playerTeamDamage: damage, final: this.state });
+  }
+
+  resume(): void {
+    this.paused = false;
+  }
+
+  dispose(): void {
+    this.view.dispose();
+    this.hud.dispose();
+  }
+}
