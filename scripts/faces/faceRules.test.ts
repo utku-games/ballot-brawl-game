@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
-  alphaBounds, chinY, creditEntry, cropFromFaceBox, cropRect, DEFAULT_LANDMARKS, HEAD_FILL, headShape, isAllowedLicense,
+  alphaBounds, chinY, creditEntry, JAW_MARGIN, jawCut, SIDE_LEVEL, cropFromFaceBox, cropRect, DEFAULT_LANDMARKS, HEAD_FILL, headShape, isAllowedLicense,
   NECK_FADE, refitRect, stripHtml, toHex, toTexture,
 } from './faceRules.ts';
 
@@ -75,5 +75,33 @@ describe('sticker shaping', () => {
     const p = toTexture({ x: 0.5, y: 0.5 }, { left: 40, top: 40, side: 20 }, 100, 100);
     expect(p).toEqual({ x: 0.5, y: 0.5 });
     expect(chinY(DEFAULT_LANDMARKS)).toBeGreaterThan(DEFAULT_LANDMARKS.mouth.y);
+  });
+});
+
+describe('jawCut', () => {
+  const jaw = [
+    { x: 0.2, y: 0.4 }, { x: 0.25, y: 0.62 }, { x: 0.35, y: 0.76 }, { x: 0.5, y: 0.82 },
+    { x: 0.65, y: 0.76 }, { x: 0.75, y: 0.62 }, { x: 0.8, y: 0.4 },
+  ];
+  const mouthY = 0.66;
+
+  it('follows the jaw under the chin', () => {
+    expect(jawCut(0.5, jaw, 0.9, mouthY)).toBeCloseTo(0.82 + JAW_MARGIN);
+  });
+
+  it('levels off at the sides and is continuous at the jaw edges', () => {
+    const side = mouthY + (0.82 - mouthY) * SIDE_LEVEL + JAW_MARGIN;
+    expect(jawCut(0.05, jaw, 0.9, mouthY)).toBeCloseTo(side);
+    expect(jawCut(0.21, jaw, 0.9, mouthY)).toBeCloseTo(side);
+    let last = jawCut(0, jaw, 0.9, mouthY);
+    for (let u = 0.01; u <= 1; u += 0.01) {
+      const cut = jawCut(u, jaw, 0.9, mouthY);
+      expect(Math.abs(cut - last)).toBeLessThan(0.05);
+      last = cut;
+    }
+  });
+
+  it('falls back to the estimated chin without a jawline', () => {
+    expect(jawCut(0.5, [], 0.77, mouthY)).toBe(0.77);
   });
 });
