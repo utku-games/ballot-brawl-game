@@ -62,8 +62,12 @@ export interface CreditEntry {
 /** Description of the edits applied to every source photo. */
 export const CHANGES_NOTE = 'Cropped to the head, resized and given a feathered oval mask.';
 
+/** Licence terms that forbid commercial use or modification; any match is rejected. */
+const FORBIDDEN_TERMS = /\b(nc|nd)\b/i;
+
 export function isAllowedLicense(shortName: string): boolean {
   const name = shortName.trim();
+  if (FORBIDDEN_TERMS.test(name)) return false;
   return ALLOWED_LICENSES.some((rule) => rule.test(name));
 }
 

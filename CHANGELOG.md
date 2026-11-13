@@ -7,7 +7,6 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 - Project scaffold: Vite, TypeScript and Three.js on the shared `@utku/engine` v0.2.0.
-- Placeholder arena scene rendered through the engine renderer.
 - Arena bounds with a tested clamp shared by the simulation and the view.
 - Vercel deploy script, harness config, architecture contract and roadmap.
 - Deterministic team fight simulation for 1v1 up to 4v4: punch, kick, defend (no damage, drains guard),
@@ -19,3 +18,10 @@ All notable changes to this project are documented here. The format follows
 - Face pipeline: downloads Commons photos, rejects non-free licences, crops the head (macOS Vision helper
   for detection), feathers an oval mask and writes WebP faces plus credits with author, licence and tone.
 - Faces and credits for all 36 fighters.
+- 3D bobblehead fighters: suit, tie and limbs in roster colours, a big head wearing the photo face that
+  keeps looking at the camera, procedural animation from move frame data and a springy head wobble.
+- Three arenas (The Chamber, The Trading Floor, The Grand Gallery), a camera that frames every fighter,
+  screen shake, finisher zoom and slow motion, and particle bursts for hits, blocks and knockdowns.
+- HUD with portraits and health bars for every fighter, timer, power and guard bars and announcements.
+- Keyboard (two players), gamepad and touch controls with Punch, Kick, Defend, Finisher and Swap buttons.
+- Synthesised sound effects for swings, hits, blocks, finishers and knockouts.
