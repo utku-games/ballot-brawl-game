@@ -29,6 +29,10 @@ export enum Outfit {
   Hoodie = 'hoodie',
   LeatherJacket = 'leather-jacket',
   Casual = 'casual',
+  /** Sports shirt with a stripe, shorts and bare legs. */
+  Jersey = 'jersey',
+  /** No clothes: the whole body in the hair colour, for the animals. */
+  Fur = 'fur',
 }
 
 export enum Neckwear {
@@ -72,6 +76,7 @@ export enum Prop {
   ToyRocket = 'toy-rocket',
   Dime = 'dime',
   Microphone = 'microphone',
+  Phone = 'phone',
 }
 
 /** A fighter's kit in roster-table order: build, outfit, neckwear, headwear, prop. */

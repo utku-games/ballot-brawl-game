@@ -20,6 +20,10 @@ const APPLE_RED = 0xc8202a;
 const STEM = 0x3a2a10;
 const BOLT_YELLOW = 0xffe040;
 const INK = 0x141414;
+const BALL_WHITE = 0xf4f4f4;
+const BULB_GLASS = 0xfff2a0;
+const PAN_BLACK = 0x222226;
+const HANDLE = 0x5a3a20;
 /** Turns a part lying along +y to lie along +z, the flight direction. */
 const ALONG_FLIGHT: Vec3 = [Math.PI / 2, 0, 0];
 
@@ -56,6 +60,19 @@ const BUILDERS: Readonly<Record<Projectile, () => PartSpec[]>> = {
     at(Shape.Box, [0.06, 0.16, 0], [0.08, 0.2, 0.08], BOLT_YELLOW, [0, 0, 0.5]),
     at(Shape.Box, [-0.02, 0, 0], [0.08, 0.22, 0.08], BOLT_YELLOW, [0, 0, -0.6]),
     at(Shape.Box, [0.04, -0.17, 0], [0.08, 0.22, 0.08], BOLT_YELLOW, [0, 0, 0.5]),
+  ],
+  [Projectile.Football]: () => [
+    at(Shape.Sphere, [0, 0, 0], [0.3, 0.3, 0.3], BALL_WHITE, UPRIGHT),
+    at(Shape.Sphere, [0, 0.11, 0.06], [0.1, 0.06, 0.1], INK, UPRIGHT),
+    at(Shape.Sphere, [0.1, -0.05, 0.08], [0.08, 0.08, 0.06], INK, UPRIGHT),
+  ],
+  [Projectile.LightBulb]: () => [
+    at(Shape.Sphere, [0, 0.04, 0], [0.26, 0.3, 0.26], BULB_GLASS, UPRIGHT),
+    at(Shape.Cylinder, [0, -0.15, 0], [0.12, 0.1, 0.12], SILVER, UPRIGHT),
+  ],
+  [Projectile.FryingPan]: () => [
+    at(Shape.Cylinder, [0, 0, 0], [0.4, 0.05, 0.4], PAN_BLACK, UPRIGHT),
+    at(Shape.Box, [0, 0, -0.32], [0.05, 0.04, 0.26], HANDLE, UPRIGHT),
   ],
   [Projectile.Note]: () => [
     at(Shape.Sphere, [0, -0.12, 0], [0.2, 0.15, 0.15], INK, UPRIGHT),

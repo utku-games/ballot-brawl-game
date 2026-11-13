@@ -1,6 +1,6 @@
 /**
- * The three arenas, one per category, with their lighting environments and colour palettes.
- * Parliament for politicians, a trading floor for tycoons and a museum hall for legends.
+ * The four arenas, one per story category, with their lighting environments and colour palettes.
+ * Parliament for politicians, a trading floor for tycoons, a museum hall for legends and a TV studio for celebrities.
  * Kept as data so the arena builder and the menus share the same names and colours.
  */
 import type { RenderEnvironment } from '@utku/engine';
@@ -10,6 +10,7 @@ export enum ArenaKind {
   Parliament = 'parliament',
   TradingFloor = 'tradingFloor',
   Museum = 'museum',
+  Studio = 'studio',
 }
 
 export interface ArenaStyle {
@@ -26,9 +27,12 @@ export const ARENA_FOR_CATEGORY: Readonly<Record<Category, ArenaKind>> = {
   [Category.Politicians]: ArenaKind.Parliament,
   [Category.Tycoons]: ArenaKind.TradingFloor,
   [Category.Legends]: ArenaKind.Museum,
+  [Category.Celebrities]: ArenaKind.Studio,
+  /** Specials have no story; Brawl picks its own arena. */
+  [Category.Specials]: ArenaKind.Studio,
 };
 
-export const ARENA_ORDER: readonly ArenaKind[] = [ArenaKind.Parliament, ArenaKind.TradingFloor, ArenaKind.Museum];
+export const ARENA_ORDER: readonly ArenaKind[] = [ArenaKind.Parliament, ArenaKind.TradingFloor, ArenaKind.Museum, ArenaKind.Studio];
 
 export const ARENA_STYLES: Readonly<Record<ArenaKind, ArenaStyle>> = {
   [ArenaKind.Parliament]: {
@@ -43,6 +47,13 @@ export const ARENA_STYLES: Readonly<Record<ArenaKind, ArenaStyle>> = {
     environment: {
       skyTopColor: 0x060a14, skyBottomColor: 0x1d2a44, fogColor: 0x0b1222, fogNear: 25, fogFar: 70,
       sunDirection: { x: 0.4, y: 1, z: 0.6 }, sunColor: 0xd8e6ff, ambientColor: 0x7d8fb8,
+    },
+  },
+  [ArenaKind.Studio]: {
+    label: 'The Studio', floor: 0x1e1a24, floorEdge: 0x111014, wall: 0x6a2a8a, trim: 0xffc84a, accent: 0xb0182a,
+    environment: {
+      skyTopColor: 0x0a0812, skyBottomColor: 0x2a1a3a, fogColor: 0x120e1a, fogNear: 25, fogFar: 70,
+      sunDirection: { x: 0.1, y: 1, z: 0.8 }, sunColor: 0xfff0e0, ambientColor: 0x9a88b8,
     },
   },
   [ArenaKind.Museum]: {

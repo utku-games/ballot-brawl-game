@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Six new fighters in the existing leagues: Benjamin Netanyahu, Ali Khamenei, Xi Jinping, Shehbaz Sharif and
+  Recep Tayyip Erdoğan join the Politicians, and Thomas Edison (throwing light bulbs) joins the Legends.
+- A Celebrities story league with its own arena, The Studio: Taylor Swift, Beyoncé, Cristiano Ronaldo, Lionel Messi,
+  Dwayne Johnson, Snoop Dogg, Lady Gaga, Gordon Ramsay, Keanu Reeves, James Cameron and Kim Kardashian, with
+  Arnold Schwarzenegger as boss.
+- Specials for Brawl: a goat, a pig and a camel.
+- New costume pieces (sports jersey, fur, phone) and thrown footballs, light bulbs and frying pans.
+
 ## [0.4.0] - 2026-11-13
 
 ### Added
