@@ -1,7 +1,7 @@
 /**
  * Per-fighter rules of one tick: action timers, guard regeneration, facing, starting attacks or defending, and walking.
  * A fighter can only act from Idle or Defend; attacks lock facing and movement until they finish.
- * The finisher needs a full power meter and empties it when it starts.
+ * The finisher needs a full power meter and empties it when it starts; a Rush finisher carries the fighter forward.
  */
 import {
   BASE_WALK_SPEED, DEFEND_SPEED_SCALE, GETUP_INVULNERABLE_TICKS, GUARD_MAX, GUARD_REGEN_PER_TICK, METER_MAX,
@@ -9,7 +9,8 @@ import {
 } from './fightConstants';
 import { ActionKind, type FightEvent, type FighterInput, type FighterState } from './fightTypes';
 import { nearestEnemy } from './matchQueries';
-import { MoveKind, moveDuration, MOVES } from './moves';
+import { FinisherStyle } from '../roster/signatureTypes';
+import { isActiveFrame, MoveKind, moveData, moveDuration, RUSH_SPEED } from './moves';
 
 /** Facing changes only when the enemy is farther than this, so stacked bodies do not spin. */
 const FACING_MIN_DISTANCE = 0.05;
@@ -47,7 +48,7 @@ function faceNearestEnemy(f: FighterState, fighters: readonly FighterState[]): v
 }
 
 function startAttack(f: FighterState, move: MoveKind, events: FightEvent[]): void {
-  f.action = { kind: ActionKind.Attack, frame: 0, duration: moveDuration(MOVES[move]), move, hitIds: [] };
+  f.action = { kind: ActionKind.Attack, frame: 0, duration: moveDuration(moveData(move, f.profile.finisher)), move, hitIds: [] };
   events.push({ kind: 'swing', attacker: f.slotId, move });
 }
 
@@ -81,6 +82,14 @@ function walk(f: FighterState, input: Readonly<FighterInput>): void {
   f.moving = true;
 }
 
+/** Carries a Rush finisher forward along the fighter's facing during its active frames. */
+function rush(f: FighterState): void {
+  if (f.action.kind !== ActionKind.Attack || f.action.move !== MoveKind.Finisher || f.profile.finisher !== FinisherStyle.Rush) return;
+  if (!isActiveFrame(moveData(MoveKind.Finisher, FinisherStyle.Rush), f.action.frame)) return;
+  f.x += f.facingX * RUSH_SPEED * TICK_SECONDS;
+  f.z += f.facingZ * RUSH_SPEED * TICK_SECONDS;
+}
+
 /** Applies one tick of input to a living fighter; mutates the (cloned) fighter. */
 export function controlFighter(
   f: FighterState,
@@ -92,5 +101,6 @@ export function controlFighter(
     faceNearestEnemy(f, fighters);
     chooseAction(f, input, events);
   }
+  rush(f);
   walk(f, input);
 }

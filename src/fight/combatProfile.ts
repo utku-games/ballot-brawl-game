@@ -5,6 +5,7 @@
  */
 import { RosterDataError } from '../core/errors';
 import { STAT_MAX, STAT_MIN, type FighterStats } from '../roster/rosterTypes';
+import type { FinisherStyle } from '../roster/signatureTypes';
 import {
   BASE_HEALTH, BOSS_DAMAGE_SCALE, BOSS_HEALTH_SCALE, BOSS_SIZE_SCALE, DAMAGE_PER_POWER,
   HEALTH_PER_TOUGHNESS, SPEED_PER_STAT, STAT_MIDDLE,
@@ -25,7 +26,7 @@ function checkStat(name: string, value: number): void {
   }
 }
 
-export function combatProfile(stats: Readonly<FighterStats>, mods: Readonly<ProfileModifiers>): CombatProfile {
+export function combatProfile(stats: Readonly<FighterStats>, mods: Readonly<ProfileModifiers>, finisher: FinisherStyle): CombatProfile {
   checkStat('power', stats.power);
   checkStat('speed', stats.speed);
   checkStat('toughness', stats.toughness);
@@ -36,5 +37,6 @@ export function combatProfile(stats: Readonly<FighterStats>, mods: Readonly<Prof
     damageScale: (1 + (stats.power - STAT_MIDDLE) * DAMAGE_PER_POWER) * bossDamage * mods.damageScale,
     speedScale: 1 + (stats.speed - STAT_MIDDLE) * SPEED_PER_STAT,
     sizeScale: mods.boss ? BOSS_SIZE_SCALE : 1,
+    finisher,
   };
 }

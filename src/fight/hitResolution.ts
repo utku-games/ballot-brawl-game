@@ -9,14 +9,14 @@ import {
 } from './fightConstants';
 import { ActionKind, type FightEvent, type FighterAction, type FighterState } from './fightTypes';
 import { isAlive } from './matchQueries';
-import { isActiveFrame, MoveKind, MOVES, type MoveData } from './moves';
+import { isActiveFrame, isRanged, MoveKind, moveData, type MoveData } from './moves';
 
 /** Knockback kept when a hit is blocked. */
 const BLOCK_KNOCKBACK_SCALE = 0.4;
 /** Distance below which two bodies count as on top of each other (no arc test). */
 const OVERLAP_EPSILON = 1e-6;
 
-interface Contact {
+export interface Contact {
   attacker: FighterState;
   target: FighterState;
   move: MoveKind;
@@ -28,7 +28,8 @@ function action(kind: ActionKind, duration: number): FighterAction {
   return { kind, frame: 0, duration, move: null, hitIds: [] };
 }
 
-function canBeHit(target: Readonly<FighterState>): boolean {
+/** True when the target can currently take a hit (alive, not invulnerable, not lying down). */
+export function canBeHit(target: Readonly<FighterState>): boolean {
   return isAlive(target) && target.invulnerable <= 0 && target.action.kind !== ActionKind.Knockdown;
 }
 
@@ -51,7 +52,8 @@ function collectContacts(fighters: readonly FighterState[]): Contact[] {
   for (const attacker of fighters) {
     const move = attacker.action.move;
     if (attacker.action.kind !== ActionKind.Attack || move === null) continue;
-    const data = MOVES[move];
+    if (move === MoveKind.Finisher && isRanged(attacker.profile.finisher)) continue;
+    const data = moveData(move, attacker.profile.finisher);
     if (!isActiveFrame(data, attacker.action.frame)) continue;
     for (const target of fighters) {
       const contact = contactWith(attacker, target, move, data);
@@ -66,7 +68,7 @@ function addMeter(f: FighterState, amount: number): void {
 }
 
 function applyBlock(c: Contact, events: FightEvent[]): void {
-  const data = MOVES[c.move];
+  const data = moveData(c.move, c.attacker.profile.finisher);
   const t = c.target;
   t.guard -= data.guardDamage;
   addMeter(t, Math.min(data.guardDamage, METER_MAX) * METER_GAIN_BLOCK);
@@ -81,7 +83,7 @@ function applyBlock(c: Contact, events: FightEvent[]): void {
 }
 
 function applyHit(c: Contact, events: FightEvent[]): void {
-  const data = MOVES[c.move];
+  const data = moveData(c.move, c.attacker.profile.finisher);
   const t = c.target;
   const damage = Math.max(1, Math.round(data.damage * c.attacker.profile.damageScale));
   t.health = Math.max(0, t.health - damage);
@@ -107,13 +109,19 @@ function applyHit(c: Contact, events: FightEvent[]): void {
   t.pushZ += c.dirZ * knock;
 }
 
+/** Applies one contact as a block or a hit, as melee and projectiles both do. */
+export function applyContact(c: Contact, events: FightEvent[]): void {
+  if (c.target.action.kind === ActionKind.Defend) applyBlock(c, events);
+  else applyHit(c, events);
+}
+
+/** True when the target can currently take a hit (alive, not invulnerable, not lying down). */
 /** Applies every contact of this tick; mutates the fighters (already cloned by the caller). */
 export function resolveAttacks(fighters: FighterState[], events: FightEvent[]): void {
   const contacts = collectContacts(fighters);
   for (const c of contacts) c.attacker.action.hitIds.push(c.target.slotId);
   for (const c of contacts) {
     if (!isAlive(c.target)) continue;
-    if (c.target.action.kind === ActionKind.Defend) applyBlock(c, events);
-    else applyHit(c, events);
+    applyContact(c, events);
   }
 }

@@ -30,7 +30,9 @@ export interface MatchPlan {
 function entry(slot: Readonly<SlotPlan>): TeamEntry {
   return {
     fighterId: slot.fighterId,
-    profile: combatProfile(fighterById(slot.fighterId).stats, { boss: slot.boss, damageScale: slot.damageScale }),
+    profile: combatProfile(
+      fighterById(slot.fighterId).stats, { boss: slot.boss, damageScale: slot.damageScale }, fighterById(slot.fighterId).signature.style,
+    ),
   };
 }
 
