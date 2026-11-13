@@ -18,6 +18,7 @@ export interface FighterInput {
   punch: boolean;
   kick: boolean;
   special: boolean;
+  taunt: boolean;
   /** Held this tick. */
   defend: boolean;
 }
@@ -30,6 +31,8 @@ export enum ActionKind {
   GuardBroken = 'guardBroken',
   Knockdown = 'knockdown',
   KnockedOut = 'knockedOut',
+  /** Showing off: cannot act, earns meter if it ends without being hit. */
+  Taunt = 'taunt',
 }
 
 export interface FighterAction {
@@ -111,6 +114,8 @@ export enum EndReason {
 export type FightEvent =
   | { kind: 'swing'; attacker: string; move: MoveKind }
   | { kind: 'throw'; attacker: string; projectile: string }
+  | { kind: 'taunt'; fighter: string }
+  | { kind: 'tauntDone'; fighter: string; meter: number }
   | { kind: 'hit'; attacker: string; target: string; move: MoveKind; damage: number; x: number; z: number }
   | { kind: 'block'; attacker: string; target: string; move: MoveKind; x: number; z: number }
   | { kind: 'guardBreak'; target: string }
@@ -131,5 +136,5 @@ export interface MatchState {
 
 /** An input that does nothing; used for knocked-out fighters and missing controllers. */
 export const IDLE_INPUT: Readonly<FighterInput> = {
-  moveX: 0, moveZ: 0, punch: false, kick: false, special: false, defend: false,
+  moveX: 0, moveZ: 0, punch: false, kick: false, special: false, taunt: false, defend: false,
 };

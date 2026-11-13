@@ -28,6 +28,8 @@ export const TOUCH_CSS = `
   animation: hud-pulse 0.6s ease-in-out infinite alternate; }
 .touch-small { position: absolute; width: 56px; height: 56px; }
 .touch-swap { right: calc(max(14px, env(safe-area-inset-right)) + 172px); bottom: max(24px, env(safe-area-inset-bottom)); }
+.touch-taunt { right: calc(max(14px, env(safe-area-inset-right)) + 172px); bottom: calc(max(24px, env(safe-area-inset-bottom)) + 66px);
+  font-size: 11px; }
 .touch-pause { right: max(12px, env(safe-area-inset-right)); top: calc(max(8px, env(safe-area-inset-top)) + 64px);
   width: 44px; height: 44px; font-size: 16px; }
 `;

@@ -44,7 +44,7 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
   if (state.phase === MatchPhase.Over) return { ...state, events: [] };
   const fighters = state.fighters.map(cloneFighter);
   const events: FightEvent[] = [];
-  for (const f of fighters) advanceTimers(f);
+  for (const f of fighters) advanceTimers(f, events);
   fighters.forEach((f, i) => {
     if (isAlive(f)) controlFighter(f, inputs[i] ?? IDLE_INPUT, fighters, events);
     else f.moving = false;
