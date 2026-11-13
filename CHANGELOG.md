@@ -5,6 +5,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Online: switching apps on a phone or hiding the tab no longer ends the game after 8 seconds. The page tells the
+  other player it is away, which then waits up to two minutes, and a page whose own timers were frozen starts a fresh
+  window when it comes back instead of blaming the other side. A real drop still shows "Connection lost" in seconds.
+- Online lobby: the host cannot start while the guest is choosing or changing fighter.
+  Online protocol version 3: both players need the updated game.
+
 ## [0.13.0] - 2026-11-13
 
 ### Changed
