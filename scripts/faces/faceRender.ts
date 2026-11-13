@@ -6,7 +6,7 @@
  */
 import sharp from 'sharp';
 import {
-  alphaBounds, chinY, cropRect, DEFAULT_LANDMARKS, headShape, refitRect, toHex, toTexture, type Crop, type FaceLandmarks,
+  alphaBounds, chinY, cropRect, jawCut, DEFAULT_LANDMARKS, headShape, refitRect, toHex, toTexture, type Crop, type FaceLandmarks,
   type PixelRect,
 } from './faceRules.ts';
 
@@ -15,6 +15,8 @@ const WEBP_QUALITY = 84;
 const CHANNELS_RGB = 3;
 const CHANNELS_RGBA = 4;
 const BYTE_MAX = 255;
+/** Alpha below this is forced to exactly zero so no faint ghost survives compression. */
+const MIN_ALPHA = 0.08;
 /** Outline thickness: blur radius of the alpha before thresholding, and the threshold (0..255). */
 const OUTLINE_BLUR = 3.5;
 const OUTLINE_THRESHOLD = 12;
@@ -28,6 +30,7 @@ export interface ImageLandmarks {
   eyeB: { x: number; y: number };
   mouth: { x: number; y: number };
   mouthWidth: number;
+  jaw?: Array<{ x: number; y: number }>;
 }
 
 export interface RenderResult {
@@ -42,6 +45,7 @@ function textureLandmarks(img: ImageLandmarks | null, rect: Readonly<PixelRect>,
     eyeB: toTexture(img.eyeB, rect, w, h),
     mouth: toTexture(img.mouth, rect, w, h),
     mouthWidth: (img.mouthWidth * w) / rect.side,
+    jaw: (img.jaw ?? []).map((p) => toTexture(p, rect, w, h)),
   };
 }
 
@@ -78,11 +82,14 @@ async function skinTone(rgb: Buffer, lm: FaceLandmarks): Promise<string> {
 function shapedAlpha(mask: Buffer | null, lm: FaceLandmarks): Buffer {
   const alpha = Buffer.alloc(FACE_SIZE * FACE_SIZE);
   const chin = chinY(lm);
-  for (let y = 0; y < FACE_SIZE; y += 1) {
-    for (let x = 0; x < FACE_SIZE; x += 1) {
+  for (let x = 0; x < FACE_SIZE; x += 1) {
+    const u = (x + 0.5) / FACE_SIZE;
+    const cut = jawCut(u, lm.jaw, chin, lm.mouth.y);
+    for (let y = 0; y < FACE_SIZE; y += 1) {
       const i = y * FACE_SIZE + x;
       const subject = mask ? mask[i] / BYTE_MAX : 1;
-      alpha[i] = Math.round(subject * headShape((x + 0.5) / FACE_SIZE, (y + 0.5) / FACE_SIZE, chin) * BYTE_MAX);
+      const a = subject * headShape(u, (y + 0.5) / FACE_SIZE, cut);
+      alpha[i] = a < MIN_ALPHA ? 0 : Math.round(a * BYTE_MAX);
     }
   }
   return alpha;
@@ -111,6 +118,6 @@ export async function renderFace(imagePath: string, maskFile: string | null, cro
     for (let c = 0; c < CHANNELS_RGB; c += 1) out[i * 4 + c] = Math.round(rgb[i * 3 + c] * a + BYTE_MAX * (1 - a));
     out[i * 4 + 3] = Math.max(alpha[i], border[i]);
   }
-  await sharp(out, { raw: { width: FACE_SIZE, height: FACE_SIZE, channels: CHANNELS_RGBA } }).webp({ quality: WEBP_QUALITY }).toFile(outPath);
+  await sharp(out, { raw: { width: FACE_SIZE, height: FACE_SIZE, channels: CHANNELS_RGBA } }).webp({ quality: WEBP_QUALITY, alphaQuality: 100 }).toFile(outPath);
   return { tone: await skinTone(rgb, landmarks), landmarks };
 }

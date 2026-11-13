@@ -1,6 +1,6 @@
 // Analyses source photos with the macOS Vision framework: lifts the subject out of the background and finds face landmarks.
-// For each image it writes <outDir>/<name>.mask.png (white = subject) and prints one JSON line with the face box, eye and
-// mouth positions normalised to 0..1 with the origin at the top left. Results are cached data, so the pipeline stays portable.
+// For each image it writes <outDir>/<name>.mask.png (white = subject) and prints one JSON line with the face box, eye,
+// mouth and jawline positions normalised to 0..1 with the origin at the top left. Results are cached data, so the pipeline stays portable.
 import CoreImage
 import Foundation
 import Vision
@@ -13,6 +13,7 @@ struct Analysis: Encodable {
     let eyeB: Point?
     let mouth: Point?
     let mouthWidth: Double?
+    let jaw: [Point]?
     let mask: Bool
 }
 
@@ -45,7 +46,7 @@ for path in args.dropFirst() {
     let name = url.deletingPathExtension().lastPathComponent
     let mask = writeMask(handler, to: outDir.appendingPathComponent("\(name).mask.png"))
     let request = VNDetectFaceLandmarksRequest()
-    var result = Analysis(path: path, box: nil, eyeA: nil, eyeB: nil, mouth: nil, mouthWidth: nil, mask: mask)
+    var result = Analysis(path: path, box: nil, eyeA: nil, eyeB: nil, mouth: nil, mouthWidth: nil, jaw: nil, mask: mask)
     if (try? handler.perform([request])) != nil, let faces = request.results, !faces.isEmpty {
         let face = faces.max { $0.boundingBox.width * $0.boundingBox.height < $1.boundingBox.width * $1.boundingBox.height }!
         let b = face.boundingBox
@@ -58,6 +59,7 @@ for path in args.dropFirst() {
             eyeB: center(face.landmarks?.rightPupil ?? face.landmarks?.rightEye, b),
             mouth: center(face.landmarks?.outerLips, b),
             mouthWidth: width,
+            jaw: face.landmarks?.faceContour?.normalizedPoints.map { toImage($0, b) },
             mask: mask
         )
     }
