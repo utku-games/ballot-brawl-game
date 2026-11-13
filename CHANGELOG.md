@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-13
+
 ### Added
 - Signature finishers: every fighter's finisher now has a style. Smash hits hard in a wide arc, Rush dashes through
   everyone in its path, Throw sends a themed projectile flying (Newton's apple, Musk's rocket, Tesla's lightning bolt,
