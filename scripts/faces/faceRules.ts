@@ -86,6 +86,36 @@ export const OVAL_CENTER_Y = 0.47;
 export const OVAL_RADIUS_X = 0.47;
 export const OVAL_RADIUS_Y = 0.52;
 
+/** Cells per side of the head silhouette grid; the 3D head card keeps only the occupied cells. */
+export const SILHOUETTE_CELLS = 48;
+/** Hex digits per row of the silhouette grid (4 cells per digit). */
+const BITS_PER_HEX = 4;
+const HEX_RADIX = 16;
+
+/**
+ * Coarse occupancy grid of a square alpha buffer: a cell is set when any pixel in it reaches SOLID_ALPHA.
+ * Rows run top to bottom and each row is a hex string, leftmost cell in the highest bit of the first digit.
+ */
+export function silhouetteRows(alpha: Uint8Array, size: number, cells: number): string[] {
+  const rows: string[] = [];
+  for (let cy = 0; cy < cells; cy += 1) {
+    let bits = '';
+    for (let cx = 0; cx < cells; cx += 1) {
+      let on = false;
+      const x0 = Math.floor((cx * size) / cells);
+      const x1 = Math.floor(((cx + 1) * size) / cells);
+      const y0 = Math.floor((cy * size) / cells);
+      const y1 = Math.floor(((cy + 1) * size) / cells);
+      for (let y = y0; y < y1 && !on; y += 1) for (let x = x0; x < x1 && !on; x += 1) on = alpha[y * size + x] >= SOLID_ALPHA;
+      bits += on ? '1' : '0';
+    }
+    let hex = '';
+    for (let i = 0; i < bits.length; i += BITS_PER_HEX) hex += Number.parseInt(bits.slice(i, i + BITS_PER_HEX).padEnd(BITS_PER_HEX, '0'), 2).toString(HEX_RADIX);
+    rows.push(hex);
+  }
+  return rows;
+}
+
 export interface CreditEntry {
   id: string;
   file: string;
@@ -97,6 +127,8 @@ export interface CreditEntry {
   /** Average skin tone of the cropped face, used to colour the hands and neck. */
   tone: string;
   landmarks: FaceLandmarks;
+  /** Head silhouette grid (SILHOUETTE_CELLS rows of hex), used to shape the 3D head. */
+  silhouette: string[];
 }
 
 /** Description of the edits applied to every source photo. */
@@ -252,7 +284,7 @@ export function chinY(landmarks: Readonly<FaceLandmarks>): number {
   return landmarks.mouth.y + (landmarks.mouth.y - eyeY) * CHIN_DROP;
 }
 
-export function creditEntry(id: string, file: string, meta: Readonly<CommonsMeta>, tone: string, landmarks: Readonly<FaceLandmarks>): CreditEntry {
+export function creditEntry(id: string, file: string, meta: Readonly<CommonsMeta>, tone: string, landmarks: Readonly<FaceLandmarks>, silhouette: readonly string[]): CreditEntry {
   return {
     id,
     file,
@@ -263,5 +295,6 @@ export function creditEntry(id: string, file: string, meta: Readonly<CommonsMeta
     changes: CHANGES_NOTE,
     tone,
     landmarks: { ...landmarks },
+    silhouette: [...silhouette],
   };
 }

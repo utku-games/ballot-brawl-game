@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
-  alphaBounds, chinY, creditEntry, inHeadRegion, JAW_SIDE_PAD, paddedJaw, cropFromFaceBox, cropRect, DEFAULT_LANDMARKS, HEAD_FILL, headShape, isAllowedLicense,
+  alphaBounds, chinY, creditEntry, inHeadRegion, JAW_SIDE_PAD, paddedJaw, silhouetteRows, cropFromFaceBox, cropRect, DEFAULT_LANDMARKS, HEAD_FILL, headShape, isAllowedLicense,
   NECK_FADE, refitRect, stripHtml, toHex, toTexture,
 } from './faceRules.ts';
 
@@ -44,7 +44,7 @@ describe('credits', () => {
   it('strips HTML from the author and keeps the licence', () => {
     const entry = creditEntry('a', 'A.jpg', {
       license: 'CC BY 2.0 ', licenseUrl: 'https://example.org/l', artist: '<a href="x">Jane &amp; Co</a>', pageUrl: 'https://example.org/p',
-    }, toHex(255, 128, 0), DEFAULT_LANDMARKS);
+    }, toHex(255, 128, 0), DEFAULT_LANDMARKS, ['f0']);
     expect(entry.author).toBe('Jane & Co');
     expect(entry.license).toBe('CC BY 2.0');
     expect(entry.tone).toBe('#ff8000');
@@ -104,5 +104,19 @@ describe('inHeadRegion', () => {
     expect(padded[3].y).toBeCloseTo(0.82 + JAW_SIDE_PAD, 2);
     expect(inHeadRegion(0.5, 0.7, [], 0.77)).toBe(true);
     expect(inHeadRegion(0.5, 0.8, [], 0.77)).toBe(false);
+  });
+});
+
+describe('silhouetteRows', () => {
+  it('marks cells that contain solid pixels, row by row in hex', () => {
+    const size = 8;
+    const alpha = new Uint8Array(size * size);
+    alpha[0] = 255;
+    alpha[7 * size + 7] = 255;
+    const rows = silhouetteRows(alpha, size, 8);
+    expect(rows).toHaveLength(8);
+    expect(rows[0]).toBe('80');
+    expect(rows[7]).toBe('01');
+    expect(rows[3]).toBe('00');
   });
 });

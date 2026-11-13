@@ -34,4 +34,12 @@ describe('face credits', () => {
     expect(isPlausibleSkin(0x40c060)).toBe(false);
     for (const c of FACE_CREDITS) expect(isPlausibleSkin(toneOf(c.id)), c.id).toBe(true);
   });
+
+  it('gives every face a 48-row silhouette with a solid centre', () => {
+    for (const c of FACE_CREDITS) {
+      expect(c.silhouette, c.id).toHaveLength(48);
+      for (const row of c.silhouette) expect(row, c.id).toMatch(/^[0-9a-f]{12}$/);
+      expect(c.silhouette[24]?.slice(5, 7), c.id).toBe('ff');
+    }
+  });
 });
