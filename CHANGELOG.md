@@ -5,6 +5,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Beyoncé's face now comes from a clean, front-facing photo (no microphone over her mouth).
+- Caesar's laurel is a wreath of leaves from temple to temple instead of a ring above his head.
+- The health bars rewind with the knockout replay instead of showing the end of the match.
+- The face pipeline fetches a fighter's photo again when its source file changes, instead of reusing the old one.
+
 ## [0.8.0] - 2026-11-13
 
 ### Added

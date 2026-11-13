@@ -187,7 +187,6 @@ export class MatchSession {
       alpha = this.simulate(dt, frames);
     } else if (this.stepOutro(dt, frames)) {
       this.view.setLight(FULL_LIGHT);
-      this.updateHud();
       return;
     } else {
       this.prev = this.state;
@@ -195,7 +194,7 @@ export class MatchSession {
     const fighting = this.started && this.state.phase === MatchPhase.Fighting;
     this.view.setLight(fighting ? blackoutLight(this.twist, this.time) : FULL_LIGHT);
     this.view.render(this.prev, this.state, alpha, this.time, dt * (this.slowmo > 0 ? SLOWMO_SCALE : 1));
-    this.updateHud();
+    this.updateHud(this.state);
   }
 
   /** After the match: the pause before the replay, the replay itself, then the outro. True when a replay frame was drawn. */
@@ -234,6 +233,7 @@ export class MatchSession {
     this.replayShown = index;
     const before = this.history[Math.max(0, index - 1)];
     this.view.render(before, this.history[index], 1, this.time, dt * REPLAY_SPEED);
+    this.updateHud(this.history[index]);
     return true;
   }
 
@@ -244,11 +244,12 @@ export class MatchSession {
     this.hud.announce('K.O.!', false, true);
   }
 
-  private updateHud(): void {
+  /** Refreshes the HUD and touch buttons from a state: the live one, or the frame being replayed. */
+  private updateHud(shown: Readonly<MatchState>): void {
     const focus = this.assignment.get(PlayerId.One) ?? null;
-    this.hud.update(this.state, focus);
-    const f = this.state.fighters.find((x) => x.slotId === focus);
-    const mates = f ? this.state.fighters.filter((x) => x.team === f.team && isAlive(x)).length : 0;
+    this.hud.update(shown, focus);
+    const f = shown.fighters.find((x) => x.slotId === focus);
+    const mates = f ? shown.fighters.filter((x) => x.team === f.team && isAlive(x)).length : 0;
     this.deps.touch?.setState(!!f && f.meter >= METER_MAX, mates > 1);
   }
 

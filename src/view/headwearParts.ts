@@ -18,8 +18,15 @@ const LAUREL_GREEN = 0x4f7a2a;
 const BERET_RED = 0x5a1a1e;
 const JEWEL_RED = 0xb01a2a;
 const LENS = 0x2a2f3a;
-/** The wreath dips toward the brow. */
-const LAUREL_TILT = 0.3;
+/** Laurel wreath: arc radius as a share of head width, how far the arc centre sits below the head top (in radii),
+ * leaves per spray, the bare gap at the crown and the sweep of each spray (radians), leaf tilt and depth. */
+const LAUREL_RADIUS = 0.48;
+const LAUREL_DROP = 0.9;
+const LAUREL_LEAVES = 6;
+const LAUREL_GAP = 0.12;
+const LAUREL_SWEEP = 1.15;
+const LAUREL_LEAF_TILT = 0.5;
+const LAUREL_Z = 0;
 /** The headcloth hood sits well behind the face. */
 const HOOD_Z = -0.16;
 
@@ -72,11 +79,23 @@ function crown(f: Readonly<HeadFrame>): PartSpec[] {
   return [band, ...jewels];
 }
 
+/** A laurel wreath seen from the front: two sprays of leaves running from the temples up to the crown of the head. */
 function laurel(f: Readonly<HeadFrame>): PartSpec[] {
-  return [part({
-    shape: Shape.Torus, anchor: Anchor.Card, position: [0, f.top - HAT_SINK / 2, HAT_Z], size: [f.width * 0.62, 0.05, f.width * 0.62],
-    rotation: [Math.PI / 2 - LAUREL_TILT, 0, 0], color: LAUREL_GREEN,
-  })];
+  const radius = f.width * LAUREL_RADIUS;
+  const centreY = f.top - radius * LAUREL_DROP;
+  const leaves: PartSpec[] = [];
+  for (let i = 0; i < LAUREL_LEAVES; i += 1) {
+    const t = i / (LAUREL_LEAVES - 1);
+    for (const side of [-1, 1]) {
+      const angle = Math.PI / 2 - side * (LAUREL_GAP + t * LAUREL_SWEEP);
+      leaves.push(part({
+        shape: Shape.Sphere, anchor: Anchor.Card,
+        position: [Math.cos(angle) * radius, centreY + Math.sin(angle) * radius, LAUREL_Z],
+        size: [0.05, 0.11, 0.03], rotation: [0, 0, angle - Math.PI / 2 + side * LAUREL_LEAF_TILT], color: LAUREL_GREEN,
+      }));
+    }
+  }
+  return leaves;
 }
 
 /** A striped headcloth: a gold band on the head top, a hood framing the face from behind, and lappets to the shoulders. */
