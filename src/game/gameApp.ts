@@ -101,6 +101,7 @@ export class GameApp {
     }, this.rng);
     window.addEventListener('keydown', (e) => this.onMenuKey(e));
     window.addEventListener('pagehide', () => this.online.disconnect());
+    document.addEventListener('visibilitychange', () => this.online.setHidden(document.hidden));
   }
 
   /** Opens the title, or what a shared link points at when target is not null. */

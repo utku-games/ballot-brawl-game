@@ -139,6 +139,7 @@ export class OnlineFlow {
 
   private checkPulse(): void {
     const now = Date.now();
+    this.liveness?.checked(now);
     if (this.liveness?.lost(now)) this.leave(FAILURE_TEXT[LinkFailure.Silent]);
     else if (this.liveness?.pingDue(now)) this.conn?.send({ kind: MsgKind.Ping });
   }
@@ -148,6 +149,8 @@ export class OnlineFlow {
     switch (m.kind) {
       case MsgKind.Ping:
         return;
+      case MsgKind.Away:
+        return this.liveness?.setPeerAway(m.away);
       case MsgKind.Here:
         if (this.theirsHere === m.inLobby) return;
         this.theirsHere = m.inLobby;
@@ -196,6 +199,7 @@ export class OnlineFlow {
 
   private pick(): void {
     this.inLobby = false;
+    this.conn?.send({ kind: MsgKind.Here, inLobby: false });
     this.shell.pickFighter((id) => {
       this.mine = id;
       this.conn?.send({ kind: MsgKind.Pick, fighterId: id });
@@ -236,6 +240,13 @@ export class OnlineFlow {
     const title = winners.length ? `${fighterById(winners[0]).name.toUpperCase()} WINS!` : 'DRAW!';
     const card = brawlCard(sides, winners, false);
     this.shell.showOverlay((p) => onlineResultScreen(p, title, card, () => this.showLobby(), () => this.leave(null)));
+  }
+
+  /** Tells the other player when this page is hidden or shown, so a short app switch does not end the link. */
+  setHidden(hidden: boolean): void {
+    if (!this.conn) return;
+    if (!hidden) this.liveness?.resumed(Date.now());
+    this.conn.send({ kind: MsgKind.Away, away: hidden });
   }
 
   /** Tells the other player and closes any room or connection, without changing screens (used when the page closes). */

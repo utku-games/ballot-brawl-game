@@ -11,7 +11,7 @@ import { ROSTER } from '../roster/roster';
 import { ArenaKind } from '../view/arenaKinds';
 
 /** Bumped whenever a message or the match state changes shape; both sides must match. */
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 
 export enum MsgKind {
   Hello = 'hello',
@@ -23,8 +23,10 @@ export enum MsgKind {
   Leave = 'leave',
   /** Keep-alive, sent once a second. */
   Ping = 'ping',
-  /** Whether the sender is in the lobby (or choosing a fighter there), so the host only starts when both are. */
+  /** Whether the sender is on the lobby screen (not choosing a fighter or on a result), so the host only starts when both are. */
   Here = 'here',
+  /** The sender's page was hidden (app switched, tab in background) or came back. */
+  Away = 'away',
 }
 
 /** Everything both sides need to build the same match. */
@@ -45,7 +47,8 @@ export type NetMessage =
   | { kind: MsgKind.State; state: MatchState }
   | { kind: MsgKind.Leave }
   | { kind: MsgKind.Ping }
-  | { kind: MsgKind.Here; inLobby: boolean };
+  | { kind: MsgKind.Here; inLobby: boolean }
+  | { kind: MsgKind.Away; away: boolean };
 
 type Fields = Record<string, unknown>;
 
@@ -122,6 +125,7 @@ export function parseMessage(data: unknown): NetMessage {
     case MsgKind.Leave: return { kind: MsgKind.Leave };
     case MsgKind.Ping: return { kind: MsgKind.Ping };
     case MsgKind.Here: return { kind: MsgKind.Here, inLobby: flag(m.inLobby) };
+    case MsgKind.Away: return { kind: MsgKind.Away, away: flag(m.away) };
     default: return fail('unknown kind');
   }
 }

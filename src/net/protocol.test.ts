@@ -23,6 +23,7 @@ describe('protocol', () => {
       { kind: MsgKind.Leave },
       { kind: MsgKind.Ping },
       { kind: MsgKind.Here, inLobby: false },
+      { kind: MsgKind.Away, away: true },
     ];
     for (const m of msgs) expect(roundTrip(m)).toEqual(m);
   });
@@ -41,6 +42,7 @@ describe('protocol', () => {
     const bad: unknown[] = [
       null, 'hi', {}, { kind: 'nope' },
       { kind: MsgKind.Hello, version: PROTOCOL_VERSION + 1 },
+      { kind: MsgKind.Hello, version: PROTOCOL_VERSION - 1 },
       { kind: MsgKind.Pick, fighterId: 'nobody' },
       { kind: MsgKind.Settings, arena: 'moon', extras: true },
       { kind: MsgKind.Start, hostFighter: 'goat', guestFighter: 'pig', arena: ArenaKind.Museum, extras: 'yes', seed: 1 },
@@ -48,6 +50,7 @@ describe('protocol', () => {
       { kind: MsgKind.Input, frame: { ...EMPTY_FRAME, moveX: Number.NaN } },
       { kind: MsgKind.State, state: { tick: 1 } },
       { kind: MsgKind.Here, inLobby: 'yes' },
+      { kind: MsgKind.Away, away: 'yes' },
     ];
     for (const b of bad) expect(() => parseMessage(b)).toThrow(NetProtocolError);
   });
