@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-13
+
 ### Changed
 - Online: both sides ping once a second, so a phone that loses signal or a frozen tab shows "Connection lost"
   after 8 seconds instead of hanging. The host can start a rematch only once the guest is back in the lobby
