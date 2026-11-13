@@ -24,6 +24,20 @@ export interface FaceCredit {
   changes: string;
   /** CSS hex colour such as "#c89a80". */
   tone: string;
+  /** Eye and mouth positions in face-texture coordinates (0..1, origin top left). */
+  landmarks: FaceLandmarks;
+}
+
+export interface FacePoint {
+  x: number;
+  y: number;
+}
+
+export interface FaceLandmarks {
+  eyeA: FacePoint;
+  eyeB: FacePoint;
+  mouth: FacePoint;
+  mouthWidth: number;
 }
 
 export const FACE_CREDITS: readonly FaceCredit[] = data.credits;

@@ -5,6 +5,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Photo heads are now background-free sticker cut-outs with a white outline that always face the camera.
+- Live facial expressions: fighters wince and squash when hit, shut their eyes under circling stars when knocked out
+  or dizzy, and grin when they win.
+- End-of-match poses: winners cheer with pumping fists and jumps, the losing side slumps.
+
+### Fixed
+- Knocked-out fighters now fall to the floor and stay down, including the final knockout of a match.
+- The camera keeps knocked-out fighters in view after the match ends.
+
 ## [0.1.0] - 2026-11-13
 
 ### Added

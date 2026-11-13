@@ -6,10 +6,10 @@
  */
 import * as THREE from 'three';
 import type { GameRenderer } from '@utku/engine';
-import type { FightEvent, FighterState, MatchState } from '../fight/fightTypes';
+import { MatchPhase, type FightEvent, type FighterState, type MatchState } from '../fight/fightTypes';
 import { isAlive } from '../fight/matchQueries';
 import { MoveKind } from '../fight/moves';
-import { toneOf } from '../roster/credits';
+import { creditFor, toneOf } from '../roster/credits';
 import { fighterById } from '../roster/roster';
 import { ARENA_STYLES, type ArenaKind } from './arenaKinds';
 import { buildArena, disposeArena } from './arenaModels';
@@ -17,6 +17,7 @@ import { CameraRig } from './cameraRig';
 import { faceTexture } from './faceTextures';
 import { FighterView } from './fighterView';
 import { BurstKind, HitEffects } from './hitEffects';
+import { Mood } from './poseLogic';
 
 export const TEAM_COLORS: readonly [number, number] = [0x3a8dff, 0xff4a4a];
 
@@ -42,7 +43,7 @@ export class MatchView {
     view.scene.add(this.arena);
     for (const f of state.fighters) {
       const def = fighterById(f.fighterId);
-      const fv = new FighterView(def, toneOf(def.id), faceTexture(def.id), TEAM_COLORS[f.team], f.profile.sizeScale);
+      const fv = new FighterView(def, toneOf(def.id), faceTexture(def.id), creditFor(def.id).landmarks, TEAM_COLORS[f.team], f.profile.sizeScale);
       this.fighters.set(f.slotId, fv);
       view.scene.add(fv.rig.root);
     }
@@ -56,9 +57,11 @@ export class MatchView {
   }
 
   render(prev: Readonly<MatchState>, cur: Readonly<MatchState>, alpha: number, time: number, dt: number): void {
-    cur.fighters.forEach((f, i) => this.fighters.get(f.slotId)?.update(prev.fighters[i] ?? f, f, alpha, time, dt));
     const living = cur.fighters.filter(isAlive);
-    this.camera.update(living.length > 0 ? living : cur.fighters, dt, this.firstFrame);
+    const framed = cur.phase === MatchPhase.Over || living.length === 0 ? cur.fighters : living;
+    this.camera.update(framed, dt, this.firstFrame);
+    const cameraQuat = this.view.camera.quaternion;
+    cur.fighters.forEach((f, i) => this.fighters.get(f.slotId)?.update(prev.fighters[i] ?? f, f, alpha, time, dt, cameraQuat));
     this.firstFrame = false;
     this.effects.update(dt);
     this.view.render(dt);
@@ -87,6 +90,11 @@ export class MatchView {
     } else if (e.kind === 'swing' && e.move === MoveKind.Finisher) {
       const a = bySlot.get(e.attacker);
       if (a) this.camera.zoomTo(a.x, a.z);
+    } else if (e.kind === 'matchOver') {
+      for (const [slot, fv] of this.fighters) {
+        const team = bySlot.get(slot)?.team;
+        fv.setMood(e.winner === null ? Mood.Lose : team === e.winner ? Mood.Win : Mood.Lose);
+      }
     } else if (e.kind === 'ko' || e.kind === 'knockdown') {
       const t = bySlot.get(e.target);
       if (t) this.effects.burst(BurstKind.Dust, t.x, FLOOR_HEIGHT, t.z);
@@ -97,7 +105,10 @@ export class MatchView {
   dispose(): void {
     this.view.scene.remove(this.arena);
     disposeArena(this.arena);
-    for (const fv of this.fighters.values()) this.view.scene.remove(fv.rig.root);
+    for (const fv of this.fighters.values()) {
+      this.view.scene.remove(fv.rig.root);
+      fv.dispose();
+    }
     this.effects.dispose();
   }
 }

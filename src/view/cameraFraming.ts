@@ -24,7 +24,7 @@ export const FRAME_MARGIN = 1.8;
 export const MIN_DISTANCE = 8;
 export const MAX_DISTANCE = 22;
 /** Depth spread counts less than width because the camera looks down at the floor. */
-const DEPTH_WEIGHT = 0.6;
+const DEPTH_WEIGHT = 0.9;
 
 export function frameFighters(input: Readonly<FramingInput>): Framing {
   if (input.points.length === 0) return { targetX: 0, targetZ: 0, distance: MIN_DISTANCE };
