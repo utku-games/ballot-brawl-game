@@ -13,6 +13,8 @@ import { createMatch } from '../fight/matchSetup';
 import { stepMatch } from '../fight/matchStep';
 import { EMPTY_FRAME, PlayerId, toFighterInput, type ControlFrame } from '../input/controlFrame';
 import { fighterById } from '../roster/roster';
+import type { Twist } from '../rivalry/rivalryTypes';
+import { blackoutLight } from '../rivalry/twists';
 import type { GameAudio } from '../audio/gameAudio';
 import { Hud } from '../ui/hud';
 import { PLAYER_COLORS } from '../ui/theme';
@@ -56,11 +58,13 @@ export class MatchSession {
   private slowmo = 0;
   private outro = -1;
   private started = false;
+  private readonly twist: Twist;
   private finished = false;
   paused = false;
 
   constructor(plan: MatchPlan, private readonly deps: SessionDeps, private readonly onEnd: (o: MatchOutcome) => void, private readonly onPause: () => void) {
     this.state = createMatch(buildMatchSetup(plan));
+    this.twist = plan.twist;
     this.prev = this.state;
     this.rng = createRng(plan.seed);
     for (const [slot, level] of cpuLevels(plan)) this.profiles.set(slot, profileForLevel(level));
@@ -69,7 +73,7 @@ export class MatchSession {
     this.hud = new Hud(deps.hudParent, this.state);
     this.refreshMarkers();
     this.view.setIntro(true);
-    this.hud.announce('READY?', false, false);
+    this.hud.announce(plan.banner ?? 'READY?', plan.banner !== null, false);
   }
 
   private refreshMarkers(): void {
@@ -169,6 +173,7 @@ export class MatchSession {
       this.outro -= dt;
       if (this.outro <= 0) this.finish();
     }
+    this.view.setLight(this.started ? blackoutLight(this.twist, this.time) : 1);
     this.view.render(this.prev, this.state, alpha, this.time, dt * (this.slowmo > 0 ? SLOWMO_SCALE : 1));
     this.updateHud();
   }
