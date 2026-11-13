@@ -5,6 +5,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-13
+
+### Added
+- Sharing: every result screen (Rivalry Battles, Brawl, Party and the end of a Story run) has a Share button. On
+  phones it opens the share sheet with a result card image (the fighters' faces, the winner ringed in gold, the
+  headline and the parody disclaimer); on desktops it copies the message and link and saves the card image.
+- Challenge links: `?rivalry=<id>` opens that rivalry's side picker, and `?duel=<fighter>~<fighter>` opens a
+  one-on-one Brawl setup with those two fighters. The rivalry side picker has a Share challenge button, and a
+  shared one-on-one Brawl result links to a rematch. Unknown fighters, bosses and broken links open the title.
+
 ## [0.10.0] - 2026-11-13
 
 ### Added
