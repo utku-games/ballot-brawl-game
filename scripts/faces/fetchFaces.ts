@@ -22,7 +22,7 @@ const DETECTOR = join(ROOT, 'scripts', 'faces', 'detectFaces.swift');
 const COMMONS_API = 'https://commons.wikimedia.org/w/api.php';
 const USER_AGENT = 'face-fetch-script/0.1';
 const DOWNLOAD_WIDTH = 1200;
-const FACE_SIZE = 256;
+const FACE_SIZE = 320;
 const WEBP_QUALITY = 82;
 const REQUEST_GAP_MS = 1500;
 const RETRY_BACKOFF_MS = 10000;
@@ -37,8 +37,8 @@ const SOURCE_READ = { failOn: 'none' } as const;
 const OVAL_MASK = Buffer.from(
   `<svg xmlns="http://www.w3.org/2000/svg" width="${FACE_SIZE}" height="${FACE_SIZE}">` +
     '<defs><radialGradient id="g" cx="50%" cy="50%" r="50%">' +
-    '<stop offset="72%" stop-color="#fff" stop-opacity="1"/><stop offset="98%" stop-color="#fff" stop-opacity="0"/>' +
-    '</radialGradient></defs><ellipse cx="50%" cy="50%" rx="44%" ry="50%" fill="url(#g)"/></svg>',
+    '<stop offset="86%" stop-color="#fff" stop-opacity="1"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/>' +
+    '</radialGradient></defs><ellipse cx="50%" cy="50%" rx="49%" ry="50%" fill="url(#g)"/></svg>',
 );
 
 class FacePipelineError extends Error {}

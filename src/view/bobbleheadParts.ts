@@ -16,7 +16,7 @@ export const HIP_WIDTH = 0.16;
 export const SHOULDER_WIDTH = 0.38;
 export const NECK_HEIGHT = 0.08;
 /** Fraction of the head diameter the photo spans; below 1 so the face fills the front instead of the whole hemisphere. */
-const FACE_SPAN = 0.92;
+const FACE_SPAN = 1;
 const FACE_LIFT = 1.006;
 const HAIR_LIFT = 1.025;
 const SPHERE_SEGMENTS = 28;
