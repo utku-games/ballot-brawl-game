@@ -16,6 +16,8 @@ import { THEME } from './theme';
 
 const LOW_HEALTH = 0.3;
 const TEAM_CSS = [THEME.teamA, THEME.teamB, THEME.teamC, THEME.teamD] as const;
+/** More rows than this in one column switch the HUD to its compact size. */
+const COMPACT_ROWS = 2;
 
 interface Row {
   root: HTMLElement;
@@ -40,7 +42,8 @@ export class Hud {
     const left = make('div', 'hud-team', null, top);
     this.timer = make('div', 'hud-timer', '', top);
     const right = make('div', 'hud-team right', null, top);
-    for (const f of state.fighters) this.rows.set(f.slotId, this.buildRow(f.team === 0 ? left : right, f));
+    for (const f of state.fighters) this.rows.set(f.slotId, this.buildRow(f.team % 2 === 0 ? left : right, f));
+    if (Math.max(left.childElementCount, right.childElementCount) > COMPACT_ROWS) this.root.classList.add('compact');
     const power = make('div', 'hud-power', null, this.root);
     this.ready = make('div', 'hud-ready', 'FINISHER READY', power);
     this.meterFill = make('div', 'hud-fill', null, make('div', 'hud-bar meter', null, power));

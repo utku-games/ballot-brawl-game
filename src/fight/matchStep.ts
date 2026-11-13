@@ -14,7 +14,7 @@ import { resolveAttacks } from './hitResolution';
 import { spawnHazard, stepHazards } from './hazards';
 import { dropFromFallen, pickUpItems, spawnItem } from './items';
 import { spawnProjectiles, stepProjectiles } from './projectiles';
-import { applyRingOuts, canRingOut } from './ringOuts';
+import { applyRingOuts, canRingOut, keepOnPlatform } from './ringOuts';
 import { isAlive, livingOnTeam, teamHealthFraction } from './matchQueries';
 
 function cloneFighter(f: Readonly<FighterState>): FighterState {
@@ -77,7 +77,11 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
   for (const f of fighters) slideKnockback(f);
   if (state.ringOuts) applyRingOuts(fighters, events);
   separateBodies(fighters);
-  for (const f of fighters) if (!onOpenEdge(f, state.ringOuts)) keepInArena(f);
+  fighters.forEach((f, i) => {
+    if (onOpenEdge(f, state.ringOuts)) return;
+    if (state.ringOuts) keepOnPlatform(f, state.fighters[i]);
+    else keepInArena(f);
+  });
   const ticksLeft = Math.max(0, state.ticksLeft - 1);
   const result = decideOutcome(fighters, ticksLeft === 0);
   if (result.over) events.push({ kind: 'matchOver', winner: result.winner, reason: result.reason });

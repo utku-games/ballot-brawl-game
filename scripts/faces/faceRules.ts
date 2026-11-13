@@ -298,3 +298,19 @@ export function creditEntry(id: string, file: string, meta: Readonly<CommonsMeta
     silhouette: [...silhouette],
   };
 }
+
+/** A patch of background the subject mask kept, cut away by hand: a polygon in the finished sticker's texture coordinates (0..1). */
+export type ErasePolygon = TexturePoint[];
+
+/** True when the texture point (u, v) lies inside any erase polygon (even-odd rule). */
+export function isErased(u: number, v: number, polygons: readonly ErasePolygon[]): boolean {
+  return polygons.some((poly) => {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i, i += 1) {
+      const a = poly[i];
+      const b = poly[j];
+      if ((a.y > v) !== (b.y > v) && u < ((b.x - a.x) * (v - a.y)) / (b.y - a.y) + a.x) inside = !inside;
+    }
+    return inside;
+  });
+}

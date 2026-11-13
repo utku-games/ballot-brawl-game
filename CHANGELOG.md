@@ -5,6 +5,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- The goat and camel faces no longer carry background patches (the goat's white body behind its horn, a second
+  camel beside the first): the face pipeline takes hand-drawn erase polygons per face.
+- Phone HUD with four sides: health bars split two per side instead of one and three, rows shrink when a column
+  holds more than two fighters, and the touch pause button sits under the timer so no health bar covers it.
+- The Rooftop: a fighter left teetering past the wall line after a hit stays where the knockback left them instead
+  of snapping back inside; they still cannot walk off.
+
 ## [0.12.0] - 2026-11-13
 
 ### Added
