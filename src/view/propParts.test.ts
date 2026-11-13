@@ -39,7 +39,9 @@ describe('propParts', () => {
       const handHeight = torsoPivotHeight(d) + d.torsoHeight - SHOULDER_DROP + handY(d);
       for (const p of Object.values(Prop)) {
         for (const s of propParts(p, d).parts.filter((x) => x.anchor === Anchor.HandR)) {
-          expect(handHeight + s.position[1] - Math.max(...s.size) / 2, `${b} ${p}`).toBeGreaterThan(0);
+          const tilt = s.rotation[0];
+          const halfDrop = (s.size[1] / 2) * Math.abs(Math.cos(tilt)) + (Math.max(s.size[0], s.size[2]) / 2) * Math.abs(Math.sin(tilt));
+          expect(handHeight + s.position[1] - halfDrop, `${b} ${p}`).toBeGreaterThan(0);
         }
       }
     }

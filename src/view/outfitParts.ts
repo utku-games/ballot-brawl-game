@@ -22,6 +22,8 @@ const LIFT = 0.006;
 const SKIRT_TUCK = 0.05;
 /** Skirts stop this far above the floor. */
 const SKIRT_HEM = 0.03;
+/** Distance from the torso top down to where a shirt front starts. */
+const THROAT = 0.04;
 const FUR = 0xd8ccb0;
 const LEATHER_PANTS = 0x22262e;
 
@@ -29,9 +31,11 @@ function front(d: Readonly<BodyDims>, y: number): number {
   return torsoFrontZ(d, y) + LIFT;
 }
 
-function shirt(d: Readonly<BodyDims>, color: Paint): PartSpec {
-  const y = d.torsoHeight * 0.7;
-  return part({ shape: Shape.Box, anchor: Anchor.Torso, position: [0, y, front(d, y) - LIFT / 2], size: [d.torsoWidth * 0.2, d.torsoHeight * 0.5, CLOTH], color });
+/** Shirt front between the lapels; an open collar is wider and shorter so it does not read as a tie. */
+function shirt(d: Readonly<BodyDims>, color: Paint, open: boolean): PartSpec {
+  const height = d.torsoHeight * (open ? 0.36 : 0.5);
+  const y = d.torsoHeight - THROAT - height / 2;
+  return part({ shape: Shape.Box, anchor: Anchor.Torso, position: [0, y, front(d, y) - LIFT / 2], size: [d.torsoWidth * (open ? 0.34 : 0.2), height, CLOTH], color });
 }
 
 function lapels(d: Readonly<BodyDims>, color: Paint): PartSpec[] {
@@ -65,11 +69,11 @@ function tails(d: Readonly<BodyDims>, lengthFraction: number, sides: boolean, co
 }
 
 function suit(d: Readonly<BodyDims>): OutfitLayout {
-  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: ColorSlot.MainDark, parts: [shirt(d, WHITE), ...lapels(d, ColorSlot.MainDark)] };
+  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: ColorSlot.MainDark, parts: [shirt(d, WHITE, false), ...lapels(d, ColorSlot.MainDark)] };
 }
 
 function trouserSuit(d: Readonly<BodyDims>): OutfitLayout {
-  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: ColorSlot.MainDark, parts: [shirt(d, ColorSlot.Accent), ...lapels(d, ColorSlot.MainDark)] };
+  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: ColorSlot.MainDark, parts: [shirt(d, ColorSlot.Accent, false), ...lapels(d, ColorSlot.MainDark)] };
 }
 
 function frockCoat(d: Readonly<BodyDims>): OutfitLayout {
@@ -116,7 +120,7 @@ function doublet(d: Readonly<BodyDims>): OutfitLayout {
 }
 
 function labCoat(d: Readonly<BodyDims>): OutfitLayout {
-  return { torso: WHITE, sleeves: WHITE, pants: ColorSlot.MainDark, parts: [shirt(d, ColorSlot.Main), ...tails(d, 0.5, true, WHITE)] };
+  return { torso: WHITE, sleeves: WHITE, pants: ColorSlot.MainDark, parts: [shirt(d, ColorSlot.Main, false), ...tails(d, 0.5, true, WHITE)] };
 }
 
 function parka(d: Readonly<BodyDims>): OutfitLayout {
@@ -147,11 +151,11 @@ function hoodie(d: Readonly<BodyDims>): OutfitLayout {
 function leatherJacket(d: Readonly<BodyDims>): OutfitLayout {
   const y = d.torsoHeight * 0.5;
   const zip = part({ shape: Shape.Box, anchor: Anchor.Torso, position: [d.torsoWidth * 0.08, y, front(d, y)], size: [0.015, d.torsoHeight * 0.8, CLOTH], color: SILVER });
-  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: LEATHER_PANTS, parts: [shirt(d, BLACK), ...lapels(d, ColorSlot.Main), zip] };
+  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: LEATHER_PANTS, parts: [shirt(d, BLACK, false), ...lapels(d, ColorSlot.Main), zip] };
 }
 
 function casual(d: Readonly<BodyDims>): OutfitLayout {
-  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: DENIM, parts: [shirt(d, ColorSlot.Accent), ...lapels(d, ColorSlot.MainDark)] };
+  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: DENIM, parts: [shirt(d, ColorSlot.Accent, true), ...lapels(d, ColorSlot.MainDark)] };
 }
 
 const BUILDERS: Readonly<Record<Outfit, (d: Readonly<BodyDims>) => OutfitLayout>> = {

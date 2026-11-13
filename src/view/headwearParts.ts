@@ -18,6 +18,10 @@ const LAUREL_GREEN = 0x4f7a2a;
 const BERET_RED = 0x5a1a1e;
 const JEWEL_RED = 0xb01a2a;
 const LENS = 0x2a2f3a;
+/** The wreath dips toward the brow. */
+const LAUREL_TILT = 0.3;
+/** The headcloth hood sits well behind the face. */
+const HOOD_Z = -0.16;
 
 const HEIGHT: Readonly<Record<Headwear, number>> = {
   [Headwear.None]: 0,
@@ -70,18 +74,21 @@ function crown(f: Readonly<HeadFrame>): PartSpec[] {
 
 function laurel(f: Readonly<HeadFrame>): PartSpec[] {
   return [part({
-    shape: Shape.Torus, anchor: Anchor.Card, position: [0, f.top - HAT_SINK / 2, HAT_Z], size: [f.width * 0.95, 0.05, 0.05], rotation: [Math.PI / 2, 0, 0], color: LAUREL_GREEN,
+    shape: Shape.Torus, anchor: Anchor.Card, position: [0, f.top - HAT_SINK / 2, HAT_Z], size: [f.width * 0.62, 0.05, 0.05],
+    rotation: [Math.PI / 2 - LAUREL_TILT, 0, 0], color: LAUREL_GREEN,
   })];
 }
 
+/** A striped headcloth: a gold band on the head top, a hood framing the face from behind, and lappets to the shoulders. */
 function egyptian(f: Readonly<HeadFrame>): PartSpec[] {
   const y = base(f);
-  const cap = part({ shape: Shape.Sphere, anchor: Anchor.Card, position: [0, y + 0.11, HAT_Z - 0.03], size: [f.width * 1.15, 0.22, 0.3], color: GOLD });
-  const flaps = [-1, 1].map((s) => part({
-    shape: Shape.Box, anchor: Anchor.Card, position: [s * f.width * 0.55, f.top - 0.38, HAT_Z - 0.05], size: [0.13, 0.55, 0.05], color: ColorSlot.Accent,
+  const band = part({ shape: Shape.Cylinder, anchor: Anchor.Card, position: [0, y + 0.04, HAT_Z], size: [f.width * 0.7, 0.08, 0.2], color: GOLD });
+  const hood = part({ shape: Shape.Sphere, anchor: Anchor.Card, position: [0, f.top - 0.3, HOOD_Z], size: [f.width * 1.3, 0.78, 0.2], color: GOLD });
+  const lappets = [-1, 1].map((s) => part({
+    shape: Shape.Box, anchor: Anchor.Card, position: [s * f.width * 0.45, f.top - 0.62, HOOD_Z + 0.04], size: [0.14, 0.5, 0.05], color: ColorSlot.Accent,
   }));
-  const cobra = part({ shape: Shape.Sphere, anchor: Anchor.Card, position: [0, y + 0.08, 0.08], size: [0.05, 0.08, 0.04], color: GOLD });
-  return [cap, ...flaps, cobra];
+  const cobra = part({ shape: Shape.Sphere, anchor: Anchor.Card, position: [0, y + 0.06, 0.06], size: [0.05, 0.09, 0.04], color: GOLD });
+  return [band, hood, ...lappets, cobra];
 }
 
 function beret(f: Readonly<HeadFrame>): PartSpec[] {

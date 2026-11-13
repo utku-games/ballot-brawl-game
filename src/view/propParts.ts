@@ -16,7 +16,7 @@ export interface PropLayout {
 /** The hand sits this far past the end of the arm capsule. */
 const HAND_DROP = 0.02;
 /** Long props lean this far forward from straight down, in radians. */
-const FORWARD_TILT = Math.PI / 4;
+const FORWARD_TILT = Math.PI / 3;
 /** In front of the palm. */
 const GRIP_Z = 0.1;
 const COS_TILT = Math.cos(FORWARD_TILT);
@@ -108,7 +108,7 @@ const BUILDERS: Readonly<Record<Prop, (d: Readonly<BodyDims>) => PartSpec[]>> = 
   [Prop.Chalk]: () => [held(Shape.Box, [0.03, 0.09, 0.03], WHITE)],
   [Prop.Baton]: () => [rod(0.32, 0.02, WHITE, 0.02)],
   [Prop.Vial]: () => [upright(0.16, 0.06, GLOW_GREEN), held(Shape.Cylinder, [0.045, 0.03, 0.045], CORK, 0.135)],
-  [Prop.Paintbrush]: () => [rod(0.28, 0.025, WOOD, 0.02), tip(0.33, 0.045, PAINT)],
+  [Prop.Paintbrush]: () => [rod(0.24, 0.025, WOOD, 0.02), tip(0.29, 0.045, PAINT)],
   [Prop.CoilWand]: () => [
     rod(0.36, 0.04, COPPER, 0.02),
     part({ shape: Shape.Torus, anchor: Anchor.HandR, position: along(0.2), size: [0.09, 0.02, 0.02], rotation: [FORWARD_TILT + Math.PI / 2, 0, 0], color: COPPER }),
@@ -127,6 +127,16 @@ const BUILDERS: Readonly<Record<Prop, (d: Readonly<BodyDims>) => PartSpec[]>> = 
   [Prop.Microphone]: () => [upright(0.2, 0.04, MIC_BLACK), held(Shape.Sphere, [0.08, 0.08, 0.08], SILVER, 0.19)],
 };
 
+/** Held props are drawn this much larger than life so they read at match distance, like the oversized heads. */
+export const PROP_SCALE = 1.5;
+
+function enlarge(p: Readonly<PartSpec>): PartSpec {
+  if (p.anchor !== Anchor.HandR) return p;
+  const [x, y, z] = p.position;
+  const [w, h, d] = p.size;
+  return { ...p, position: [x * PROP_SCALE, y * PROP_SCALE, z * PROP_SCALE], size: [w * PROP_SCALE, h * PROP_SCALE, d * PROP_SCALE] };
+}
+
 export function propParts(prop: Prop, dims: Readonly<BodyDims>): PropLayout {
-  return { parts: BUILDERS[prop](dims), hidesHand: prop === Prop.Mittens };
+  return { parts: BUILDERS[prop](dims).map(enlarge), hidesHand: prop === Prop.Mittens };
 }

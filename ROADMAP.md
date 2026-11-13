@@ -19,7 +19,7 @@ Five pieces, built one at a time, each with its own spec, PR and release.
 
 | Piece | Branch | Content | Status |
 |---|---|---|---|
-| 1 | `feature/character-looks` | body types, outfits, neckwear, headwear and hand props per fighter ([spec](docs/specs/2026-11-13-character-looks-design.md)) | spec written |
+| 1 | `feature/character-looks` | body types, outfits, neckwear, headwear and hand props per fighter ([spec](docs/specs/2026-11-13-character-looks-design.md), [plan](docs/plans/2026-11-13-character-looks.md)) | built, in review |
 | 2 | tbd | one special move per fighter, entrances, taunts, celebrations | planned |
 | 3 | tbd | new fighters: Netanyahu and Khamenei (regular Politicians), Edison, Xi and other rivalry opponents, a Celebrities category with its own boss and ladder, the Pakistani leader, James Cameron, a goat and a pig | planned |
 | 4 | tbd | Rivalry Battles mode with two sections: Rivalries (Edison vs Tesla, Trump vs Xi, Musk vs Zuckerberg and more) and Special Edition (Pakistani leader vs goat, James Cameron vs pig, more later); Netanyahu and Khamenei are never paired | planned |
