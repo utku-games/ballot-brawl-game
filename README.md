@@ -27,7 +27,8 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
   a pig, a camel, Larry the cat, a bull and a chicken.
 - **Story**: choose Politicians, Tycoons, Legends or Celebrities, pick a fighter and beat 10 opponents in a row,
   ending with the boss (Churchill, Rockefeller, Napoleon or Schwarzenegger). Each fight is harder than the last; you
-  have three lives: the third lost fight ends the run and shows your score. Beat the boss and you saved the world. The score comes from the damage you take
+  have three lives: the third lost fight ends the run and shows your score. Beat the boss and you saved the world, and that boss becomes playable in Brawl and Party. The Trophies
+  screen tracks leagues won, rivalries settled and bosses unlocked. The score comes from the damage you take
   across the run (plus stage clears and perfect fights), with an S to D rank and a saved best score.
 
 ## Fighting

@@ -33,6 +33,7 @@ export const MENU_CSS = `
 .card .card-nick { font-size: 12px; color: ${THEME.inkSoft}; text-align: center; }
 .card .card-best { font-size: 12px; color: ${THEME.gold}; }
 .card.boss img { border-color: ${THEME.gold}; }
+.card.locked { opacity: 0.55; } .card.locked img { filter: grayscale(1); }
 .grid.wide { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
 .card.rivalry .pair { display: flex; align-items: center; gap: 8px; font-family: ${THEME.font}; font-size: 16px; }
 .card.rivalry .pair img { width: 64px; height: 64px; }

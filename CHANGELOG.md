@@ -5,6 +5,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Unlocks: each league's boss (Churchill, Rockefeller, Napoleon, Schwarzenegger) becomes playable in Brawl and Party
+  once you win that league's story; locked bosses show greyed out with a hint, and the victory screen announces the
+  unlock.
+- Trophies: a new title-menu screen with leagues won, rivalries settled and bosses unlocked.
+
 ## [0.9.0] - 2026-11-13
 
 ### Added

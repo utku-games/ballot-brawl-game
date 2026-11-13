@@ -20,6 +20,7 @@ import type { Screen } from '../ui/screenKit';
 import { brawlSetupScreen } from '../ui/screens/brawlSetupScreen';
 import { brawlResultScreen, creditsScreen, pauseScreen } from '../ui/screens/miscScreens';
 import { partySetupScreen } from '../ui/screens/partyScreens';
+import { trophiesScreen } from '../ui/screens/trophiesScreen';
 import { categoryScreen, fighterPickScreen } from '../ui/screens/pickScreens';
 import { rivalryListScreen, rivalryResultScreen, rivalrySideScreen } from '../ui/screens/rivalryScreens';
 import { fightResultScreen, ladderScreen, storyEndScreen } from '../ui/screens/storyScreens';
@@ -31,7 +32,8 @@ import { defaultBrawl, defaultParty, RANDOM_FIGHTER, setFighter, toMatchPlan, ty
 import type { MatchPlan } from './matchPlan';
 import { MatchSession, type MatchOutcome } from './matchSession';
 import { rivalryMatchPlan, type RivalrySide } from './rivalryPlan';
-import { loadSave, recordBest, recordRivalryWin, storeSave } from './saveData';
+import { loadSave, recordBest, recordLeagueWin, recordRivalryWin, storeSave } from './saveData';
+import { lockReason, newlyUnlocked } from './unlocks';
 import { storyMatchPlan } from './storyPlan';
 
 /** Stick deflection that counts as a menu step, and the delay before it repeats. */
@@ -187,6 +189,7 @@ export class GameApp {
       onBrawl: () => this.showBrawlSetup(),
       onParty: () => this.showPartySetup(),
       onCredits: () => this.show((q) => creditsScreen(q, () => this.showTitle()), null),
+      onTrophies: () => this.show((q) => trophiesScreen(q, this.save, () => this.showTitle()), ArenaKind.Museum),
       onToggleMute: () => this.toggleMute(),
     }, this.save.muted, window.matchMedia(COARSE_POINTER).matches), ArenaKind.Parliament);
   }
@@ -206,7 +209,7 @@ export class GameApp {
 
   private showStoryPick(category: Category): void {
     const fighters = fightersIn(category).filter((f) => !f.boss);
-    this.show((p) => fighterPickScreen(p, { title: 'Pick your fighter', fighters, allowRandom: true }, (id) => {
+    this.show((p) => fighterPickScreen(p, { title: 'Pick your fighter', fighters, allowRandom: true, lockReason: () => null }, (id) => {
       const pick = id ?? fighters[Math.floor(this.rng() * fighters.length)].id;
       this.run = startRun(category, pick, buildLadder(category, pick, this.rng));
       this.attempt = 0;
@@ -240,9 +243,11 @@ export class GameApp {
 
   private showStoryEnd(run: StoryRun): void {
     const won = run.status === RunStatus.Won;
+    const unlocked = won ? newlyUnlocked(run.category, this.save) : null;
+    if (won) recordLeagueWin(this.save, run.category);
     const newBest = recordBest(this.save, run.category, run.fighterId, runScore(run));
     if (won) this.deps.audio.play(Sfx.Victory);
-    this.show((p) => storyEndScreen(p, run, won, newBest, () => this.showTitle()), ARENA_FOR_CATEGORY[run.category]);
+    this.show((p) => storyEndScreen(p, run, won, newBest, unlocked?.name ?? null, () => this.showTitle()), ARENA_FOR_CATEGORY[run.category]);
   }
 
   // ---- rivalry battles ----
@@ -290,7 +295,7 @@ export class GameApp {
 
   private pickBrawlFighter(team: 0 | 1, index: number): void {
     const fighters = BRAWL_ORDER.flatMap((c) => fightersIn(c));
-    this.show((p) => fighterPickScreen(p, { title: 'Choose a fighter', fighters, allowRandom: true }, (id) => {
+    this.show((p) => fighterPickScreen(p, { title: 'Choose a fighter', fighters, allowRandom: true, lockReason: (def) => lockReason(def, this.save) }, (id) => {
       this.brawl = setFighter(this.brawl, team, index, id ?? RANDOM_FIGHTER);
       this.showBrawlSetup();
     }, () => this.showBrawlSetup()), this.brawl.arena);
@@ -320,7 +325,7 @@ export class GameApp {
 
   private pickPartyFighter(side: number): void {
     const fighters = BRAWL_ORDER.flatMap((c) => fightersIn(c));
-    this.show((p) => fighterPickScreen(p, { title: 'Choose a fighter', fighters, allowRandom: true }, (id) => {
+    this.show((p) => fighterPickScreen(p, { title: 'Choose a fighter', fighters, allowRandom: true, lockReason: (def) => lockReason(def, this.save) }, (id) => {
       this.party = setFighter(this.party, side, 0, id ?? RANDOM_FIGHTER);
       this.showPartySetup();
     }, () => this.showPartySetup()), this.party.arena);

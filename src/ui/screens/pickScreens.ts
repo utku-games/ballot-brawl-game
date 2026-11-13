@@ -45,6 +45,8 @@ export interface PickOptions {
   title: string;
   fighters: readonly FighterDef[];
   allowRandom: boolean;
+  /** Why a fighter is locked, or null when they can be picked. */
+  lockReason: (def: FighterDef) => string | null;
 }
 
 export function fighterPickScreen(parent: HTMLElement, opts: PickOptions, onPick: (id: string | null) => void, onBack: () => void): Screen {
@@ -56,7 +58,15 @@ export function fighterPickScreen(parent: HTMLElement, opts: PickOptions, onPick
     make('div', 'card-name', 'Random', random);
     make('div', 'card-nick', 'Surprise me', random);
   }
-  for (const def of opts.fighters) fighterCard(grid, def, () => onPick(def.id));
+  for (const def of opts.fighters) {
+    const reason = opts.lockReason(def);
+    const card = fighterCard(grid, def, () => onPick(def.id));
+    if (reason) {
+      card.disabled = true;
+      card.classList.add('locked');
+      make('div', 'card-best', `Locked: ${reason}`, card);
+    }
+  }
   button(root, 'Back', onBack, 'small');
   focusFirst(root);
   return { root };
