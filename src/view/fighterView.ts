@@ -141,7 +141,9 @@ export class FighterView {
     for (const m of this.rig.flashMaterials) m.emissive.copy(FLASH_COLOR).multiplyScalar(this.flash * 0.8);
   }
 
+  /** Frees the head card and this fighter's own materials; shared geometry stays for other fighters. */
   dispose(): void {
     this.rig.card.dispose();
+    this.rig.materials.dispose();
   }
 }
