@@ -84,9 +84,35 @@ export interface FighterState {
   invulnerable: number;
   /** Total damage taken this match (for scoring). */
   damageTaken: number;
+  /** Item in hand, thrown by the next punch. */
+  holding: ItemKind | null;
 }
 
-/** A thrown finisher in flight. */
+/** Throwable items that appear on the floor when extras are on; the kind only changes the look. */
+export enum ItemKind {
+  Briefcase = 'briefcase',
+  Gavel = 'gavel',
+  MoneyBag = 'money-bag',
+}
+
+/** An item lying on the floor, waiting to be picked up. */
+export interface ItemState {
+  id: string;
+  kind: ItemKind;
+  x: number;
+  z: number;
+}
+
+/** A falling anvil: its shadow marks the spot until it lands. */
+export interface HazardState {
+  id: string;
+  x: number;
+  z: number;
+  /** Ticks until impact. */
+  ticksLeft: number;
+}
+
+/** A thrown finisher or item in flight. */
 export interface ProjectileState {
   /** Unique within the match: thrower slot and tick. */
   id: string;
@@ -99,6 +125,10 @@ export interface ProjectileState {
   dirX: number;
   dirZ: number;
   ticksLeft: number;
+  /** Move that threw it: the finisher or a picked-up item. */
+  move: MoveKind;
+  /** The thrown item, or null for a finisher projectile. */
+  item: ItemKind | null;
 }
 
 export enum MatchPhase {
@@ -115,6 +145,10 @@ export type FightEvent =
   | { kind: 'swing'; attacker: string; move: MoveKind }
   | { kind: 'throw'; attacker: string; projectile: string }
   | { kind: 'taunt'; fighter: string }
+  | { kind: 'pickup'; fighter: string; item: ItemKind }
+  | { kind: 'hazard'; id: string; x: number; z: number }
+  | { kind: 'crash'; id: string; x: number; z: number }
+  | { kind: 'hazardHit'; target: string; damage: number; x: number; z: number }
   | { kind: 'tauntDone'; fighter: string; meter: number }
   | { kind: 'hit'; attacker: string; target: string; move: MoveKind; damage: number; x: number; z: number }
   | { kind: 'block'; attacker: string; target: string; move: MoveKind; x: number; z: number }
@@ -128,8 +162,16 @@ export interface MatchState {
   ticksLeft: number;
   phase: MatchPhase;
   fighters: FighterState[];
-  /** Thrown finishers in flight. */
+  /** Thrown finishers and items in flight. */
   projectiles: ProjectileState[];
+  /** Items lying on the floor. */
+  items: ItemState[];
+  /** Anvils on their way down. */
+  hazards: HazardState[];
+  /** True when items and hazards are on. */
+  extras: boolean;
+  /** Seed for the deterministic placement of items and hazards. */
+  seed: number;
   winner: TeamIndex | null;
   events: FightEvent[];
 }

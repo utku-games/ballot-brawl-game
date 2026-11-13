@@ -62,7 +62,7 @@ function chooseAction(f: FighterState, input: Readonly<FighterInput>, events: Fi
     f.meter = 0;
     startAttack(f, MoveKind.Finisher, events);
   } else if (input.punch) {
-    startAttack(f, MoveKind.Punch, events);
+    startAttack(f, f.holding ? MoveKind.Item : MoveKind.Punch, events);
   } else if (input.kick) {
     startAttack(f, MoveKind.Kick, events);
   } else if (input.defend && f.guard > 0) {

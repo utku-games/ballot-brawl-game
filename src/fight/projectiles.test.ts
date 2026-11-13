@@ -10,7 +10,7 @@ import { IDLE_INPUT, type MatchState } from './fightTypes';
 import { createMatch } from './matchSetup';
 import { FINISHERS, MoveKind } from './moves';
 import { PROJECTILE_TICKS } from './projectiles';
-import { duel, entries, input, run, styled, tap } from './testFight';
+import { duel, entries, input, run, styled, tap, NO_EXTRAS } from './testFight';
 
 const SPECIAL = input({ special: true });
 const DEFEND = input({ defend: true });
@@ -42,7 +42,7 @@ describe('projectiles', () => {
   });
 
   it('flies past teammates', () => {
-    const start = createMatch({ teams: [entries(2), entries(1)] });
+    const start = createMatch({ teams: [entries(2), entries(1)], ...NO_EXTRAS });
     const [a, mate, enemy] = start.fighters;
     a.profile = styled(FinisherStyle.Throw);
     a.meter = METER_MAX;

@@ -5,6 +5,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Brawl items: briefcases, gavels and money bags appear on the floor; walk over one to pick it up and Punch to throw it.
+- Brawl hazards: a cartoon anvil drops where a red ring warns, knocking down anyone underneath on either team.
+- A Brawl setup toggle for items and hazards (on by default; Story and Rivalry Battles stay without them).
+- Flying knockouts: a knockout from a finisher or an anvil launches the loser into the air with a spin.
+- Knockout replay: the last seconds before the final knockout play back in slow motion; attack buttons skip it.
+
 ### Changed
 - David Cameron, former UK prime minister, joins the Politicians and takes the pig matchup in the Special Edition
   (now The Pork Barrel). James Cameron, added by mistake, leaves the Celebrities.

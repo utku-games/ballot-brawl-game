@@ -31,6 +31,8 @@ export interface BrawlConfig {
   teams: [SlotConfig[], SlotConfig[]];
   difficulty: Difficulty;
   arena: ArenaKind;
+  /** Throwable items and falling anvils; on by default. */
+  extras: boolean;
 }
 
 const CPU_SLOT: Readonly<SlotConfig> = { fighterId: RANDOM_FIGHTER, controller: Controller.Cpu };
@@ -40,6 +42,7 @@ export function defaultBrawl(arena: ArenaKind): BrawlConfig {
     teams: [[{ fighterId: RANDOM_FIGHTER, controller: Controller.P1 }], [{ ...CPU_SLOT }]],
     difficulty: Difficulty.Normal,
     arena,
+    extras: true,
   };
 }
 
@@ -101,5 +104,5 @@ export function toMatchPlan(config: Readonly<BrawlConfig>, rng: Rng): MatchPlan 
     damageScale: 1,
     boss: false,
   }));
-  return { teams: [plan(0), plan(1)], arena: config.arena, seed: Math.floor(rng() * SEED_RANGE), ...PLAIN_FIGHT };
+  return { teams: [plan(0), plan(1)], arena: config.arena, seed: Math.floor(rng() * SEED_RANGE), ...PLAIN_FIGHT, extras: config.extras };
 }

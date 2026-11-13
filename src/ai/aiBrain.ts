@@ -37,6 +37,9 @@ const REACH_MARGIN = 0.9;
 /** Distances from which each finisher style is worth firing, meters between body centres (Smash and Quake use reach). */
 const THROW_RANGE = 6;
 const RUSH_RANGE = 3;
+/** Range in which a CPU holding an item throws it, meters. */
+const ITEM_MIN_RANGE = 2.5;
+const ITEM_MAX_RANGE = 7;
 /** With no enemy closer than this, the CPU may taunt to build power. */
 const TAUNT_DISTANCE = 4;
 /** Chance to taunt per decision when alone. */
@@ -101,6 +104,9 @@ function decide(state: Readonly<MatchState>, self: Readonly<FighterState>, profi
   }
   if (self.meter >= METER_MAX && dist <= finisherRange(self, target) && rng() < profile.finisherChance) {
     return { input: { ...IDLE_INPUT, special: true }, memory };
+  }
+  if (self.holding && dist >= ITEM_MIN_RANGE && dist <= ITEM_MAX_RANGE) {
+    return { input: { ...IDLE_INPUT, punch: true }, memory };
   }
   const kick = rng() < profile.kickBias;
   if (dist <= reachTo(self, target, kick ? MoveKind.Kick : MoveKind.Punch)) {

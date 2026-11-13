@@ -16,13 +16,16 @@ export function styled(style: FinisherStyle): typeof NEUTRAL_PROFILE {
   return { ...NEUTRAL_PROFILE, finisher: style };
 }
 
+/** Setup fields for a match without items or hazards. */
+export const NO_EXTRAS = { extras: false, seed: 0 } as const;
+
 export function entries(count: number): TeamEntry[] {
   return Array.from({ length: count }, (_, i) => ({ fighterId: `f${i}`, profile: NEUTRAL_PROFILE }));
 }
 
 /** A 1v1 match with both fighters placed `gap` meters apart on the X axis, facing each other. */
 export function duel(gap: number): MatchState {
-  const state = createMatch({ teams: [entries(1), entries(1)] });
+  const state = createMatch({ teams: [entries(1), entries(1)], ...NO_EXTRAS });
   const [a, b] = state.fighters;
   a.x = -gap / 2;
   a.z = 0;

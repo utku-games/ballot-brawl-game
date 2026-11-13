@@ -14,6 +14,7 @@ const HIT_SOUND: Readonly<Record<MoveKind, Sfx>> = {
   [MoveKind.Punch]: Sfx.Punch,
   [MoveKind.Kick]: Sfx.Kick,
   [MoveKind.Finisher]: Sfx.FinisherHit,
+  [MoveKind.Item]: Sfx.Kick,
 };
 
 export class GameAudio {

@@ -1,5 +1,5 @@
 /**
- * Frame data for the three attacks every fighter has: punch, kick and the meter-powered finisher in four styles.
+ * Frame data for every attack: punch, kick, throwing a picked-up item, and the meter-powered finisher in four styles.
  * Startup, active and recovery are counted in 60 Hz ticks; reach is measured from the body edge.
  * Smash is a heavy close hit in a wide arc, Rush dashes through enemies, Quake hits all around and Throw hits at range
  * through a projectile (so it has no melee reach of its own).
@@ -10,6 +10,8 @@ export enum MoveKind {
   Punch = 'punch',
   Kick = 'kick',
   Finisher = 'finisher',
+  /** Throwing a picked-up item; it hits through a projectile, not in melee. */
+  Item = 'item',
 }
 
 export interface MoveData {
@@ -32,11 +34,11 @@ export interface MoveData {
 const ARC_NARROW = Math.cos(Math.PI / 4);
 const ARC_WIDE = Math.cos(Math.PI / 3);
 const ARC_FINISHER = Math.cos((Math.PI * 5) / 12);
+export const RUSH_SPEED = 15;
+
 /** Every direction counts as inside the arc. */
 const ARC_FULL = -1;
 /** Rush dash speed during its active frames, m/s. */
-export const RUSH_SPEED = 15;
-
 export const MOVES: Readonly<Record<MoveKind, MoveData>> = {
   [MoveKind.Punch]: {
     startup: 5, active: 3, recovery: 10, damage: 6, reach: 0.75, arcCos: ARC_NARROW,
@@ -49,6 +51,10 @@ export const MOVES: Readonly<Record<MoveKind, MoveData>> = {
   [MoveKind.Finisher]: {
     startup: 22, active: 8, recovery: 30, damage: 38, reach: 1.6, arcCos: ARC_FINISHER,
     knockback: 9, hitstun: 40, guardDamage: 1000,
+  },
+  [MoveKind.Item]: {
+    startup: 8, active: 1, recovery: 14, damage: 14, reach: 0, arcCos: ARC_FULL,
+    knockback: 3.5, hitstun: 24, guardDamage: 25,
   },
 };
 
@@ -77,6 +83,11 @@ export function moveData(move: MoveKind, style: FinisherStyle): MoveData {
 /** True when a style's finisher hits through a projectile instead of a melee contact. */
 export function isRanged(style: FinisherStyle): boolean {
   return style === FinisherStyle.Throw;
+}
+
+/** True when this move, for a fighter with this finisher style, never makes melee contact. */
+export function hitsByProjectile(move: MoveKind, style: FinisherStyle): boolean {
+  return move === MoveKind.Item || (move === MoveKind.Finisher && isRanged(style));
 }
 
 /** Total ticks a move occupies the attacker. */

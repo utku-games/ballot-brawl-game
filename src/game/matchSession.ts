@@ -1,6 +1,7 @@
 /**
  * Runs one match in the browser: fixed-step simulation, player and CPU control, rendering, HUD, sound and announcements.
- * It shows a short intro with every fighter's gesture, plays the fight with slow motion after finishers, waits on the knockout, then reports the outcome.
+ * It shows a short intro with every fighter's gesture, plays the fight with slow motion after finishers, replays a
+ * knockout in slow motion, then reports the outcome.
  * Pausing simply stops the clock; the game app owns the pause menu and calls resume or dispose.
  */
 import { createRng, FixedStepClock, type GameRenderer, type Rng } from '@utku/engine';
@@ -22,6 +23,7 @@ import type { TouchControls } from '../ui/touchControls';
 import { MatchView } from '../view/matchView';
 import { playerSlots, updateAssignment } from './controlAssignment';
 import { buildMatchSetup, cpuLevels, initialAssignment, type MatchPlan } from './matchPlan';
+import { pushCapped, REPLAY_SPEED, REPLAY_TICKS, replayIndex } from './replayBuffer';
 
 export interface MatchOutcome {
   winner: TeamIndex | null;
@@ -40,6 +42,8 @@ export interface SessionDeps {
 const MAX_CATCH_UP_STEPS = 5;
 const INTRO_SECONDS = 2.2;
 const OUTRO_SECONDS = 2.6;
+/** Pause on the knockout before the replay starts. */
+const KO_PAUSE_SECONDS = 0.9;
 const SLOWMO_SECONDS = 0.9;
 const SLOWMO_SCALE = 0.3;
 /** Normal arena light, used outside the fight itself (intro, knockout outro, result screen). */
@@ -59,6 +63,12 @@ export class MatchSession {
   private time = 0;
   private slowmo = 0;
   private outro = -1;
+  /** Recent states for the knockout replay, oldest first. */
+  private history: MatchState[] = [];
+  /** Seconds left before the replay starts, seconds into the replay (-1 when not replaying), last replayed index. */
+  private replayWait = 0;
+  private replayAt = -1;
+  private replayShown = -1;
   private started = false;
   private readonly twist: Twist;
   private finished = false;
@@ -129,6 +139,7 @@ export class MatchSession {
       } else if (e.kind === 'matchOver') {
         this.hud.announce(e.reason === EndReason.KnockOut ? 'K.O.!' : 'TIME!', false, true);
         this.outro = OUTRO_SECONDS;
+        if (e.reason === EndReason.KnockOut) this.replayWait = KO_PAUSE_SECONDS;
       }
     }
   }
@@ -142,6 +153,7 @@ export class MatchSession {
       const inputs = this.inputsFor(frames, i === 0);
       this.prev = this.state;
       this.state = stepMatch(this.state, inputs);
+      this.history = pushCapped(this.history, this.state, REPLAY_TICKS);
       this.view.handleEvents(this.state.events, this.state);
       this.deps.audio.playEvents(this.state.events);
       this.announceEvents(this.state);
@@ -170,15 +182,63 @@ export class MatchSession {
       }
     } else if (this.state.phase === MatchPhase.Fighting) {
       alpha = this.simulate(dt, frames);
+    } else if (this.stepOutro(dt, frames)) {
+      this.view.setLight(FULL_LIGHT);
+      this.updateHud();
+      return;
     } else {
       this.prev = this.state;
-      this.outro -= dt;
-      if (this.outro <= 0) this.finish();
     }
     const fighting = this.started && this.state.phase === MatchPhase.Fighting;
     this.view.setLight(fighting ? blackoutLight(this.twist, this.time) : FULL_LIGHT);
     this.view.render(this.prev, this.state, alpha, this.time, dt * (this.slowmo > 0 ? SLOWMO_SCALE : 1));
     this.updateHud();
+  }
+
+  /** After the match: the pause before the replay, the replay itself, then the outro. True when a replay frame was drawn. */
+  private stepOutro(dt: number, frames: Readonly<Record<PlayerId, ControlFrame>>): boolean {
+    if (this.replayWait > 0) {
+      this.replayWait -= dt;
+      if (this.replayWait <= 0 && this.history.length > 1) this.startReplay();
+      return false;
+    }
+    if (this.replayAt >= 0) return this.stepReplay(dt, frames);
+    this.outro -= dt;
+    if (this.outro <= 0) this.finish();
+    return false;
+  }
+
+  private startReplay(): void {
+    this.replayAt = 0;
+    this.replayShown = -1;
+    this.view.clearMoods();
+    this.hud.announce('REPLAY', true, true);
+  }
+
+  /** Plays the buffered fight back in slow motion; any attack button skips it. */
+  private stepReplay(dt: number, frames: Readonly<Record<PlayerId, ControlFrame>>): boolean {
+    this.replayAt += dt;
+    const skip = PLAYERS.some((p) => frames[p].punch || frames[p].kick || frames[p].special);
+    const index = replayIndex(this.replayAt, this.history.length);
+    if (index < 0 || skip) {
+      this.endReplay();
+      return false;
+    }
+    for (let i = this.replayShown + 1; i <= index; i += 1) {
+      this.view.handleEvents(this.history[i].events, this.history[i]);
+      this.deps.audio.playEvents(this.history[i].events);
+    }
+    this.replayShown = index;
+    const before = this.history[Math.max(0, index - 1)];
+    this.view.render(before, this.history[index], 1, this.time, dt * REPLAY_SPEED);
+    return true;
+  }
+
+  private endReplay(): void {
+    this.replayAt = -1;
+    const ending = this.state.events.filter((e) => e.kind === 'matchOver');
+    this.view.handleEvents(ending, this.state);
+    this.hud.announce('K.O.!', false, true);
   }
 
   private updateHud(): void {

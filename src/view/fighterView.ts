@@ -4,18 +4,22 @@
  * The simulation state is read only; between ticks the position is blended so motion stays smooth above 60 Hz,
  * and the photo head always turns to face the camera so every face stays readable, even lying on the floor.
  * Hits squash the head, flash the body and make the face wince; knockouts close the eyes and circle stars overhead;
- * the match result makes winners grin and cheer and the losing side slump.
+ * the match result makes winners grin and cheer and the losing side slump; big knockouts launch the fighter into the air,
+ * and a held item shows in the right hand.
  */
 import * as THREE from 'three';
 import { dampAngle, dampValue } from '@utku/engine';
-import { ActionKind, type FighterState } from '../fight/fightTypes';
+import { ActionKind, type FighterState, type ItemKind } from '../fight/fightTypes';
 import type { FaceCredit } from '../roster/credits';
 import type { FighterDef } from '../roster/rosterTypes';
 import type { FinisherStyle, Gesture } from '../roster/signatureTypes';
 import type { Expression } from './faceWarp';
 import { buildFighterRig, setFall, type FighterRig } from './fighterModel';
 import { kickSpring, RESTING_SPRING, stepSpring, type SpringState } from './headSpring';
-import { computePose, Mood, type Pose } from './poseLogic';
+import { computePose, launchArc, Mood, type Pose } from './poseLogic';
+import { itemParts } from './extraParts';
+import { attachParts, fixedColorMaterials, type MaterialSet } from './outfitMeshes';
+import { Anchor } from './partSpec';
 
 const TURN_RATE = 18;
 const FLASH_DECAY = 6;
@@ -32,6 +36,8 @@ const DIZZY_KO = 0.6;
 const LOSE_HURT = 0.45;
 const SQUASH = 0.16;
 const STAR_SPIN = 4;
+/** Held items are drawn smaller than floor items so they fit the hand. */
+const HELD_SCALE = 0.7;
 
 const parentWorld = new THREE.Quaternion();
 const wobble = new THREE.Quaternion();
@@ -49,6 +55,8 @@ export class FighterView {
   private intro = false;
   private readonly style: FinisherStyle;
   private readonly gesture: Gesture;
+  private launchStart = -1;
+  private held: { kind: ItemKind; group: THREE.Group; materials: MaterialSet } | null = null;
 
   constructor(def: FighterDef, tone: number, face: THREE.Texture, credit: FaceCredit, teamColor: number, sizeScale: number) {
     this.rig = buildFighterRig(def, tone, face, credit, teamColor);
@@ -61,6 +69,28 @@ export class FighterView {
   setMarker(color: number | null): void {
     this.rig.marker.visible = color !== null;
     if (color !== null) this.rig.markerMaterial.color.setHex(color);
+  }
+
+  /** Sends the fighter flying from a big knockout, starting now. */
+  launch(time: number): void {
+    this.launchStart = time;
+  }
+
+  /** Shows the item in the right hand, or nothing. */
+  private showHeld(kind: ItemKind | null): void {
+    if ((this.held?.kind ?? null) === kind) return;
+    if (this.held) {
+      this.rig.grip.remove(this.held.group);
+      this.held.materials.dispose();
+      this.held = null;
+    }
+    if (!kind) return;
+    const group = new THREE.Group();
+    group.scale.setScalar(HELD_SCALE);
+    const materials = fixedColorMaterials();
+    attachParts(itemParts(kind), new Map([[Anchor.Projectile, group]]), materials);
+    this.rig.grip.add(group);
+    this.held = { kind, group, materials };
   }
 
   /** Sets the end-of-match mood (win, lose or none). */
@@ -101,6 +131,14 @@ export class FighterView {
     root.rotation.y = this.heading;
     const knockedOut = cur.action.kind === ActionKind.KnockedOut;
     if (knockedOut && this.koStart < 0) this.koStart = time;
+    if (!knockedOut) {
+      this.koStart = -1;
+      this.launchStart = -1;
+    }
+    const flight = launchArc(this.launchStart < 0 ? -1 : time - this.launchStart);
+    root.position.y = flight.height;
+    root.rotation.z = flight.spin;
+    this.showHeld(cur.holding);
     const pose = computePose({
       kind: cur.action.kind, frame: cur.action.frame, duration: cur.action.duration, move: cur.action.move,
       moving: cur.moving, time, mood: knockedOut ? Mood.None : this.mood, koSeconds: knockedOut ? time - this.koStart : -1,
@@ -155,6 +193,7 @@ export class FighterView {
 
   /** Frees the head card and this fighter's own materials; shared geometry stays for other fighters. */
   dispose(): void {
+    this.showHeld(null);
     this.rig.card.dispose();
     this.rig.materials.dispose();
   }
