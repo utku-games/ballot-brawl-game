@@ -125,7 +125,7 @@ function labCoat(d: Readonly<BodyDims>): OutfitLayout {
 
 function parka(d: Readonly<BodyDims>): OutfitLayout {
   const ruff = part({
-    shape: Shape.Torus, anchor: Anchor.Torso, position: [0, d.torsoHeight - 0.02, 0], size: [d.torsoWidth * 0.75, 0.1, 0.1], rotation: [Math.PI / 2, 0, 0], color: FUR,
+    shape: Shape.Torus, anchor: Anchor.Torso, position: [0, d.torsoHeight - 0.02, 0], size: [d.torsoWidth * 0.75, 0.1, d.torsoDepth], rotation: [Math.PI / 2, 0, 0], color: FUR,
   });
   const y = d.torsoHeight * 0.5;
   const zip = part({ shape: Shape.Box, anchor: Anchor.Torso, position: [0, y, front(d, y)], size: [0.02, d.torsoHeight * 0.85, CLOTH], color: ColorSlot.MainDark });
@@ -138,7 +138,7 @@ function turtleneck(d: Readonly<BodyDims>): OutfitLayout {
 }
 
 function hoodie(d: Readonly<BodyDims>): OutfitLayout {
-  const hood = part({ shape: Shape.Sphere, anchor: Anchor.Torso, position: [0, d.torsoHeight, -d.torsoDepth * 0.35], size: [d.torsoWidth * 0.6, 0.22, d.torsoDepth * 0.6], color: ColorSlot.Main });
+  const hood = part({ shape: Shape.Sphere, anchor: Anchor.Torso, position: [0, d.torsoHeight, -d.torsoDepth * 0.3], size: [d.torsoWidth * 0.6, 0.22, d.torsoDepth * 0.45], color: ColorSlot.Main });
   const y = d.torsoHeight * 0.3;
   const pocket = part({ shape: Shape.Box, anchor: Anchor.Torso, position: [0, y, front(d, y)], size: [d.torsoWidth * 0.5, d.torsoHeight * 0.22, CLOTH], color: ColorSlot.MainDark });
   const strings = [-1, 1].map((s) => {

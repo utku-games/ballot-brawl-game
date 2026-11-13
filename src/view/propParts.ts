@@ -111,12 +111,12 @@ const BUILDERS: Readonly<Record<Prop, (d: Readonly<BodyDims>) => PartSpec[]>> = 
   [Prop.Paintbrush]: () => [rod(0.24, 0.025, WOOD, 0.02), tip(0.29, 0.045, PAINT)],
   [Prop.CoilWand]: () => [
     rod(0.36, 0.04, COPPER, 0.02),
-    part({ shape: Shape.Torus, anchor: Anchor.HandR, position: along(0.2), size: [0.09, 0.02, 0.02], rotation: [FORWARD_TILT + Math.PI / 2, 0, 0], color: COPPER }),
+    part({ shape: Shape.Torus, anchor: Anchor.HandR, position: along(0.2), size: [0.09, 0.02, 0.09], rotation: [FORWARD_TILT + Math.PI / 2, 0, 0], color: COPPER }),
     tip(0.4, 0.08, SPARK_BLUE),
   ],
   [Prop.Sword]: sword,
   [Prop.Snake]: () => [
-    part({ shape: Shape.Torus, anchor: Anchor.HandR, position: [0, 0.14, 0], size: [0.2, 0.05, 0.05], rotation: [Math.PI / 2, 0, 0], color: SNAKE_GREEN }),
+    part({ shape: Shape.Torus, anchor: Anchor.HandR, position: [0, 0.14, 0], size: [0.2, 0.05, 0.2], rotation: [Math.PI / 2, 0, 0], color: SNAKE_GREEN }),
     held(Shape.Sphere, [0.07, 0.05, 0.09], SNAKE_GREEN, 0.04),
   ],
   [Prop.Chainsaw]: chainsaw,

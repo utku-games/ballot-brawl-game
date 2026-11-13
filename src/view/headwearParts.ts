@@ -9,7 +9,7 @@ import { Anchor, BLACK, ColorSlot, GOLD, part, Shape, type PartSpec } from './pa
 import type { HeadFrame } from './silhouette';
 
 /** How far a hat sinks into the hair below the head top. */
-export const HAT_SINK = 0.06;
+export const HAT_SINK = 0.09;
 /** Hats sit slightly behind the card plane so the face stays in front. */
 const HAT_Z = -0.05;
 const BRIM = 0.03;
@@ -74,7 +74,7 @@ function crown(f: Readonly<HeadFrame>): PartSpec[] {
 
 function laurel(f: Readonly<HeadFrame>): PartSpec[] {
   return [part({
-    shape: Shape.Torus, anchor: Anchor.Card, position: [0, f.top - HAT_SINK / 2, HAT_Z], size: [f.width * 0.62, 0.05, 0.05],
+    shape: Shape.Torus, anchor: Anchor.Card, position: [0, f.top - HAT_SINK / 2, HAT_Z], size: [f.width * 0.62, 0.05, f.width * 0.62],
     rotation: [Math.PI / 2 - LAUREL_TILT, 0, 0], color: LAUREL_GREEN,
   })];
 }
@@ -92,7 +92,7 @@ function egyptian(f: Readonly<HeadFrame>): PartSpec[] {
 }
 
 function beret(f: Readonly<HeadFrame>): PartSpec[] {
-  return [part({ shape: Shape.Sphere, anchor: Anchor.Card, position: [0, base(f) + 0.07, HAT_Z], size: [f.width * 1.05, 0.14, f.width * 0.8], color: BERET_RED })];
+  return [part({ shape: Shape.Sphere, anchor: Anchor.Card, position: [0, base(f) + 0.07, HAT_Z], size: [f.width * 1.05, 0.14, f.width * 0.5], color: BERET_RED })];
 }
 
 function aviators(f: Readonly<HeadFrame>): PartSpec[] {

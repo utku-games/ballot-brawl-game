@@ -8,7 +8,7 @@ import { ActionKind } from '../fight/fightTypes';
 import { MoveKind, MOVES } from '../fight/moves';
 import { frameFighters, MAX_DISTANCE, MIN_DISTANCE } from './cameraFraming';
 import { RESTING_SPRING, kickSpring, stepSpring } from './headSpring';
-import { attackPhase, computePose, KO_FALL_SECONDS, koFall, Mood } from './poseLogic';
+import { attackPhase, computePose, KO_FALL_SECONDS, koFall, Mood, SKIRT_FOLD, skirtFold } from './poseLogic';
 
 const BASE = { frame: 0, duration: 0, move: null, moving: false, time: 0, mood: Mood.None, koSeconds: -1 };
 
@@ -70,5 +70,24 @@ describe('frameFighters', () => {
     const wide = frameFighters({ points, aspect: 16 / 9, fovY: fov }).distance;
     const tall = frameFighters({ points, aspect: 9 / 16, fovY: fov }).distance;
     expect(tall).toBeGreaterThan(wide);
+  });
+});
+
+describe('skirtFold', () => {
+  it('leaves a standing skirt alone', () => {
+    expect(skirtFold(0, 0.6)).toEqual({ scale: 1, lift: 0 });
+  });
+
+  it('folds a fallen skirt flat so its hem stays near the floor', () => {
+    const r = 0.7;
+    const fold = skirtFold(1, r);
+    expect(fold.scale).toBeCloseTo(SKIRT_FOLD, 6);
+    expect(fold.lift - r * fold.scale).toBeGreaterThan(-r * SKIRT_FOLD);
+    expect(fold.lift - r * fold.scale).toBeCloseTo(-r * SKIRT_FOLD / 2, 6);
+  });
+
+  it('clamps the fall amount', () => {
+    expect(skirtFold(2, 0.5)).toEqual(skirtFold(1, 0.5));
+    expect(skirtFold(-1, 0.5)).toEqual(skirtFold(0, 0.5));
   });
 });

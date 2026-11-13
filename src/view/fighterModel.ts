@@ -16,6 +16,7 @@ import { neckwearParts } from './neckwearParts';
 import { outfitLayout } from './outfitParts';
 import { attachParts, MaterialSet } from './outfitMeshes';
 import { Anchor, ColorSlot, type Paint } from './partSpec';
+import { skirtFold } from './poseLogic';
 import { handY, propParts } from './propParts';
 import { headFrame } from './silhouette';
 
@@ -32,6 +33,10 @@ export interface FighterRig {
   legR: THREE.Group;
   ring: THREE.Mesh;
   marker: THREE.Mesh;
+  /** Hip-height group holding skirts, folded flat when the fighter lies down. */
+  skirt: THREE.Group;
+  /** Hem radius of the widest skirt, 0 without one. */
+  skirtRadius: number;
   materials: MaterialSet;
   flashMaterials: THREE.MeshStandardMaterial[];
   ringMaterial: THREE.MeshBasicMaterial;
@@ -147,15 +152,26 @@ export function buildFighterRig(def: FighterDef, tone: number, face: THREE.Textu
   bodyPart(kit, 'torso', layout.torso, torso);
   const left = buildArm(kit, torso, -1, layout.sleeves, !prop.hidesHand);
   const right = buildArm(kit, torso, 1, layout.sleeves, !prop.hidesHand);
+  const skirt = pivot(body, 0, dims.legLength);
   const anchors = new Map<Anchor, THREE.Object3D>([
-    [Anchor.Body, pivot(body, 0, dims.legLength)], [Anchor.Torso, torso], [Anchor.ArmL, left.shoulder], [Anchor.ArmR, right.shoulder],
+    [Anchor.Body, skirt], [Anchor.Torso, torso], [Anchor.ArmL, left.shoulder], [Anchor.ArmR, right.shoulder],
     [Anchor.LegL, legL], [Anchor.LegR, legR], [Anchor.HandR, right.grip],
   ]);
-  attachParts([...layout.parts, ...neckwearParts(def.look.neckwear, dims), ...prop.parts], anchors, kit.materials);
+  const parts = [...layout.parts, ...neckwearParts(def.look.neckwear, dims), ...prop.parts];
+  attachParts(parts, anchors, kit.materials);
+  const skirtRadius = Math.max(0, ...parts.filter((p) => p.anchor === Anchor.Body).map((p) => p.size[0] / 2));
   const { head, card, stars } = buildHead(kit, torso, face, credit);
   const markerHeight = headPivotHeight(dims) + HEAD_CARD_SIZE + headwearHeight(def.look.headwear);
   return {
     root, body, torso, head, card, stars, armL: left.shoulder, armR: right.shoulder, legL, legR,
-    ...buildRingAndMarker(root, teamColor, markerHeight), materials: kit.materials, flashMaterials: kit.materials.all(),
+    ...buildRingAndMarker(root, teamColor, markerHeight), skirt, skirtRadius, materials: kit.materials, flashMaterials: kit.materials.all(),
   };
+}
+
+/** Tips the body over (fall 0 standing, 1 flat on its back) and folds any skirt so it rests on the floor. */
+export function setFall(rig: FighterRig, fall: number): void {
+  rig.body.rotation.x = (-fall * Math.PI) / 2;
+  const fold = skirtFold(fall, rig.skirtRadius);
+  rig.skirt.scale.z = fold.scale;
+  rig.skirt.position.z = fold.lift;
 }

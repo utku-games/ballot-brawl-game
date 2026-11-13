@@ -14,7 +14,7 @@ export enum Shape {
   Cone = 'cone',
   /** Ellipsoid: full extent per axis. */
   Sphere = 'sphere',
-  /** Ring in the x-y plane: x is the outer diameter, y the tube diameter, z unused but positive. */
+  /** Ring in the x-y plane: x is the outer diameter across, y the tube diameter, z the outer diameter along y. */
   Torus = 'torus',
 }
 

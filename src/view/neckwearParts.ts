@@ -39,7 +39,7 @@ function bowTie(d: Readonly<BodyDims>): PartSpec[] {
 
 function ruff(d: Readonly<BodyDims>): PartSpec[] {
   return [part({
-    shape: Shape.Torus, anchor: Anchor.Torso, position: [0, d.torsoHeight - 0.01, 0], size: [d.torsoWidth * 0.75, 0.1, 0.1], rotation: [Math.PI / 2, 0, 0], color: WHITE,
+    shape: Shape.Torus, anchor: Anchor.Torso, position: [0, d.torsoHeight - 0.01, 0], size: [d.torsoWidth * 0.75, 0.1, d.torsoDepth], rotation: [Math.PI / 2, 0, 0], color: WHITE,
   })];
 }
 
@@ -53,7 +53,7 @@ function cravat(d: Readonly<BodyDims>): PartSpec[] {
 
 function goldCollar(d: Readonly<BodyDims>): PartSpec[] {
   return [part({
-    shape: Shape.Cylinder, anchor: Anchor.Torso, position: [0, d.torsoHeight - 0.03, 0], size: [d.torsoWidth * 0.95, 0.04, d.torsoDepth * 1.25], color: GOLD,
+    shape: Shape.Cylinder, anchor: Anchor.Torso, position: [0, d.torsoHeight - 0.03, 0], size: [d.torsoWidth * 0.95, 0.04, d.torsoDepth * 1.05], color: GOLD,
   })];
 }
 

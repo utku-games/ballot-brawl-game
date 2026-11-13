@@ -13,7 +13,7 @@ import { Category } from '../roster/rosterTypes';
 import { ARENA_FOR_CATEGORY, ARENA_STYLES } from '../view/arenaKinds';
 import { buildArena } from '../view/arenaModels';
 import { faceTexture } from '../view/faceTextures';
-import { buildFighterRig, type FighterRig } from '../view/fighterModel';
+import { buildFighterRig, setFall, type FighterRig } from '../view/fighterModel';
 
 const COLUMNS = 6;
 const SPACING_X = 1.55;
@@ -33,7 +33,7 @@ enum Pose {
 function applyPose(rig: FighterRig, pose: Pose): void {
   if (pose === Pose.Punch) rig.armR.rotation.x = -PUNCH_ARM;
   if (pose === Pose.Ko) {
-    rig.body.rotation.x = -Math.PI / 2;
+    setFall(rig, 1);
     rig.stars.visible = true;
   }
 }

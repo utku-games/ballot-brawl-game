@@ -85,7 +85,7 @@ function geometryFor(p: Readonly<PartSpec>): THREE.BufferGeometry {
 
 function applyScale(mesh: THREE.Mesh, p: Readonly<PartSpec>): void {
   const [x, y, z] = p.size;
-  if (p.shape === Shape.Torus) mesh.scale.setScalar(x);
+  if (p.shape === Shape.Torus) mesh.scale.set(x, z, x);
   else if (p.shape === Shape.Cone) mesh.scale.set(x, y, x);
   else if (p.shape === Shape.Capsule) mesh.scale.set(x * 2, y, z * 2);
   else mesh.scale.set(x, y, z);
