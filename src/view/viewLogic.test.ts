@@ -10,6 +10,7 @@ import { FinisherStyle, Gesture } from '../roster/signatureTypes';
 import { frameFighters, MAX_DISTANCE, MIN_DISTANCE } from './cameraFraming';
 import { RESTING_SPRING, kickSpring, stepSpring } from './headSpring';
 import { gesturePose } from './gesturePoses';
+import { launchArc, LAUNCH_SECONDS, ringOutDrop } from './poseLogic';
 import { attackPhase, computePose, KO_FALL_SECONDS, koFall, Mood, SKIRT_FOLD, skirtFold } from './poseLogic';
 
 const BASE = {
@@ -131,5 +132,21 @@ describe('gestures', () => {
     const at = (style: FinisherStyle): number => computePose({ ...BASE, style, kind: ActionKind.Attack, move: MoveKind.Finisher, frame: 8 }).armR;
     const values = new Set(Object.values(FinisherStyle).map(at));
     expect(values.size).toBe(Object.values(FinisherStyle).length);
+  });
+});
+
+describe('launch and ring-out falls', () => {
+  it('launches up and back down to the floor', () => {
+    expect(launchArc(-1)).toEqual({ height: 0, spin: 0 });
+    expect(launchArc(LAUNCH_SECONDS / 2).height).toBeGreaterThan(1);
+    expect(launchArc(LAUNCH_SECONDS).height).toBe(0);
+  });
+
+  it('drops a rung-out fighter faster and faster', () => {
+    expect(ringOutDrop(-1)).toEqual({ depth: 0, spin: 0 });
+    const a = ringOutDrop(0.5).depth;
+    const b = ringOutDrop(1).depth;
+    expect(a).toBeGreaterThan(0);
+    expect(b - a).toBeGreaterThan(a);
   });
 });

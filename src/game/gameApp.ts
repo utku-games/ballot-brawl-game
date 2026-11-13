@@ -1,6 +1,6 @@
 /**
  * The game's top-level state machine: title, story (category, fighter, ladder, fights, ending), rivalry battles, brawl
- * setup and matches, pause and credits.
+ * and party setup and matches, pause and credits.
  * It owns the current screen or match session, the menu backdrop and the save data, and routes each frame to whichever is active.
  * Menus are navigable by mouse, touch, keyboard arrows and gamepad; touch fight buttons appear only during matches.
  */
@@ -11,7 +11,7 @@ import { PlayerId, type ControlFrame } from '../input/controlFrame';
 import type { InputHub } from '../input/inputHub';
 import { Difficulty } from '../ai/aiProfile';
 import type { Rivalry } from '../rivalry/rivalryTypes';
-import { BRAWL_ORDER, fightersIn } from '../roster/roster';
+import { BRAWL_ORDER, fighterById, fightersIn } from '../roster/roster';
 import type { Category } from '../roster/rosterTypes';
 import { buildLadder } from '../story/ladder';
 import { recordFight, RunStatus, runScore, startRun, type StoryRun } from '../story/storyRun';
@@ -19,6 +19,7 @@ import { activateFocus, moveFocus } from '../ui/menuFocus';
 import type { Screen } from '../ui/screenKit';
 import { brawlSetupScreen } from '../ui/screens/brawlSetupScreen';
 import { brawlResultScreen, creditsScreen, pauseScreen } from '../ui/screens/miscScreens';
+import { partySetupScreen } from '../ui/screens/partyScreens';
 import { categoryScreen, fighterPickScreen } from '../ui/screens/pickScreens';
 import { rivalryListScreen, rivalryResultScreen, rivalrySideScreen } from '../ui/screens/rivalryScreens';
 import { fightResultScreen, ladderScreen, storyEndScreen } from '../ui/screens/storyScreens';
@@ -26,7 +27,7 @@ import { titleScreen } from '../ui/screens/titleScreen';
 import type { TouchControls } from '../ui/touchControls';
 import { ARENA_FOR_CATEGORY, ArenaKind } from '../view/arenaKinds';
 import { MenuBackdrop } from '../view/menuBackdrop';
-import { defaultBrawl, RANDOM_FIGHTER, setFighter, toMatchPlan, type BrawlConfig } from './brawlConfig';
+import { defaultBrawl, defaultParty, RANDOM_FIGHTER, setFighter, toMatchPlan, type BrawlConfig } from './brawlConfig';
 import type { MatchPlan } from './matchPlan';
 import { MatchSession, type MatchOutcome } from './matchSession';
 import { rivalryMatchPlan, type RivalrySide } from './rivalryPlan';
@@ -62,6 +63,7 @@ export class GameApp {
   private readonly save = loadSave();
   private readonly rng: Rng = createRng(Date.now());
   private brawl: BrawlConfig = defaultBrawl(ArenaKind.Parliament);
+  private party: BrawlConfig = defaultParty(ArenaKind.Rooftop);
   private run: StoryRun | null = null;
   private rivalryDifficulty = Difficulty.Normal;
   private attempt = 0;
@@ -183,6 +185,7 @@ export class GameApp {
       onStory: () => this.showCategories(),
       onRivalry: () => this.showRivalries(),
       onBrawl: () => this.showBrawlSetup(),
+      onParty: () => this.showPartySetup(),
       onCredits: () => this.show((q) => creditsScreen(q, () => this.showTitle()), null),
       onToggleMute: () => this.toggleMute(),
     }, this.save.muted, window.matchMedia(COARSE_POINTER).matches), ArenaKind.Parliament);
@@ -298,6 +301,37 @@ export class GameApp {
       const title = o.winner === null ? 'DRAW!' : o.winner === 0 ? 'LEFT TEAM WINS!' : 'RIGHT TEAM WINS!';
       this.showOverlay((p) => brawlResultScreen(p, title, () => this.startBrawl({ ...plan, seed: plan.seed + 1 }),
         () => this.showBrawlSetup(), () => this.showTitle()));
+    });
+  }
+
+  // ---- party ----
+
+  private showPartySetup(): void {
+    this.show((p) => partySetupScreen(p, this.party, {
+      onChange: (c) => {
+        this.party = c;
+        this.showPartySetup();
+      },
+      onPickFighter: (side) => this.pickPartyFighter(side),
+      onStart: () => this.startParty(toMatchPlan(this.party, this.rng)),
+      onBack: () => this.showTitle(),
+    }), this.party.arena);
+  }
+
+  private pickPartyFighter(side: number): void {
+    const fighters = BRAWL_ORDER.flatMap((c) => fightersIn(c));
+    this.show((p) => fighterPickScreen(p, { title: 'Choose a fighter', fighters, allowRandom: true }, (id) => {
+      this.party = setFighter(this.party, side, 0, id ?? RANDOM_FIGHTER);
+      this.showPartySetup();
+    }, () => this.showPartySetup()), this.party.arena);
+  }
+
+  private startParty(plan: MatchPlan): void {
+    this.startMatch(plan, (o) => {
+      const winner = o.winner === null ? null : o.final.fighters.find((f) => f.team === o.winner);
+      const title = winner ? `${fighterById(winner.fighterId).name.toUpperCase()} WINS!` : 'DRAW!';
+      this.showOverlay((p) => brawlResultScreen(p, title, () => this.startParty({ ...plan, seed: plan.seed + 1 }),
+        () => this.showPartySetup(), () => this.showTitle()));
     });
   }
 }

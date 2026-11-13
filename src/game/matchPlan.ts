@@ -12,7 +12,7 @@ import type { PlayerId } from '../input/controlFrame';
 import { fighterById } from '../roster/roster';
 import { Twist } from '../rivalry/rivalryTypes';
 import { twistModifiers } from '../rivalry/twists';
-import type { ArenaKind } from '../view/arenaKinds';
+import { arenaHasRingOuts, type ArenaKind } from '../view/arenaKinds';
 
 export interface SlotPlan {
   fighterId: string;
@@ -25,7 +25,8 @@ export interface SlotPlan {
 }
 
 export interface MatchPlan {
-  teams: readonly [readonly SlotPlan[], readonly SlotPlan[]];
+  /** Two teams for Story, Rivalry and Brawl; three or four single-fighter sides for a Party free-for-all. */
+  teams: readonly (readonly SlotPlan[])[];
   arena: ArenaKind;
   seed: number;
   /** Shown instead of "READY?" during the intro (a rivalry title), or null. */
@@ -51,9 +52,10 @@ function entry(slot: Readonly<SlotPlan>, twist: Twist): TeamEntry {
 
 export function buildMatchSetup(plan: Readonly<MatchPlan>): MatchSetup {
   return {
-    teams: [plan.teams[0].map((s) => entry(s, plan.twist)), plan.teams[1].map((s) => entry(s, plan.twist))],
+    teams: plan.teams.map((team) => team.map((s) => entry(s, plan.twist))),
     extras: plan.extras,
     seed: plan.seed,
+    ringOuts: arenaHasRingOuts(plan.arena),
   };
 }
 

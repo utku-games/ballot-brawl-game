@@ -1,7 +1,7 @@
 /**
  * The deterministic fight step: given a MatchState and one input per fighter, produce the next MatchState.
  * Order per tick: timers, control (facing, actions, walking), hit resolution, projectiles, items and hazards,
- * knockback, body separation, walls, end check.
+ * knockback, ring-outs, body separation, walls, end check.
  * The input state is never mutated; fighters are cloned first, and the returned state lists this tick's events.
  */
 import {
@@ -14,6 +14,7 @@ import { resolveAttacks } from './hitResolution';
 import { spawnHazard, stepHazards } from './hazards';
 import { dropFromFallen, pickUpItems, spawnItem } from './items';
 import { spawnProjectiles, stepProjectiles } from './projectiles';
+import { applyRingOuts, canRingOut } from './ringOuts';
 import { isAlive, livingOnTeam, teamHealthFraction } from './matchQueries';
 
 function cloneFighter(f: Readonly<FighterState>): FighterState {
@@ -26,19 +27,28 @@ interface Outcome {
   reason: EndReason;
 }
 
+function teamsIn(fighters: readonly FighterState[]): TeamIndex[] {
+  return [...new Set(fighters.map((f) => f.team))].sort();
+}
+
+/** The match ends when at most one side has living fighters, or at time over with the healthiest side winning. */
 function decideOutcome(fighters: readonly FighterState[], timeUp: boolean): Outcome {
-  const alive0 = livingOnTeam(fighters, 0).length;
-  const alive1 = livingOnTeam(fighters, 1).length;
+  const teams = teamsIn(fighters);
+  const standing = teams.filter((t) => livingOnTeam(fighters, t).length > 0);
   const ko = EndReason.KnockOut;
-  if (alive0 === 0 && alive1 === 0) return { over: true, winner: null, reason: ko };
-  if (alive0 === 0) return { over: true, winner: 1, reason: ko };
-  if (alive1 === 0) return { over: true, winner: 0, reason: ko };
+  if (standing.length === 0) return { over: true, winner: null, reason: ko };
+  if (standing.length === 1) return { over: true, winner: standing[0], reason: ko };
   const time = EndReason.TimeOver;
   if (!timeUp) return { over: false, winner: null, reason: time };
-  const h0 = teamHealthFraction(fighters, 0);
-  const h1 = teamHealthFraction(fighters, 1);
-  if (h0 === h1) return { over: true, winner: null, reason: time };
-  return { over: true, winner: h0 > h1 ? 0 : 1, reason: time };
+  const health = standing.map((t) => teamHealthFraction(fighters, t));
+  const best = Math.max(...health);
+  const leaders = standing.filter((_, i) => health[i] === best);
+  return { over: true, winner: leaders.length === 1 ? leaders[0] : null, reason: time };
+}
+
+/** On an open platform, rung-out fighters and fighters mid-knockback are not held in by the walls. */
+function onOpenEdge(f: Readonly<FighterState>, ringOuts: boolean): boolean {
+  return ringOuts && (f.ringedOut || canRingOut(f));
 }
 
 /** Items and hazards for this tick: lands falling anvils, drops items from fallen fighters, hands out and spawns items. */
@@ -65,8 +75,9 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
   const projectiles = [...stepProjectiles(state.projectiles, fighters, events), ...spawnProjectiles(fighters, state.tick, events)];
   const extras = stepExtras(state, fighters, events);
   for (const f of fighters) slideKnockback(f);
+  if (state.ringOuts) applyRingOuts(fighters, events);
   separateBodies(fighters);
-  for (const f of fighters) keepInArena(f);
+  for (const f of fighters) if (!onOpenEdge(f, state.ringOuts)) keepInArena(f);
   const ticksLeft = Math.max(0, state.ticksLeft - 1);
   const result = decideOutcome(fighters, ticksLeft === 0);
   if (result.over) events.push({ kind: 'matchOver', winner: result.winner, reason: result.reason });
@@ -80,6 +91,7 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
     hazards: result.over ? [] : extras.hazards,
     extras: state.extras,
     seed: state.seed,
+    ringOuts: state.ringOuts,
     winner: result.winner,
     events,
   };

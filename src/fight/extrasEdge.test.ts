@@ -25,7 +25,7 @@ function scripted(tick: number, i: number): FighterInput {
 }
 
 function long(seed: number, ticks: number): { state: MatchState; maxItems: number } {
-  let s = createMatch({ teams: [entries(4), entries(4)], extras: true, seed });
+  let s = createMatch({ teams: [entries(4), entries(4)], extras: true, seed, ringOuts: false });
   let maxItems = 0;
   for (let t = 0; t < ticks && s.phase === MatchPhase.Fighting; t += 1) {
     s = stepMatch(s, s.fighters.map((_, i) => scripted(t, i)));
@@ -67,7 +67,7 @@ describe('extras edge cases', () => {
   });
 
   it('lets an anvil skip a fighter who is already knocked out', () => {
-    const s = { ...duel(1), extras: true, seed: 5 };
+    const s = { ...duel(1), extras: true, seed: 5, ringOuts: false };
     const before = run(s, HAZARD_INTERVAL_TICKS + 1, IDLE2).state;
     const h = before.hazards[0];
     const [a, b] = before.fighters;
@@ -80,7 +80,7 @@ describe('extras edge cases', () => {
   });
 
   it('clears items and hazards when the match ends', () => {
-    const s = { ...duel(1), extras: true, seed: 5 };
+    const s = { ...duel(1), extras: true, seed: 5, ringOuts: false };
     const before = run(s, HAZARD_INTERVAL_TICKS + 1, IDLE2).state;
     before.items = [{ id: 'x', kind: ItemKind.Gavel, x: 5, z: 5 }];
     before.fighters[1].health = 0;
@@ -101,7 +101,7 @@ describe('extras edge cases', () => {
   });
 
   it('does not mutate the previous state when stepping with extras', () => {
-    const s = createMatch({ teams: [entries(2), entries(2)], extras: true, seed: 9 });
+    const s = createMatch({ teams: [entries(2), entries(2)], extras: true, seed: 9, ringOuts: false });
     s.fighters[0].holding = ItemKind.Gavel;
     const snapshot = JSON.stringify(s);
     stepMatch(s, s.fighters.map((_, i) => scripted(0, i)));

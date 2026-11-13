@@ -15,7 +15,7 @@ import { HUD_CSS } from './hudStyles';
 import { THEME } from './theme';
 
 const LOW_HEALTH = 0.3;
-const TEAM_CSS = [THEME.teamA, THEME.teamB] as const;
+const TEAM_CSS = [THEME.teamA, THEME.teamB, THEME.teamC, THEME.teamD] as const;
 
 interface Row {
   root: HTMLElement;
