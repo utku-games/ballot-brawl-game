@@ -5,6 +5,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Three more Specials: Larry the Cat (Downing Street's Chief Mouser), a bull and a chicken that throws eggs.
+- Three more Special Edition matchups: The Chief Mouser (Keir Starmer vs Larry), Bull Market (Warren Buffett vs the
+  bull) and Free Range (Gordon Ramsay vs the chicken).
+
+### Changed
+- The face pipeline also accepts photos under the "OGL v1.0" spelling of the UK Open Government Licence.
+
 ### Fixed
 - Beyoncé's face now comes from a clean, front-facing photo (no microphone over her mouth).
 - Caesar's laurel is a wreath of leaves from temple to temple instead of a ring above his head.
