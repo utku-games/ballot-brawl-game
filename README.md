@@ -16,7 +16,7 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
 
 - **Rivalry Battles**: famous one-on-one feuds (Edison vs Tesla, Trump vs Xi, Musk vs Zuckerberg, Ronaldo vs
   Messi and more) and a Special Edition of joke matchups (Shehbaz Sharif vs a goat, David Cameron vs a pig,
-  Erdoğan vs a camel). Pick a side and a CPU difficulty; some rivalries add a twist such as a blackout, turbo speed
+  Erdoğan vs a camel, Keir Starmer vs Larry the cat, Warren Buffett vs a bull, Gordon Ramsay vs a chicken). Pick a side and a CPU difficulty; some rivalries add a twist such as a blackout, turbo speed
   or heavy hits. Won rivalries are marked as settled.
 - **Party**: a free-for-all for three or four fighters, each on their own side; the last one standing wins. Every
   slot can be Player 1, Player 2 or CPU, with items and hazards and any arena (The Rooftop adds ring-outs).
@@ -24,7 +24,7 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
   it has no walls, and a hard hit near the edge knocks a fighter off the platform. Items and hazards (on by default) drop
   briefcases, gavels and money bags to pick up and throw with Punch, and send cartoon anvils down where a red ring
   marks the floor. Brawl also lists the Specials: a goat,
-  a pig and a camel.
+  a pig, a camel, Larry the cat, a bull and a chicken.
 - **Story**: choose Politicians, Tycoons, Legends or Celebrities, pick a fighter and beat 10 opponents in a row,
   ending with the boss (Churchill, Rockefeller, Napoleon or Schwarzenegger). Each fight is harder than the last; you
   have three lives: the third lost fight ends the run and shows your score. Beat the boss and you saved the world. The score comes from the damage you take

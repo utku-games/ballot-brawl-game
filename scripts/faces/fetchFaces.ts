@@ -4,7 +4,7 @@
  * With --analyze (macOS only) it first runs the Vision helper to lift subjects, find faces and store crops and landmarks.
  * Non-free licences stop the run, so nothing unlicensed can reach the game.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import { downloadOnce, imageInfo, type ImageInfo } from './commonsClient.ts';
@@ -29,6 +29,17 @@ interface FaceSource {
   manual?: boolean;
   crop: Crop | null;
   landmarks: ImageLandmarks | null;
+}
+
+/** Drops a cached photo and its analysis when the fighter's source file changed, so the new photo is fetched. */
+function forgetIfSourceChanged(source: Readonly<FaceSource>, path: string): void {
+  const marker = `${path}.source`;
+  const previous = existsSync(marker) ? readFileSync(marker, 'utf8') : null;
+  if (previous !== null && previous !== source.file) {
+    rmSync(path, { force: true });
+    rmSync(maskPath(ANALYSIS_DIR, source.id), { force: true });
+  }
+  writeFileSync(marker, source.file);
 }
 
 async function analyze(sources: FaceSource[], paths: Map<string, string>): Promise<void> {
@@ -59,6 +70,7 @@ async function main(): Promise<void> {
     const info = await imageInfo(source.file);
     if (!isAllowedLicense(info.meta.license)) throw new FaceLicenseError(`${source.id}: licence "${info.meta.license}" is not free`);
     const path = join(CACHE_DIR, `${source.id}.img`);
+    forgetIfSourceChanged(source, path);
     await downloadOnce(info.downloadUrl, path);
     infos.set(source.id, info);
     paths.set(source.id, path);

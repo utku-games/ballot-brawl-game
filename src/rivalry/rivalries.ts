@@ -26,6 +26,9 @@ export const RIVALRIES: readonly Rivalry[] = [
   { id: 'the-feud', section: R, left: 'taylor-swift', right: 'kim-kardashian', title: 'The Feud', tagline: 'Look what you made them do.', arena: ArenaKind.Studio, twist: Twist.None },
   { id: 'goat-summit', section: S, left: 'shehbaz-sharif', right: 'goat', title: 'The G.O.A.T. Summit', tagline: 'A prime minister meets the greatest of all time.', arena: ArenaKind.Parliament, twist: Twist.None },
   { id: 'pork-barrel', section: S, left: 'david-cameron', right: 'pig', title: 'The Pork Barrel', tagline: 'A former prime minister meets the opposition he never saw coming.', arena: ArenaKind.Parliament, twist: Twist.HeavyHitters },
+  { id: 'chief-mouser', section: S, left: 'keir-starmer', right: 'larry', title: 'The Chief Mouser', tagline: 'Prime ministers come and go. The cat stays.', arena: ArenaKind.Parliament, twist: Twist.None },
+  { id: 'bull-market', section: S, left: 'warren-buffett', right: 'bull', title: 'Bull Market', tagline: 'The oracle meets the market mascot in person.', arena: ArenaKind.TradingFloor, twist: Twist.Turbo },
+  { id: 'free-range', section: S, left: 'gordon-ramsay', right: 'chicken', title: 'Free Range', tagline: 'One chef, one very fast chicken, no recipe.', arena: ArenaKind.Studio, twist: Twist.HeavyHitters },
   { id: 'desert-derby', section: S, left: 'recep-tayyip-erdogan', right: 'camel', title: 'The Desert Derby', tagline: 'One has humps, the other has a long walk home.', arena: ArenaKind.Museum, twist: Twist.Turbo },
 ];
 
