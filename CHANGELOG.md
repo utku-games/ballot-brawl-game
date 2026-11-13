@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- David Cameron, former UK prime minister, joins the Politicians and takes the pig matchup in the Special Edition
+  (now The Pork Barrel). James Cameron, added by mistake, leaves the Celebrities.
+
 ## [0.6.0] - 2026-11-13
 
 ### Added

@@ -1,5 +1,5 @@
 /**
- * The Celebrities category: pop stars, athletes, actors, a chef, a director and an influencer, with Arnold as boss.
+ * The Celebrities category: pop stars, athletes, actors, a chef and an influencer, with Arnold as boss.
  * Their faces come from freely licensed event photos on Wikimedia Commons, credited in-game like every other face.
  * Every regular fighter has the same stat total; the boss gets more and fights last in the story ladder.
  */
@@ -21,7 +21,6 @@ const ROWS: readonly FighterRow[] = [
   { id: 'lady-gaga', name: 'Lady Gaga', nickname: 'Mother Monster', finisher: 'Bad Romance', stats: [3, 4, 2], colors: [0x1a1a1a, 0xc8c8c8, 0xf6d6c4, 0xf0e0a0], kit: [Build.Average, Outfit.Gown, Neckwear.None, Headwear.None, Prop.None], signature: [FinisherStyle.Throw, Gesture.Bow, Projectile.Note], boss: REG },
   { id: 'gordon-ramsay', name: 'Gordon Ramsay', nickname: 'The Chef', finisher: 'Kitchen Nightmare', stats: [4, 3, 2], colors: [0xe8e8e8, 0x1a1a1a, 0xf0c0a0, 0xd8b070], kit: [Build.Average, Outfit.LabCoat, Neckwear.None, Headwear.None, Prop.None], signature: [FinisherStyle.Throw, Gesture.Point, Projectile.FryingPan], boss: REG },
   { id: 'keanu-reeves', name: 'Keanu Reeves', nickname: 'The One', finisher: 'Matrix Rush', stats: [3, 4, 2], colors: [0x111111, 0x1a1a1a, 0xe8c09a, 0x1a1a1a], kit: [Build.Lanky, Outfit.FrockCoat, Neckwear.None, Headwear.Aviators, Prop.None], signature: [FinisherStyle.Rush, Gesture.Bow, Projectile.None], boss: REG },
-  { id: 'james-cameron', name: 'James Cameron', nickname: 'The Director', finisher: 'Deep Dive', stats: [3, 3, 3], colors: [0x3a4a5a, 0x8ab0e0, 0xf0c4a4, 0xd0d0d0], kit: [Build.Tall, Outfit.Casual, Neckwear.None, Headwear.None, Prop.None], signature: [FinisherStyle.Rush, Gesture.Point, Projectile.None], boss: REG },
   { id: 'kim-kardashian', name: 'Kim Kardashian', nickname: 'The Influencer', finisher: 'Break the Internet', stats: [2, 4, 3], colors: [0xe8d8c8, 0xc8a080, 0xe8c0a0, 0x1a1a1a], kit: [Build.Average, Outfit.Gown, Neckwear.None, Headwear.None, Prop.Phone], signature: [FinisherStyle.Quake, Gesture.Wave, Projectile.None], boss: REG },
   { id: 'arnold-schwarzenegger', name: 'Arnold Schwarzenegger', nickname: 'The Governator', finisher: 'Judgment Day', stats: [5, 3, 3], colors: [0x1a1a1a, 0x3a3a3a, 0xe0b090, 0x8a6a4a], kit: [Build.Stocky, Outfit.LeatherJacket, Neckwear.None, Headwear.Aviators, Prop.None], signature: [FinisherStyle.Smash, Gesture.Flex, Projectile.None], boss: BOSS },
 ];
