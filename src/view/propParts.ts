@@ -40,6 +40,7 @@ const LETTUCE = 0x5aa02a;
 const ROCKET_RED = 0xd0202a;
 const MITTEN = 0x8a6a4a;
 const MIC_BLACK = 0x1a1a1a;
+const SCREEN_BLUE = 0x4a8ad0;
 
 /** Height of the hand centre below the shoulder pivot. */
 export function handY(dims: Readonly<BodyDims>): number {
@@ -124,6 +125,7 @@ const BUILDERS: Readonly<Record<Prop, (d: Readonly<BodyDims>) => PartSpec[]>> = 
   [Prop.Burger]: burger,
   [Prop.ToyRocket]: () => [upright(0.3, 0.08, WHITE), held(Shape.Cone, [0.08, 0.1, 0.01], ROCKET_RED, 0.31)],
   [Prop.Dime]: () => [part({ shape: Shape.Cylinder, anchor: Anchor.HandR, position: [0, 0.02, GRIP_Z], size: [0.1, 0.012, 0.1], rotation: [Math.PI / 2, 0, 0], color: SILVER })],
+  [Prop.Phone]: () => [held(Shape.Box, [0.09, 0.17, 0.02], MIC_BLACK, 0.06), held(Shape.Box, [0.08, 0.15, 0.005], SCREEN_BLUE, 0.06)],
   [Prop.Microphone]: () => [upright(0.2, 0.04, MIC_BLACK), held(Shape.Sphere, [0.08, 0.08, 0.08], SILVER, 0.19)],
 };
 

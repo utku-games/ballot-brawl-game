@@ -12,6 +12,8 @@ const CATEGORY_BLURB: Readonly<Record<Category, string>> = {
   [Category.Politicians]: 'Presidents, prime ministers and party leaders.',
   [Category.Tycoons]: 'Billionaires, moguls and founders.',
   [Category.Legends]: 'Scientists, artists, rulers and icons of history.',
+  [Category.Celebrities]: 'Pop stars, athletes, actors and screen icons.',
+  [Category.Specials]: 'Animals and other surprises.',
 };
 
 export function categoryScreen(

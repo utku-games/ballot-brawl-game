@@ -9,7 +9,7 @@ import type { GameAudio } from '../audio/gameAudio';
 import { Sfx } from '../audio/sfxTable';
 import { PlayerId, type ControlFrame } from '../input/controlFrame';
 import type { InputHub } from '../input/inputHub';
-import { CATEGORY_ORDER, fightersIn } from '../roster/roster';
+import { BRAWL_ORDER, fightersIn } from '../roster/roster';
 import type { Category } from '../roster/rosterTypes';
 import { buildLadder } from '../story/ladder';
 import { recordFight, RunStatus, runScore, startRun, type StoryRun } from '../story/storyRun';
@@ -249,7 +249,7 @@ export class GameApp {
   }
 
   private pickBrawlFighter(team: 0 | 1, index: number): void {
-    const fighters = CATEGORY_ORDER.flatMap((c) => fightersIn(c));
+    const fighters = BRAWL_ORDER.flatMap((c) => fightersIn(c));
     this.show((p) => fighterPickScreen(p, { title: 'Choose a fighter', fighters, allowRandom: true }, (id) => {
       this.brawl = setFighter(this.brawl, team, index, id ?? RANDOM_FIGHTER);
       this.showBrawlSetup();

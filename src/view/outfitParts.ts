@@ -158,6 +158,19 @@ function casual(d: Readonly<BodyDims>): OutfitLayout {
   return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: DENIM, parts: [shirt(d, ColorSlot.Accent, true), ...lapels(d, ColorSlot.MainDark)] };
 }
 
+/** Sports kit: shirt in the main colour with an accent stripe and number panel, shorts, bare legs below the knee. */
+function jersey(d: Readonly<BodyDims>): OutfitLayout {
+  const y = d.torsoHeight * 0.55;
+  const stripe = part({ shape: Shape.Box, anchor: Anchor.Torso, position: [0, y, front(d, y)], size: [d.torsoWidth * 0.9, 0.06, CLOTH], color: ColorSlot.Accent });
+  const shorts = skirt(d, 0.32, 1.02, ColorSlot.MainDark);
+  return { torso: ColorSlot.Main, sleeves: ColorSlot.Main, pants: ColorSlot.Skin, parts: [stripe, shorts] };
+}
+
+/** No clothes: body, arms and legs all in the fur (hair) colour. */
+function fur(): OutfitLayout {
+  return { torso: ColorSlot.Hair, sleeves: ColorSlot.Hair, pants: ColorSlot.Hair, parts: [] };
+}
+
 const BUILDERS: Readonly<Record<Outfit, (d: Readonly<BodyDims>) => OutfitLayout>> = {
   [Outfit.Suit]: suit,
   [Outfit.TrouserSuit]: trouserSuit,
@@ -173,6 +186,8 @@ const BUILDERS: Readonly<Record<Outfit, (d: Readonly<BodyDims>) => OutfitLayout>
   [Outfit.Hoodie]: hoodie,
   [Outfit.LeatherJacket]: leatherJacket,
   [Outfit.Casual]: casual,
+  [Outfit.Jersey]: jersey,
+  [Outfit.Fur]: fur,
 };
 
 export function outfitLayout(outfit: Outfit, dims: Readonly<BodyDims>): OutfitLayout {

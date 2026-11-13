@@ -9,14 +9,15 @@ anyone depicted. There is no gore: knocked-out fighters just fall over.
 
 ## Status
 
-Playable: Story and Brawl modes, 36 fighters with their own body types and costumes, three arenas. See
+Playable: Story and Brawl modes, 57 fighters with their own body types and costumes, four arenas. See
 [ROADMAP.md](ROADMAP.md).
 
 ## Modes
 
-- **Brawl**: 1v1 up to 4v4, every slot set to Player 1, Player 2 or CPU.
-- **Story**: choose Politicians, Tycoons or Legends, pick a fighter and beat 10 opponents in a row,
-  ending with the boss (Churchill, Rockefeller or Napoleon). Each fight is harder than the last; you
+- **Brawl**: 1v1 up to 4v4, every slot set to Player 1, Player 2 or CPU. Brawl also lists the Specials: a goat,
+  a pig and a camel.
+- **Story**: choose Politicians, Tycoons, Legends or Celebrities, pick a fighter and beat 10 opponents in a row,
+  ending with the boss (Churchill, Rockefeller, Napoleon or Schwarzenegger). Each fight is harder than the last; you
   have three lives: the third lost fight ends the run and shows your score. Beat the boss and you saved the world. The score comes from the damage you take
   across the run (plus stage clears and perfect fights), with an S to D rank and a saved best score.
 

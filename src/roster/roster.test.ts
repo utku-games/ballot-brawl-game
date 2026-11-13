@@ -5,17 +5,37 @@
  */
 import { describe, expect, it } from 'vitest';
 import { RosterDataError, UnknownEntityError } from '../core/errors';
-import { bossOf, CATEGORY_ORDER, fighterById, fightersIn, REGULARS_PER_CATEGORY, ROSTER, validateRoster } from './roster';
+import { bossOf, BRAWL_ORDER, CATEGORY_ORDER, fighterById, fightersIn, MIN_REGULARS, ROSTER, validateRoster } from './roster';
 import { Build, Headwear, Neckwear, Outfit, Prop } from './lookTypes';
 import { Category } from './rosterTypes';
 import { FinisherStyle, Gesture, Projectile } from './signatureTypes';
 
 describe('roster', () => {
-  it('has eleven regulars and one boss per category', () => {
+  it('has at least ten regulars and one boss per story category, and no boss among the Specials', () => {
     for (const c of CATEGORY_ORDER) {
-      expect(fightersIn(c).filter((f) => !f.boss)).toHaveLength(REGULARS_PER_CATEGORY);
+      expect(fightersIn(c).filter((f) => !f.boss).length).toBeGreaterThanOrEqual(MIN_REGULARS);
       expect(bossOf(c).boss).toBe(true);
     }
+    expect(CATEGORY_ORDER).not.toContain(Category.Specials);
+    expect(BRAWL_ORDER).toContain(Category.Specials);
+    expect(fightersIn(Category.Specials).map((f) => f.id).sort()).toEqual(['camel', 'goat', 'pig']);
+    expect(fightersIn(Category.Specials).some((f) => f.boss)).toBe(false);
+  });
+
+  it('adds the requested fighters', () => {
+    for (const id of ['benjamin-netanyahu', 'ali-khamenei', 'xi-jinping', 'shehbaz-sharif', 'recep-tayyip-erdogan']) {
+      expect(fighterById(id).category, id).toBe(Category.Politicians);
+    }
+    expect(fighterById('thomas-edison').signature.projectile).toBe(Projectile.LightBulb);
+    expect(fighterById('james-cameron').category).toBe(Category.Celebrities);
+    expect(bossOf(Category.Celebrities).id).toBe('arnold-schwarzenegger');
+  });
+
+  it('rejects a category below the minimum and a boss among the Specials', () => {
+    const thin = ROSTER.filter((f) => f.category !== Category.Celebrities || f.boss || f.id === 'beyonce');
+    expect(() => validateRoster(thin)).toThrow(RosterDataError);
+    const bossy = ROSTER.map((f) => (f.id === 'goat' ? { ...f, boss: true } : f));
+    expect(() => validateRoster(bossy)).toThrow(RosterDataError);
   });
 
   it('uses kebab-case ids that are safe file names', () => {
