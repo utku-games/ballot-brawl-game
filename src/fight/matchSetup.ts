@@ -18,6 +18,10 @@ export interface TeamEntry {
 
 export interface MatchSetup {
   teams: readonly [readonly TeamEntry[], readonly TeamEntry[]];
+  /** True to spawn throwable items and hazards. */
+  extras: boolean;
+  /** Seed for item and hazard placement. */
+  seed: number;
 }
 
 /** Slot id of the index-th fighter of a team, e.g. "t1s0". */
@@ -47,6 +51,7 @@ function spawnFighter(entry: Readonly<TeamEntry>, team: TeamIndex, index: number
     combo: 0,
     invulnerable: 0,
     damageTaken: 0,
+    holding: null,
   };
 }
 
@@ -60,5 +65,8 @@ export function createMatch(setup: Readonly<MatchSetup>): MatchState {
     const team = teamIndex as TeamIndex;
     entries.forEach((entry, i) => fighters.push(spawnFighter(entry, team, i, entries.length)));
   });
-  return { tick: 0, ticksLeft: MATCH_TIME_TICKS, phase: MatchPhase.Fighting, fighters, projectiles: [], winner: null, events: [] };
+  return {
+    tick: 0, ticksLeft: MATCH_TIME_TICKS, phase: MatchPhase.Fighting, fighters, projectiles: [], items: [], hazards: [],
+    extras: setup.extras, seed: setup.seed, winner: null, events: [],
+  };
 }

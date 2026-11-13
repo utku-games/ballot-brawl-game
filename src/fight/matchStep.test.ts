@@ -10,7 +10,7 @@ import { ActionKind, EndReason, IDLE_INPUT, MatchPhase } from './fightTypes';
 import { createMatch } from './matchSetup';
 import { stepMatch } from './matchStep';
 import { MoveKind, moveDuration, MOVES } from './moves';
-import { duel, entries, input, NEUTRAL_PROFILE, run, tap } from './testFight';
+import { duel, entries, input, NEUTRAL_PROFILE, run, tap, NO_EXTRAS } from './testFight';
 
 const CLOSE = 1.2;
 const PUNCH = input({ punch: true });
@@ -20,12 +20,12 @@ const SPECIAL = input({ special: true });
 
 describe('createMatch', () => {
   it('rejects empty and oversized teams', () => {
-    expect(() => createMatch({ teams: [entries(0), entries(1)] })).toThrow(MatchSetupError);
-    expect(() => createMatch({ teams: [entries(5), entries(1)] })).toThrow(MatchSetupError);
+    expect(() => createMatch({ teams: [entries(0), entries(1)], ...NO_EXTRAS })).toThrow(MatchSetupError);
+    expect(() => createMatch({ teams: [entries(5), entries(1)], ...NO_EXTRAS })).toThrow(MatchSetupError);
   });
 
   it('spawns 4v4 with teams facing each other', () => {
-    const s = createMatch({ teams: [entries(4), entries(4)] });
+    const s = createMatch({ teams: [entries(4), entries(4)], ...NO_EXTRAS });
     expect(s.fighters).toHaveLength(8);
     expect(s.fighters.filter((f) => f.team === 0).every((f) => f.x < 0 && f.facingX > 0)).toBe(true);
     expect(s.fighters.filter((f) => f.team === 1).every((f) => f.x > 0 && f.facingX < 0)).toBe(true);
@@ -121,7 +121,7 @@ describe('knockdown and KO', () => {
   });
 
   it('a team keeps fighting while one member stands', () => {
-    const start = createMatch({ teams: [entries(1), entries(2)] });
+    const start = createMatch({ teams: [entries(1), entries(2)], ...NO_EXTRAS });
     start.fighters[1].health = 0;
     start.fighters[1].action = { kind: ActionKind.KnockedOut, frame: 0, duration: 0, move: null, hitIds: [] };
     expect(stepMatch(start, []).phase).toBe(MatchPhase.Fighting);
@@ -140,7 +140,7 @@ describe('time over and determinism', () => {
   });
 
   it('never mutates the input state and replays identically', () => {
-    const start = createMatch({ teams: [entries(2), entries(2)] });
+    const start = createMatch({ teams: [entries(2), entries(2)], ...NO_EXTRAS });
     const snapshot = JSON.stringify(start);
     const script = [input({ moveX: 1, punch: true }), KICK, DEFEND, input({ moveZ: -1 })];
     const a = run(start, 200, script).state;

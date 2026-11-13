@@ -29,6 +29,8 @@ export interface FighterRig {
   stars: THREE.Group;
   armL: THREE.Group;
   armR: THREE.Group;
+  /** Centre of the right hand, where held items go. */
+  grip: THREE.Group;
   legL: THREE.Group;
   legR: THREE.Group;
   ring: THREE.Mesh;
@@ -163,7 +165,7 @@ export function buildFighterRig(def: FighterDef, tone: number, face: THREE.Textu
   const { head, card, stars } = buildHead(kit, torso, face, credit);
   const markerHeight = headPivotHeight(dims) + HEAD_CARD_SIZE + headwearHeight(def.look.headwear);
   return {
-    root, body, torso, head, card, stars, armL: left.shoulder, armR: right.shoulder, legL, legR,
+    root, body, torso, head, card, stars, armL: left.shoulder, armR: right.shoulder, grip: right.grip, legL, legR,
     ...buildRingAndMarker(root, teamColor, markerHeight), skirt, skirtRadius, materials: kit.materials, flashMaterials: kit.materials.all(),
   };
 }

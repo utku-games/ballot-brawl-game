@@ -7,11 +7,11 @@
 import { describe, expect, it } from 'vitest';
 import { createRng } from '@utku/engine';
 import { METER_MAX } from '../fight/fightConstants';
-import { ActionKind, MatchPhase } from '../fight/fightTypes';
+import { ActionKind, ItemKind, MatchPhase } from '../fight/fightTypes';
 import { createMatch } from '../fight/matchSetup';
 import { stepMatch } from '../fight/matchStep';
 import { MoveKind } from '../fight/moves';
-import { duel, entries, styled } from '../fight/testFight';
+import { duel, entries, styled, NO_EXTRAS } from '../fight/testFight';
 import { FinisherStyle } from '../roster/signatureTypes';
 import { FRESH_MEMORY, thinkAi, type AiMemory } from './aiBrain';
 import { Difficulty, DIFFICULTY_LEVEL, profileForLevel } from './aiProfile';
@@ -69,7 +69,7 @@ describe('thinkAi', () => {
 });
 
 function cpuMatch(seed: number, size: number): { winner: number | null; tick: number; health: number[] } {
-  let s = createMatch({ teams: [entries(size), entries(size)] });
+  let s = createMatch({ teams: [entries(size), entries(size)], ...NO_EXTRAS });
   const rng = createRng(seed);
   const memories: AiMemory[] = s.fighters.map(() => ({ ...FRESH_MEMORY }));
   while (s.phase === MatchPhase.Fighting) {
@@ -120,5 +120,13 @@ describe('signature moves', () => {
     expect(decideMany(7, FinisherStyle.Smash, 0).taunt).toBeGreaterThan(0);
     expect(decideMany(IN_REACH, FinisherStyle.Smash, 0).taunt).toBe(0);
     expect(decideMany(7, FinisherStyle.Smash, METER_MAX).taunt).toBe(0);
+  });
+});
+
+describe('items', () => {
+  it('throws a held item at an enemy in range', () => {
+    const s = duel(5);
+    s.fighters[0].holding = ItemKind.Briefcase;
+    expect(thinkAi(s, s.fighters[0], HARD, FRESH_MEMORY, createRng(SEED)).input.punch).toBe(true);
   });
 });

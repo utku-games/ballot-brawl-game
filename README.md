@@ -18,7 +18,9 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
   Messi and more) and a Special Edition of joke matchups (Shehbaz Sharif vs a goat, James Cameron vs a pig,
   Erdoğan vs a camel). Pick a side and a CPU difficulty; some rivalries add a twist such as a blackout, turbo speed
   or heavy hits. Won rivalries are marked as settled.
-- **Brawl**: 1v1 up to 4v4, every slot set to Player 1, Player 2 or CPU. Brawl also lists the Specials: a goat,
+- **Brawl**: 1v1 up to 4v4, every slot set to Player 1, Player 2 or CPU. Items and hazards (on by default) drop
+  briefcases, gavels and money bags to pick up and throw with Punch, and send cartoon anvils down where a red ring
+  marks the floor. Brawl also lists the Specials: a goat,
   a pig and a camel.
 - **Story**: choose Politicians, Tycoons, Legends or Celebrities, pick a fighter and beat 10 opponents in a row,
   ending with the boss (Churchill, Rockefeller, Napoleon or Schwarzenegger). Each fight is harder than the last; you
@@ -39,6 +41,8 @@ Playable: Story and Brawl modes, 57 fighters with their own body types and costu
   - **Quake**: a ground slam that hits every enemy close by, even behind you.
 - **Taunt** shows off your fighter's personal gesture. Finish it without being hit and you earn a chunk of power;
   get hit and you earn nothing. The same gesture plays in the match intro and when your team wins.
+- Big knockouts (finishers and anvils) send the loser flying, and the final knockout of every match is replayed in
+  slow motion (press an attack button to skip).
 - In team fights, **Swap** jumps to your next teammate; if your fighter is knocked out you switch
   automatically.
 
