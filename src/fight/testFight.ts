@@ -17,7 +17,7 @@ export function styled(style: FinisherStyle): typeof NEUTRAL_PROFILE {
 }
 
 /** Setup fields for a match without items or hazards. */
-export const NO_EXTRAS = { extras: false, seed: 0 } as const;
+export const NO_EXTRAS = { extras: false, seed: 0, ringOuts: false } as const;
 
 export function entries(count: number): TeamEntry[] {
   return Array.from({ length: count }, (_, i) => ({ fighterId: `f${i}`, profile: NEUTRAL_PROFILE }));

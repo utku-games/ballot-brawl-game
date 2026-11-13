@@ -18,7 +18,7 @@ const DEFEND = input({ defend: true });
 const SEED = 1234;
 
 function withExtras(state: MatchState, seed: number): MatchState {
-  return { ...state, extras: true, seed };
+  return { ...state, extras: true, seed, ringOuts: false };
 }
 
 function holding(state: MatchState): MatchState {
@@ -111,7 +111,7 @@ describe('hazards', () => {
 
 describe('determinism', () => {
   it('replays the same extras for the same seed and differs for another', () => {
-    const play = (seed: number): MatchState => run(withExtras(createMatch({ teams: [entries(2), entries(2)], extras: true, seed }), seed), ITEM_INTERVAL_TICKS * 2 + 2, [IDLE_INPUT, IDLE_INPUT, IDLE_INPUT, IDLE_INPUT]).state;
+    const play = (seed: number): MatchState => run(withExtras(createMatch({ teams: [entries(2), entries(2)], extras: true, seed, ringOuts: false }), seed), ITEM_INTERVAL_TICKS * 2 + 2, [IDLE_INPUT, IDLE_INPUT, IDLE_INPUT, IDLE_INPUT]).state;
     expect(play(SEED)).toEqual(play(SEED));
     expect(play(SEED).items).not.toEqual(play(SEED + 1).items);
   });

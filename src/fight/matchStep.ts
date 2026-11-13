@@ -1,7 +1,7 @@
 /**
  * The deterministic fight step: given a MatchState and one input per fighter, produce the next MatchState.
  * Order per tick: timers, control (facing, actions, walking), hit resolution, projectiles, items and hazards,
- * knockback, body separation, walls, end check.
+ * knockback, ring-outs, body separation, walls, end check.
  * The input state is never mutated; fighters are cloned first, and the returned state lists this tick's events.
  */
 import {
@@ -14,6 +14,7 @@ import { resolveAttacks } from './hitResolution';
 import { spawnHazard, stepHazards } from './hazards';
 import { dropFromFallen, pickUpItems, spawnItem } from './items';
 import { spawnProjectiles, stepProjectiles } from './projectiles';
+import { applyRingOuts, canRingOut } from './ringOuts';
 import { isAlive, livingOnTeam, teamHealthFraction } from './matchQueries';
 
 function cloneFighter(f: Readonly<FighterState>): FighterState {
@@ -41,6 +42,11 @@ function decideOutcome(fighters: readonly FighterState[], timeUp: boolean): Outc
   return { over: true, winner: h0 > h1 ? 0 : 1, reason: time };
 }
 
+/** On an open platform, rung-out fighters and fighters mid-knockback are not held in by the walls. */
+function onOpenEdge(f: Readonly<FighterState>, ringOuts: boolean): boolean {
+  return ringOuts && (f.ringedOut || canRingOut(f));
+}
+
 /** Items and hazards for this tick: lands falling anvils, drops items from fallen fighters, hands out and spawns items. */
 function stepExtras(state: Readonly<MatchState>, fighters: FighterState[], events: FightEvent[]): { items: ItemState[]; hazards: HazardState[] } {
   const hazards = stepHazards(state.hazards, fighters, events);
@@ -65,8 +71,9 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
   const projectiles = [...stepProjectiles(state.projectiles, fighters, events), ...spawnProjectiles(fighters, state.tick, events)];
   const extras = stepExtras(state, fighters, events);
   for (const f of fighters) slideKnockback(f);
+  if (state.ringOuts) applyRingOuts(fighters, events);
   separateBodies(fighters);
-  for (const f of fighters) keepInArena(f);
+  for (const f of fighters) if (!onOpenEdge(f, state.ringOuts)) keepInArena(f);
   const ticksLeft = Math.max(0, state.ticksLeft - 1);
   const result = decideOutcome(fighters, ticksLeft === 0);
   if (result.over) events.push({ kind: 'matchOver', winner: result.winner, reason: result.reason });
@@ -80,6 +87,7 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
     hazards: result.over ? [] : extras.hazards,
     extras: state.extras,
     seed: state.seed,
+    ringOuts: state.ringOuts,
     winner: result.winner,
     events,
   };

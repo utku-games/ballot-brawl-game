@@ -22,6 +22,8 @@ export interface MatchSetup {
   extras: boolean;
   /** Seed for item and hazard placement. */
   seed: number;
+  /** True on an open platform where hard hits can knock fighters off. */
+  ringOuts: boolean;
 }
 
 /** Slot id of the index-th fighter of a team, e.g. "t1s0". */
@@ -52,6 +54,7 @@ function spawnFighter(entry: Readonly<TeamEntry>, team: TeamIndex, index: number
     invulnerable: 0,
     damageTaken: 0,
     holding: null,
+    ringedOut: false,
   };
 }
 
@@ -67,6 +70,6 @@ export function createMatch(setup: Readonly<MatchSetup>): MatchState {
   });
   return {
     tick: 0, ticksLeft: MATCH_TIME_TICKS, phase: MatchPhase.Fighting, fighters, projectiles: [], items: [], hazards: [],
-    extras: setup.extras, seed: setup.seed, winner: null, events: [],
+    extras: setup.extras, seed: setup.seed, ringOuts: setup.ringOuts, winner: null, events: [],
   };
 }

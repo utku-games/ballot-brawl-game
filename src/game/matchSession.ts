@@ -136,6 +136,8 @@ export class MatchSession {
         this.slowmo = SLOWMO_SECONDS;
       } else if (e.kind === 'tauntDone' && playerSlots(this.assignment).has(e.fighter) && e.meter > 0) {
         this.hud.announce('+POWER', true, false);
+      } else if (e.kind === 'ringOut') {
+        this.hud.announce('RING OUT!', false, false);
       } else if (e.kind === 'matchOver') {
         this.hud.announce(e.reason === EndReason.KnockOut ? 'K.O.!' : 'TIME!', false, true);
         this.outro = OUTRO_SECONDS;

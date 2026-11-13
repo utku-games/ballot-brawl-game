@@ -16,7 +16,7 @@ import type { FinisherStyle, Gesture } from '../roster/signatureTypes';
 import type { Expression } from './faceWarp';
 import { buildFighterRig, setFall, type FighterRig } from './fighterModel';
 import { kickSpring, RESTING_SPRING, stepSpring, type SpringState } from './headSpring';
-import { computePose, launchArc, Mood, type Pose } from './poseLogic';
+import { computePose, launchArc, Mood, ringOutDrop, type Pose } from './poseLogic';
 import { itemParts } from './extraParts';
 import { attachParts, fixedColorMaterials, type MaterialSet } from './outfitMeshes';
 import { Anchor } from './partSpec';
@@ -38,6 +38,8 @@ const SQUASH = 0.16;
 const STAR_SPIN = 4;
 /** Held items are drawn smaller than floor items so they fit the hand. */
 const HELD_SCALE = 0.7;
+/** A rung-out fighter is hidden once this far below the platform, meters. */
+const RING_OUT_HIDE_DEPTH = 25;
 
 const parentWorld = new THREE.Quaternion();
 const wobble = new THREE.Quaternion();
@@ -56,6 +58,7 @@ export class FighterView {
   private readonly style: FinisherStyle;
   private readonly gesture: Gesture;
   private launchStart = -1;
+  private ringOutStart = -1;
   private held: { kind: ItemKind; group: THREE.Group; materials: MaterialSet } | null = null;
 
   constructor(def: FighterDef, tone: number, face: THREE.Texture, credit: FaceCredit, teamColor: number, sizeScale: number) {
@@ -135,9 +138,13 @@ export class FighterView {
       this.koStart = -1;
       this.launchStart = -1;
     }
+    if (cur.ringedOut && this.ringOutStart < 0) this.ringOutStart = time;
+    if (!cur.ringedOut) this.ringOutStart = -1;
     const flight = launchArc(this.launchStart < 0 ? -1 : time - this.launchStart);
-    root.position.y = flight.height;
-    root.rotation.z = flight.spin;
+    const drop = ringOutDrop(this.ringOutStart < 0 ? -1 : time - this.ringOutStart);
+    root.position.y = flight.height - drop.depth;
+    root.rotation.z = flight.spin + drop.spin;
+    root.visible = drop.depth < RING_OUT_HIDE_DEPTH;
     this.showHeld(cur.holding);
     const pose = computePose({
       kind: cur.action.kind, frame: cur.action.frame, duration: cur.action.duration, move: cur.action.move,

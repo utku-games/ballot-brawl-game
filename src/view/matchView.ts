@@ -159,6 +159,9 @@ export class MatchView {
       this.effects.burst(BurstKind.Shockwave, e.x, FLOOR_HEIGHT, e.z);
       this.camera.addShake(QUAKE_SHAKE);
       this.extras.land(e.x, e.z, this.time);
+    } else if (e.kind === 'ringOut') {
+      this.effects.burst(BurstKind.Dust, e.x, FLOOR_HEIGHT, e.z);
+      this.camera.addShake(KO_SHAKE);
     } else if (e.kind === 'hazardHit') {
       this.effects.burst(BurstKind.Kick, e.x, HIT_HEIGHT, e.z);
     }
