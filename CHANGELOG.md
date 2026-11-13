@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-13
+
 ### Added
 - Three more Specials: Larry the Cat (Downing Street's Chief Mouser), a bull and a chicken that throws eggs.
 - Three more Special Edition matchups: The Chief Mouser (Keir Starmer vs Larry), Bull Market (Warren Buffett vs the
