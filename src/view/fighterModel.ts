@@ -1,12 +1,14 @@
 /**
- * Assembles one bobblehead fighter from the shared parts: legs, suit torso with a tie, arms, and the big photo head.
- * It returns the pivots the animator drives (hips, torso, shoulders, neck) plus the materials that flash on hits.
- * Colours come from the roster look; the head uses the photo's own skin tone so the face blends into it.
+ * Assembles one bobblehead fighter from the shared parts: legs, suit torso with a tie, arms, a neck and the photo sticker head.
+ * It returns the pivots the animator drives (hips, torso, shoulders, head), the head card, the dizzy stars and the
+ * materials that flash on hits. Colours come from the roster look; hands and neck use the photo's measured skin tone.
  */
 import * as THREE from 'three';
+import type { FaceLandmarks } from '../roster/credits';
 import type { FighterDef } from '../roster/rosterTypes';
+import { HEAD_CARD_SIZE, HeadCard } from './headCard';
 import {
-  HEAD_RADIUS, HIP_WIDTH, LEG_LENGTH, NECK_HEIGHT, SHOULDER_WIDTH, TORSO_HEIGHT, partGeometry,
+  HIP_WIDTH, LEG_LENGTH, NECK_HEIGHT, SHOULDER_WIDTH, TORSO_HEIGHT, partGeometry,
 } from './bobbleheadParts';
 
 export interface FighterRig {
@@ -14,6 +16,8 @@ export interface FighterRig {
   body: THREE.Group;
   torso: THREE.Group;
   head: THREE.Group;
+  card: HeadCard;
+  stars: THREE.Group;
   armL: THREE.Group;
   armR: THREE.Group;
   legL: THREE.Group;
@@ -52,16 +56,38 @@ function pivot(parent: THREE.Object3D, x: number, y: number): THREE.Group {
   return g;
 }
 
-function buildHead(torso: THREE.Group, def: FighterDef, tone: number, face: THREE.Texture): THREE.Group {
+/** Height of the card centre above the neck pivot, as a fraction of the card size. */
+const CARD_LIFT = 0.42;
+const NECK_LIFT = 0.02;
+/** The card sits this far in front of the neck so the neck never pokes through the face. */
+const CARD_FORWARD = 0.16;
+const STAR_COUNT = 3;
+const STAR_RADIUS = 0.32;
+const STAR_HEIGHT = 0.5;
+const STAR_COLOR = 0xffd23a;
+
+function buildStars(parent: THREE.Object3D): THREE.Group {
+  const stars = new THREE.Group();
+  stars.position.y = HEAD_CARD_SIZE * (CARD_LIFT + STAR_HEIGHT);
+  const material = new THREE.MeshBasicMaterial({ color: STAR_COLOR });
+  for (let i = 0; i < STAR_COUNT; i += 1) {
+    const a = (i / STAR_COUNT) * Math.PI * 2;
+    const star = new THREE.Mesh(partGeometry('star'), material);
+    star.position.set(Math.cos(a) * STAR_RADIUS, 0, Math.sin(a) * STAR_RADIUS);
+    stars.add(star);
+  }
+  stars.visible = false;
+  parent.add(stars);
+  return stars;
+}
+
+function buildHead(torso: THREE.Group, tone: number, face: THREE.Texture, landmarks: FaceLandmarks): { head: THREE.Group; card: HeadCard; stars: THREE.Group } {
   const head = pivot(torso, 0, TORSO_HEIGHT + NECK_HEIGHT);
-  const ball = new THREE.Group();
-  ball.position.y = HEAD_RADIUS * 0.9;
-  head.add(ball);
-  mesh(partGeometry('head'), standard(tone, SKIN_ROUGHNESS), ball);
-  mesh(partGeometry('hair'), standard(def.look.hairColor, SUIT_ROUGHNESS), ball);
-  const faceMaterial = new THREE.MeshStandardMaterial({ map: face, transparent: true, roughness: SKIN_ROUGHNESS, depthWrite: false });
-  mesh(partGeometry('face'), faceMaterial, ball).castShadow = false;
-  return head;
+  mesh(partGeometry('neck'), standard(tone, SKIN_ROUGHNESS), head).position.y = NECK_LIFT;
+  const card = new HeadCard(face, landmarks);
+  card.mesh.position.set(0, HEAD_CARD_SIZE * CARD_LIFT, CARD_FORWARD);
+  head.add(card.mesh);
+  return { head, card, stars: buildStars(head) };
 }
 
 function buildLeg(body: THREE.Group, x: number, pants: THREE.Material, shoe: THREE.Material): THREE.Group {
@@ -79,7 +105,7 @@ function buildArm(torso: THREE.Group, x: number, suit: THREE.Material, skin: THR
   return shoulder;
 }
 
-export function buildFighterRig(def: FighterDef, tone: number, face: THREE.Texture, teamColor: number): FighterRig {
+export function buildFighterRig(def: FighterDef, tone: number, face: THREE.Texture, landmarks: FaceLandmarks, teamColor: number): FighterRig {
   const root = new THREE.Group();
   const body = pivot(root, 0, 0);
   const suit = standard(def.look.suitColor, SUIT_ROUGHNESS);
@@ -93,15 +119,15 @@ export function buildFighterRig(def: FighterDef, tone: number, face: THREE.Textu
   mesh(partGeometry('tie'), standard(def.look.accentColor, SUIT_ROUGHNESS), torso);
   const armL = buildArm(torso, -SHOULDER_WIDTH, suit, skin);
   const armR = buildArm(torso, SHOULDER_WIDTH, suit, skin);
-  const head = buildHead(torso, def, tone, face);
+  const { head, card, stars } = buildHead(torso, tone, face, landmarks);
   const ringMaterial = new THREE.MeshBasicMaterial({ color: teamColor, transparent: true, opacity: RING_OPACITY });
   const ring = new THREE.Mesh(partGeometry('ring'), ringMaterial);
   ring.position.y = RING_HEIGHT;
   root.add(ring);
   const markerMaterial = new THREE.MeshBasicMaterial({ color: teamColor });
   const marker = new THREE.Mesh(partGeometry('marker'), markerMaterial);
-  marker.position.y = LEG_LENGTH + TORSO_HEIGHT + HEAD_RADIUS * 2 + MARKER_GAP;
+  marker.position.y = LEG_LENGTH + TORSO_HEIGHT + HEAD_CARD_SIZE + MARKER_GAP;
   marker.visible = false;
   root.add(marker);
-  return { root, body, torso, head, armL, armR, legL, legR, ring, marker, flashMaterials: [suit, pants, skin], ringMaterial, markerMaterial };
+  return { root, body, torso, head, card, stars, armL, armR, legL, legR, ring, marker, flashMaterials: [suit, pants, skin], ringMaterial, markerMaterial };
 }

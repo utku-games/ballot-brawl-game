@@ -7,8 +7,23 @@
       "author": "Daniel Torok",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#59473f"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#433733",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.4084831199160108,
+          "y": 0.5097823143326492
+        },
+        "eyeB": {
+          "x": 0.6376602579778262,
+          "y": 0.4867533111201798
+        },
+        "mouth": {
+          "x": 0.5475257502324293,
+          "y": 0.7605050728089647
+        },
+        "mouthWidth": 0.1674996735194181
+      }
     },
     {
       "id": "joe-biden",
@@ -17,8 +32,23 @@
       "author": "Adam Schultz",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#b29d94"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#a59791",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.4126094314154363,
+          "y": 0.4588930064932226
+        },
+        "eyeB": {
+          "x": 0.6243972414207841,
+          "y": 0.4630603043549925
+        },
+        "mouth": {
+          "x": 0.5105301914074468,
+          "y": 0.7011913531552308
+        },
+        "mouthWidth": 0.2341125780750727
+      }
     },
     {
       "id": "barack-obama",
@@ -27,8 +57,23 @@
       "author": "Official White House Photo by Pete Souza",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#a37e6f"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#9f7b6d",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.34472955532667005,
+          "y": 0.4318226394954678
+        },
+        "eyeB": {
+          "x": 0.5764155437292852,
+          "y": 0.42997701689961615
+        },
+        "mouth": {
+          "x": 0.45566780360805287,
+          "y": 0.6832820927634877
+        },
+        "mouthWidth": 0.25854812679839023
+      }
     },
     {
       "id": "bernie-sanders",
@@ -37,8 +82,23 @@
       "author": "Palácio do Planalto from Brasilia, Brasil",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#b99b9c"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#b19a9b",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.31098216162891124,
+          "y": 0.4674603879900904
+        },
+        "eyeB": {
+          "x": 0.5334358846262468,
+          "y": 0.45002656645855815
+        },
+        "mouth": {
+          "x": 0.4501035164851872,
+          "y": 0.7008699198261497
+        },
+        "mouthWidth": 0.2432245279560016
+      }
     },
     {
       "id": "boris-johnson",
@@ -47,8 +107,23 @@
       "author": "Ben Shread",
       "license": "OGL 3",
       "licenseUrl": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#846561"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#78615e",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.38790515509707046,
+          "y": 0.49577908267652193
+        },
+        "eyeB": {
+          "x": 0.5892785488392882,
+          "y": 0.4921193458551704
+        },
+        "mouth": {
+          "x": 0.5059550961841439,
+          "y": 0.7408200039604312
+        },
+        "mouthWidth": 0.1857313842617351
+      }
     },
     {
       "id": "keir-starmer",
@@ -57,8 +132,23 @@
       "author": "Prime Minister's Office",
       "license": "OGL 3",
       "licenseUrl": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#a7887a"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#a68d7e",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.3761907622096542,
+          "y": 0.447637754087976
+        },
+        "eyeB": {
+          "x": 0.5831982082396909,
+          "y": 0.4506129660316849
+        },
+        "mouth": {
+          "x": 0.47523311180440725,
+          "y": 0.6960040428671979
+        },
+        "mouthWidth": 0.1835109072870602
+      }
     },
     {
       "id": "emmanuel-macron",
@@ -67,8 +157,23 @@
       "author": "Nebojša Tejić",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#b19487"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#b39d91",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.3269125484694038,
+          "y": 0.4647875755584204
+        },
+        "eyeB": {
+          "x": 0.5350643379503163,
+          "y": 0.4497770619033035
+        },
+        "mouth": {
+          "x": 0.43348593506722943,
+          "y": 0.6983740065708065
+        },
+        "mouthWidth": 0.19833192399882396
+      }
     },
     {
       "id": "angela-merkel",
@@ -77,8 +182,23 @@
       "author": "Armin Linnartz",
       "license": "CC BY-SA 3.0 de",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#ba968a"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#c5a198",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.38069944521565774,
+          "y": 0.45427879959234085
+        },
+        "eyeB": {
+          "x": 0.5974706232213116,
+          "y": 0.4744851320723211
+        },
+        "mouth": {
+          "x": 0.47585459589085666,
+          "y": 0.701373559076715
+        },
+        "mouthWidth": 0.1865202748587256
+      }
     },
     {
       "id": "justin-trudeau",
@@ -87,8 +207,23 @@
       "author": "European Union",
       "license": "Attribution",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#866159"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#87655d",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.3674167282833743,
+          "y": 0.4933577734365162
+        },
+        "eyeB": {
+          "x": 0.585094467469189,
+          "y": 0.482562496936064
+        },
+        "mouth": {
+          "x": 0.4932426059814958,
+          "y": 0.7343753585185373
+        },
+        "mouthWidth": 0.17933036720216924
+      }
     },
     {
       "id": "giorgia-meloni",
@@ -97,8 +232,23 @@
       "author": "Governo Italiano",
       "license": "CC BY 3.0 it",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/it/deed.en",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#9a7d64"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#816852",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.3837816986427419,
+          "y": 0.49835664074020564
+        },
+        "eyeB": {
+          "x": 0.5914510357902892,
+          "y": 0.48974341044733505
+        },
+        "mouth": {
+          "x": 0.49804967167278336,
+          "y": 0.7176762505193766
+        },
+        "mouthWidth": 0.16922304753924672
+      }
     },
     {
       "id": "javier-milei",
@@ -107,8 +257,23 @@
       "author": "Cancillería Argentina",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#957562"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#967b67",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.41672169555719246,
+          "y": 0.4697219720572063
+        },
+        "eyeB": {
+          "x": 0.6288304331444875,
+          "y": 0.47284928447932856
+        },
+        "mouth": {
+          "x": 0.5224469502664081,
+          "y": 0.7063151011510888
+        },
+        "mouthWidth": 0.17261601870277074
+      }
     },
     {
       "id": "winston-churchill",
@@ -117,8 +282,23 @@
       "author": "Unknown",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#5a5a5a"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#4c4c4c",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.3343040363458592,
+          "y": 0.48777881962850467
+        },
+        "eyeB": {
+          "x": 0.5412948851834146,
+          "y": 0.4733887930993775
+        },
+        "mouth": {
+          "x": 0.4483602299075761,
+          "y": 0.7110926253799199
+        },
+        "mouthWidth": 0.16850275800220424
+      }
     },
     {
       "id": "elon-musk",
@@ -127,8 +307,23 @@
       "author": "Gage Skidmore",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#a97e6e"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#a37b6d",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.4104320227407072,
+          "y": 0.44507750027816967
+        },
+        "eyeB": {
+          "x": 0.6319757030705211,
+          "y": 0.44867050522317575
+        },
+        "mouth": {
+          "x": 0.5392924030016877,
+          "y": 0.6949784282791533
+        },
+        "mouthWidth": 0.19997746099043923
+      }
     },
     {
       "id": "jeff-bezos",
@@ -137,8 +332,23 @@
       "author": "Seattle City Council from Seattle",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#75614e"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#6f5e4c",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.2716204645812286,
+          "y": 0.4537800386066806
+        },
+        "eyeB": {
+          "x": 0.4948640171810628,
+          "y": 0.4305850650439238
+        },
+        "mouth": {
+          "x": 0.38145015113261227,
+          "y": 0.7019078499635815
+        },
+        "mouthWidth": 0.1728942858859706
+      }
     },
     {
       "id": "bill-gates",
@@ -147,8 +357,23 @@
       "author": "Bogdan Hoyaux / European Union",
       "license": "CC BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#80738a"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#7e7793",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.37305646104787615,
+          "y": 0.4922830559233977
+        },
+        "eyeB": {
+          "x": 0.633167989986656,
+          "y": 0.48753545333033865
+        },
+        "mouth": {
+          "x": 0.5160773252874512,
+          "y": 0.7628718608695834
+        },
+        "mouthWidth": 0.27839061651215474
+      }
     },
     {
       "id": "mark-zuckerberg",
@@ -157,8 +382,23 @@
       "author": "Anthony Quintano from Westminster, United States",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#666fa7"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#6671a9",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.43140739551467017,
+          "y": 0.39926002882769057
+        },
+        "eyeB": {
+          "x": 0.6692062690385996,
+          "y": 0.41167047093091685
+        },
+        "mouth": {
+          "x": 0.5426942632661761,
+          "y": 0.6736986749900813
+        },
+        "mouthWidth": 0.19530445342532968
+      }
     },
     {
       "id": "warren-buffett",
@@ -167,8 +407,23 @@
       "author": "Mark Hirschey",
       "license": "CC BY-SA 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#856344"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#8b6e56",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.5902049853717103,
+          "y": 0.4527601011001338
+        },
+        "eyeB": {
+          "x": 0.7519832713102305,
+          "y": 0.44406035449448916
+        },
+        "mouth": {
+          "x": 0.7278143604053349,
+          "y": 0.6937351773359193
+        },
+        "mouthWidth": 0.16807171255702236
+      }
     },
     {
       "id": "richard-branson",
@@ -177,8 +432,23 @@
       "author": "User:David Shankbone",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#ac5f4b"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#ae5241",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.4249531106932227,
+          "y": 0.47545470014250185
+        },
+        "eyeB": {
+          "x": 0.654293323899029,
+          "y": 0.4479817417089714
+        },
+        "mouth": {
+          "x": 0.5780703114497235,
+          "y": 0.7019962783221917
+        },
+        "mouthWidth": 0.20687600939950435
+      }
     },
     {
       "id": "larry-ellison",
@@ -187,8 +457,23 @@
       "author": "Oracle PR Hartmann Studios",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#ab8c93"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#a1848e",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.43736132561740865,
+          "y": 0.405528445223646
+        },
+        "eyeB": {
+          "x": 0.6567635163792075,
+          "y": 0.3977900664065261
+        },
+        "mouth": {
+          "x": 0.5785161357173201,
+          "y": 0.6705980105554364
+        },
+        "mouthWidth": 0.1728050122857863
+      }
     },
     {
       "id": "jensen-huang",
@@ -197,8 +482,23 @@
       "author": "Anderseidesvik",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#80695e"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#867770",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.2962093782026154,
+          "y": 0.5017316717035134
+        },
+        "eyeB": {
+          "x": 0.4869849478360241,
+          "y": 0.524850752090136
+        },
+        "mouth": {
+          "x": 0.37775988684059675,
+          "y": 0.749099653893264
+        },
+        "mouthWidth": 0.17206633480436778
+      }
     },
     {
       "id": "oprah-winfrey",
@@ -207,8 +507,23 @@
       "author": "Maryland GovPics",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#664e43"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#66544b",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.3768896246206835,
+          "y": 0.4962711335097992
+        },
+        "eyeB": {
+          "x": 0.5928142423551798,
+          "y": 0.48349166110740205
+        },
+        "mouth": {
+          "x": 0.48978648515996864,
+          "y": 0.6933315429742928
+        },
+        "mouthWidth": 0.2011644486138384
+      }
     },
     {
       "id": "steve-jobs",
@@ -217,8 +532,23 @@
       "author": "MetalGearLiquid, based on File:Steve_Jobs_Headshot_2010-CROP.jpg made by Matt Yohe",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#796162"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#70595b",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.43566418120680206,
+          "y": 0.5326790620390813
+        },
+        "eyeB": {
+          "x": 0.7128821354201992,
+          "y": 0.5255752923239637
+        },
+        "mouth": {
+          "x": 0.5966422987687514,
+          "y": 0.8380033965237733
+        },
+        "mouthWidth": 0.28413881409055214
+      }
     },
     {
       "id": "jack-ma",
@@ -227,8 +557,23 @@
       "author": "Foundations World Economic Forum",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#776c70"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#6e6672",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.3663293459190138,
+          "y": 0.4731915172108257
+        },
+        "eyeB": {
+          "x": 0.6320566052941052,
+          "y": 0.4788029883326898
+        },
+        "mouth": {
+          "x": 0.47155671976042085,
+          "y": 0.7068049888513154
+        },
+        "mouthWidth": 0.21319768417525717
+      }
     },
     {
       "id": "john-d-rockefeller",
@@ -237,8 +582,23 @@
       "author": "Unknown",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#aba2a1"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#a69c9b",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.30342768222469896,
+          "y": 0.4194958786028436
+        },
+        "eyeB": {
+          "x": 0.5249314555876969,
+          "y": 0.4150555726103861
+        },
+        "mouth": {
+          "x": 0.37987685963795503,
+          "y": 0.676912606022108
+        },
+        "mouthWidth": 0.14584753311513038
+      }
     },
     {
       "id": "albert-einstein",
@@ -247,8 +607,23 @@
       "author": "Ferdinand Schmutzer / Adam Cuerden",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#82785f"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#736a52",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.2990412631820587,
+          "y": 0.48336638777440316
+        },
+        "eyeB": {
+          "x": 0.4813737511057697,
+          "y": 0.4709205619830673
+        },
+        "mouth": {
+          "x": 0.3851380678544245,
+          "y": 0.7119091593903796
+        },
+        "mouthWidth": 0.1556996527790287
+      }
     },
     {
       "id": "isaac-newton",
@@ -257,8 +632,23 @@
       "author": "Godfrey Kneller",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#675850"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#594e48",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.4517006598931718,
+          "y": 0.4680500403620965
+        },
+        "eyeB": {
+          "x": 0.6628535350696847,
+          "y": 0.48818027209330267
+        },
+        "mouth": {
+          "x": 0.5392982833271299,
+          "y": 0.7072749071335307
+        },
+        "mouthWidth": 0.14554776874968026
+      }
     },
     {
       "id": "leonardo-da-vinci",
@@ -267,8 +657,23 @@
       "author": "Leonardo da Vinci",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#e1ae77"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#e3b47f",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.4,
+          "y": 0.45
+        },
+        "eyeB": {
+          "x": 0.6,
+          "y": 0.45
+        },
+        "mouth": {
+          "x": 0.5,
+          "y": 0.66
+        },
+        "mouthWidth": 0.16
+      }
     },
     {
       "id": "william-shakespeare",
@@ -277,8 +682,23 @@
       "author": "Attributed to John Taylor",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#665035"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#5b4933",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.28717834876482645,
+          "y": 0.44085941855694966
+        },
+        "eyeB": {
+          "x": 0.4816576572362297,
+          "y": 0.4443888989870857
+        },
+        "mouth": {
+          "x": 0.3589486478517677,
+          "y": 0.6929650068790228
+        },
+        "mouthWidth": 0.15932875743182034
+      }
     },
     {
       "id": "cleopatra",
@@ -287,8 +707,23 @@
       "author": "Louis le Grand",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#a39a8a"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#a19a8c",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.6658018335246965,
+          "y": 0.5123991396772201
+        },
+        "eyeB": {
+          "x": 0.8344266958450148,
+          "y": 0.5123991396772201
+        },
+        "mouth": {
+          "x": 0.7705958096957749,
+          "y": 0.797749714510198
+        },
+        "mouthWidth": 0.14038812715274113
+      }
     },
     {
       "id": "julius-caesar",
@@ -297,8 +732,23 @@
       "author": "Ángel M. Felicísimo from Mérida, España",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#534a43"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#5b5049",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.33068036500264764,
+          "y": 0.3642660447879027
+        },
+        "eyeB": {
+          "x": 0.562588412375187,
+          "y": 0.3863593987849512
+        },
+        "mouth": {
+          "x": 0.44311767038292477,
+          "y": 0.6669533934608747
+        },
+        "mouthWidth": 0.2106123420880082
+      }
     },
     {
       "id": "abraham-lincoln",
@@ -307,8 +757,23 @@
       "author": "Alexander Gardner",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#797979"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#818181",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.38500449209518334,
+          "y": 0.47736438863651326
+        },
+        "eyeB": {
+          "x": 0.5844018358639352,
+          "y": 0.46727829920847774
+        },
+        "mouth": {
+          "x": 0.49374178340872693,
+          "y": 0.7076604025502705
+        },
+        "mouthWidth": 0.17113518313800924
+      }
     },
     {
       "id": "queen-victoria",
@@ -317,8 +782,23 @@
       "author": "Alexander Bassano",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#8c8c8c"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#818181",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.2546065364212335,
+          "y": 0.5418995698081772
+        },
+        "eyeB": {
+          "x": 0.4281274132740135,
+          "y": 0.531402109159897
+        },
+        "mouth": {
+          "x": 0.33078209327084146,
+          "y": 0.7417261444536111
+        },
+        "mouthWidth": 0.13296267398337605
+      }
     },
     {
       "id": "marie-curie",
@@ -327,8 +807,23 @@
       "author": "Unknown authorUnknown author",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#9c9c9c"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#969696",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.36885874370161637,
+          "y": 0.5267204608596359
+        },
+        "eyeB": {
+          "x": 0.6298345824021377,
+          "y": 0.5192067291520598
+        },
+        "mouth": {
+          "x": 0.487157763510203,
+          "y": 0.8014356402206858
+        },
+        "mouthWidth": 0.18917828902911574
+      }
     },
     {
       "id": "nikola-tesla",
@@ -337,8 +832,23 @@
       "author": "Napoleon Sarony",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#797979"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#7e7e7e",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.28755531210089874,
+          "y": 0.46630258892400106
+        },
+        "eyeB": {
+          "x": 0.47187157655279127,
+          "y": 0.42620176344933186
+        },
+        "mouth": {
+          "x": 0.3873945910486924,
+          "y": 0.6942877090013311
+        },
+        "mouthWidth": 0.14599884301945346
+      }
     },
     {
       "id": "wolfgang-amadeus-mozart",
@@ -347,8 +857,23 @@
       "author": "Barbara Krafft",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#8a7260"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#735d4e",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.5322352885338368,
+          "y": 0.47371398374814566
+        },
+        "eyeB": {
+          "x": 0.7182846795253565,
+          "y": 0.47134058094464565
+        },
+        "mouth": {
+          "x": 0.6722964909585158,
+          "y": 0.7068360442540118
+        },
+        "mouthWidth": 0.1347560859300682
+      }
     },
     {
       "id": "napoleon-bonaparte",
@@ -357,8 +882,23 @@
       "author": "Jacques-Louis David",
       "license": "Public domain",
       "licenseUrl": "",
-      "changes": "Cropped to the head, resized and given a feathered oval mask.",
-      "tone": "#735336"
+      "changes": "Background removed, cropped to the head, resized and given a white outline.",
+      "tone": "#725335",
+      "landmarks": {
+        "eyeA": {
+          "x": 0.2741876056707146,
+          "y": 0.4565940421915673
+        },
+        "eyeB": {
+          "x": 0.4926517073417243,
+          "y": 0.4345733747962786
+        },
+        "mouth": {
+          "x": 0.3823914421114978,
+          "y": 0.6902066234691622
+        },
+        "mouthWidth": 0.16545691294069706
+      }
     }
   ]
 }

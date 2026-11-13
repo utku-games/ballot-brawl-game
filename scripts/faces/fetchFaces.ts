@@ -1,161 +1,75 @@
 /**
- * Face pipeline I/O shell: downloads each source photo from Wikimedia Commons, rejects non-free licences, crops the head,
- * feathers it into an oval and writes one WebP per fighter plus the credits file.
- * Downloads are cached and requests are paced so Wikimedia rate limits are respected.
- * Run `node scripts/faces/fetchFaces.ts --detect` first on macOS to fill missing crops with the Vision face detector.
+ * Face pipeline entry point: checks every source photo's licence on Wikimedia Commons, downloads it once, and renders
+ * one sticker-style WebP per fighter plus src/roster/credits.json with author, licence, tone and landmarks.
+ * With --analyze (macOS only) it first runs the Vision helper to lift subjects, find faces and store crops and landmarks.
+ * Non-free licences stop the run, so nothing unlicensed can reach the game.
  */
-import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
-import {
-  creditEntry, cropFromFaceBox, cropRect, isAllowedLicense, toHex, type CommonsMeta, type Crop, type CreditEntry,
-  type FaceBox,
-} from './faceRules.ts';
+import { downloadOnce, imageInfo, type ImageInfo } from './commonsClient.ts';
+import { analyzePhotos, maskPath } from './faceAnalysis.ts';
+import { renderFace, type ImageLandmarks } from './faceRender.ts';
+import { creditEntry, cropFromFaceBox, isAllowedLicense, type Crop, type CreditEntry } from './faceRules.ts';
 
 const ROOT = join(import.meta.dirname, '..', '..');
 const SOURCES_PATH = join(ROOT, 'scripts', 'faces', 'faceSources.json');
 const CACHE_DIR = join(ROOT, 'scripts', 'faces', 'cache');
+const ANALYSIS_DIR = join(CACHE_DIR, 'analysis');
 const OUTPUT_DIR = join(ROOT, 'public', 'faces');
 const CREDITS_PATH = join(ROOT, 'src', 'roster', 'credits.json');
-const DETECTOR = join(ROOT, 'scripts', 'faces', 'detectFaces.swift');
-const COMMONS_API = 'https://commons.wikimedia.org/w/api.php';
-const USER_AGENT = 'face-fetch-script/0.1';
-const DOWNLOAD_WIDTH = 1200;
-const FACE_SIZE = 320;
-const WEBP_QUALITY = 82;
-const REQUEST_GAP_MS = 1500;
-const RETRY_BACKOFF_MS = 10000;
-const MAX_ATTEMPTS = 6;
-const HTTP_TOO_MANY_REQUESTS = 429;
-/** Fraction of the face texture (centred) averaged for the skin tone. */
-const TONE_SAMPLE_FRACTION = 0.3;
-/** Vertical offset of the tone sample below the centre (cheeks rather than eyes), fraction of the side. */
-const TONE_SAMPLE_DROP = 0.08;
-/** Some Commons JPEGs carry harmless encoder quirks; decode them leniently. */
 const SOURCE_READ = { failOn: 'none' } as const;
-const OVAL_MASK = Buffer.from(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="${FACE_SIZE}" height="${FACE_SIZE}">` +
-    '<defs><radialGradient id="g" cx="50%" cy="50%" r="50%">' +
-    '<stop offset="86%" stop-color="#fff" stop-opacity="1"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/>' +
-    '</radialGradient></defs><ellipse cx="50%" cy="50%" rx="49%" ry="50%" fill="url(#g)"/></svg>',
-);
 
-class FacePipelineError extends Error {}
+class FaceLicenseError extends Error {}
 
 interface FaceSource {
   id: string;
   file: string;
+  /** Hand-set crops are kept by --analyze; detected ones are replaced. */
+  manual?: boolean;
   crop: Crop | null;
+  landmarks: ImageLandmarks | null;
 }
 
-interface ImageInfo {
-  meta: CommonsMeta;
-  downloadUrl: string;
-}
-
-const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function request(url: string): Promise<Response> {
-  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
-    await sleep(REQUEST_GAP_MS);
-    const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
-    if (response.ok) return response;
-    if (response.status !== HTTP_TOO_MANY_REQUESTS) throw new FacePipelineError(`${response.status} for ${url}`);
-    await sleep(RETRY_BACKOFF_MS * attempt);
-  }
-  throw new FacePipelineError(`Rate limited: ${url}`);
-}
-
-async function imageInfo(file: string): Promise<ImageInfo> {
-  const params = new URLSearchParams({
-    action: 'query', titles: `File:${file}`, prop: 'imageinfo', iiprop: 'url|extmetadata',
-    iiurlwidth: String(DOWNLOAD_WIDTH), format: 'json',
-  });
-  const body = (await (await request(`${COMMONS_API}?${params}`)).json()) as {
-    query: { pages: Record<string, { imageinfo?: Array<{ thumburl?: string; url: string; descriptionurl: string; extmetadata: Record<string, { value: string }> }> }> };
-  };
-  const info = Object.values(body.query.pages)[0]?.imageinfo?.[0];
-  if (!info) throw new FacePipelineError(`No Commons file named ${file}`);
-  const m = info.extmetadata;
-  return {
-    downloadUrl: info.thumburl ?? info.url,
-    meta: {
-      license: m.LicenseShortName?.value ?? '',
-      licenseUrl: m.LicenseUrl?.value ?? '',
-      artist: m.Artist?.value ?? '',
-      pageUrl: info.descriptionurl,
-    },
-  };
-}
-
-async function cachedImage(source: FaceSource, info: ImageInfo): Promise<string> {
-  const path = join(CACHE_DIR, `${source.id}.img`);
-  if (!existsSync(path)) writeFileSync(path, Buffer.from(await (await request(info.downloadUrl)).arrayBuffer()));
-  return path;
-}
-
-async function skinTone(face: Buffer): Promise<string> {
-  const side = Math.round(FACE_SIZE * TONE_SAMPLE_FRACTION);
-  const left = Math.round((FACE_SIZE - side) / 2);
-  const top = Math.round((FACE_SIZE - side) / 2 + FACE_SIZE * TONE_SAMPLE_DROP);
-  const stats = await sharp(face).extract({ left, top, width: side, height: side }).stats();
-  const [r, g, b] = stats.channels;
-  return toHex(r.mean, g.mean, b.mean);
-}
-
-async function renderFace(source: FaceSource, imagePath: string): Promise<string> {
-  if (!source.crop) throw new FacePipelineError(`${source.id} has no crop; run with --detect first`);
-  const { width = 0, height = 0 } = await sharp(imagePath, SOURCE_READ).metadata();
-  const rect = cropRect(source.crop, width, height);
-  const face = await sharp(imagePath, SOURCE_READ)
-    .extract({ left: rect.left, top: rect.top, width: rect.side, height: rect.side })
-    .resize(FACE_SIZE, FACE_SIZE)
-    .removeAlpha()
-    .toBuffer();
-  const tone = await skinTone(face);
-  await sharp(face).ensureAlpha().composite([{ input: OVAL_MASK, blend: 'dest-in' }])
-    .webp({ quality: WEBP_QUALITY }).toFile(join(OUTPUT_DIR, `${source.id}.webp`));
-  return tone;
-}
-
-async function detectCrops(sources: FaceSource[], paths: Map<string, string>): Promise<void> {
-  const missing = sources.filter((s) => !s.crop);
-  if (missing.length === 0) return;
-  const output = execFileSync('swift', [DETECTOR, ...missing.map((s) => paths.get(s.id) ?? '')], { encoding: 'utf8' });
-  const boxes = output.trim().split('\n').map((line) => JSON.parse(line) as { box: FaceBox | null });
-  for (const [i, source] of missing.entries()) {
-    const box = boxes[i]?.box;
-    if (!box) {
-      console.warn(`no face found for ${source.id}; set its crop in faceSources.json by hand`);
+async function analyze(sources: FaceSource[], paths: Map<string, string>): Promise<void> {
+  const list = sources.map((s) => paths.get(s.id) ?? '');
+  const results = analyzePhotos(ANALYSIS_DIR, list);
+  for (const [i, source] of sources.entries()) {
+    const r = results[i];
+    if (source.manual || !r?.box) {
+      if (!source.crop) console.warn(`no face found for ${source.id}; set a manual crop in faceSources.json`);
       continue;
     }
-    const { width = 0, height = 0 } = await sharp(paths.get(source.id) ?? '').metadata();
-    source.crop = cropFromFaceBox(box, width, height);
+    const { width = 0, height = 0 } = await sharp(list[i], SOURCE_READ).metadata();
+    source.crop = cropFromFaceBox(r.box, width, height);
+    source.landmarks = r.eyeA && r.eyeB && r.mouth && r.mouthWidth ? { eyeA: r.eyeA, eyeB: r.eyeB, mouth: r.mouth, mouthWidth: r.mouthWidth } : null;
   }
   writeFileSync(SOURCES_PATH, `${JSON.stringify({ sources }, null, 2)}\n`);
 }
 
 async function main(): Promise<void> {
-  const detect = process.argv.includes('--detect');
   const sources = (JSON.parse(readFileSync(SOURCES_PATH, 'utf8')) as { sources: FaceSource[] }).sources;
-  mkdirSync(CACHE_DIR, { recursive: true });
+  mkdirSync(ANALYSIS_DIR, { recursive: true });
   mkdirSync(OUTPUT_DIR, { recursive: true });
   const infos = new Map<string, ImageInfo>();
   const paths = new Map<string, string>();
   for (const source of sources) {
     const info = await imageInfo(source.file);
-    if (!isAllowedLicense(info.meta.license)) throw new FacePipelineError(`${source.id}: licence "${info.meta.license}" is not free`);
+    if (!isAllowedLicense(info.meta.license)) throw new FaceLicenseError(`${source.id}: licence "${info.meta.license}" is not free`);
+    const path = join(CACHE_DIR, `${source.id}.img`);
+    await downloadOnce(info.downloadUrl, path);
     infos.set(source.id, info);
-    paths.set(source.id, await cachedImage(source, info));
-    console.log(`fetched ${source.id} (${info.meta.license})`);
+    paths.set(source.id, path);
   }
-  if (detect) await detectCrops(sources, paths);
+  if (process.argv.includes('--analyze')) await analyze(sources, paths);
   const credits: CreditEntry[] = [];
   for (const source of sources) {
-    const tone = await renderFace(source, paths.get(source.id) ?? '');
+    if (!source.crop) throw new FaceLicenseError(`${source.id} has no crop`);
+    const mask = maskPath(ANALYSIS_DIR, source.id);
+    const out = join(OUTPUT_DIR, `${source.id}.webp`);
+    const result = await renderFace(paths.get(source.id) ?? '', existsSync(mask) ? mask : null, source.crop, source.landmarks, out);
     const info = infos.get(source.id);
-    if (info) credits.push(creditEntry(source.id, source.file, info.meta, tone));
+    if (info) credits.push(creditEntry(source.id, source.file, info.meta, result.tone, result.landmarks));
   }
   writeFileSync(CREDITS_PATH, `${JSON.stringify({ credits }, null, 2)}\n`);
   console.log(`wrote ${credits.length} faces`);

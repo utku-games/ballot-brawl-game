@@ -1,40 +1,53 @@
 /**
- * Drives one fighter's model each frame: interpolated position, heading, procedural pose, head wobble and hit flash.
- * The simulation state is read only; between ticks the position is blended so motion stays smooth above 60 Hz.
- * Hits kick the head spring away from the attacker and flash the body white for a moment.
+ * Drives one fighter's model each frame: interpolated position, heading, procedural pose, head wobble, hit flash and
+ * the photo head's facial expression.
+ * The simulation state is read only; between ticks the position is blended so motion stays smooth above 60 Hz,
+ * and the photo head always turns to face the camera so every face stays readable, even lying on the floor.
+ * Hits squash the head, flash the body and make the face wince; knockouts close the eyes and circle stars overhead;
+ * the match result makes winners grin and cheer and the losing side slump.
  */
 import * as THREE from 'three';
-import { dampAngle } from '@utku/engine';
-import type { FighterState } from '../fight/fightTypes';
+import { dampAngle, dampValue } from '@utku/engine';
+import { ActionKind, type FighterState } from '../fight/fightTypes';
+import type { FaceLandmarks } from '../roster/credits';
 import type { FighterDef } from '../roster/rosterTypes';
+import type { Expression } from './faceWarp';
 import { buildFighterRig, type FighterRig } from './fighterModel';
 import { kickSpring, RESTING_SPRING, stepSpring, type SpringState } from './headSpring';
-import { computePose } from './poseLogic';
+import { computePose, Mood, type Pose } from './poseLogic';
 
 const TURN_RATE = 18;
-/** How much of the body's turn the head undoes, so faces keep looking at the camera (1 = always straight at it). */
-const HEAD_CAMERA_PULL = 0.8;
 const FLASH_DECAY = 6;
 const FLASH_COLOR = new THREE.Color(0xffffff);
 const MARKER_SPIN = 3;
-const MARKER_BOB = 0.08;
 const STEP_WOBBLE = 0.02;
 const KO_RING_OPACITY = 0.15;
 const RING_OPACITY = 0.85;
+/** Seconds a wince lasts after a hit, and how fast expressions blend. */
+const WINCE_SECONDS = 0.5;
+const EXPRESSION_RATE = 10;
+/** Expression strengths for the dizzy guard break and the sad face of the losing side. */
+const DIZZY_KO = 0.6;
+const LOSE_HURT = 0.45;
+const SQUASH = 0.16;
+const STAR_SPIN = 4;
 
-/** Wraps an angle into -PI..PI. */
-function wrapAngle(a: number): number {
-  return Math.atan2(Math.sin(a), Math.cos(a));
-}
+const parentWorld = new THREE.Quaternion();
+const wobble = new THREE.Quaternion();
+const wobbleEuler = new THREE.Euler();
 
 export class FighterView {
   readonly rig: FighterRig;
   private spring: SpringState = { ...RESTING_SPRING };
   private flash = 0;
   private heading = 0;
+  private wince = 0;
+  private expression: Expression = { hurt: 0, happy: 0, ko: 0 };
+  private koStart = -1;
+  private mood = Mood.None;
 
-  constructor(def: FighterDef, tone: number, face: THREE.Texture, teamColor: number, private readonly sizeScale: number) {
-    this.rig = buildFighterRig(def, tone, face, teamColor);
+  constructor(def: FighterDef, tone: number, face: THREE.Texture, landmarks: FaceLandmarks, teamColor: number, sizeScale: number) {
+    this.rig = buildFighterRig(def, tone, face, landmarks, teamColor);
     this.rig.root.scale.setScalar(sizeScale);
   }
 
@@ -42,6 +55,12 @@ export class FighterView {
   setMarker(color: number | null): void {
     this.rig.marker.visible = color !== null;
     if (color !== null) this.rig.markerMaterial.color.setHex(color);
+  }
+
+  /** Sets the end-of-match mood (win, lose or none). */
+  setMood(mood: Mood): void {
+    this.mood = mood;
+    if (mood !== Mood.None) this.rig.marker.visible = false;
   }
 
   /** Reacts to being hit from direction (dirX, dirZ) in world space. */
@@ -52,14 +71,40 @@ export class FighterView {
     const localZ = -dirX * sin + dirZ * cos;
     this.spring = kickSpring(this.spring, -localX * strength, localZ * strength);
     this.flash = 1;
+    this.wince = WINCE_SECONDS;
   }
 
-  update(prev: Readonly<FighterState>, cur: Readonly<FighterState>, alpha: number, time: number, dt: number): void {
+  /** Turns the head card to face the camera in world space, then adds the wobble and tilt on top. */
+  private faceCamera(cameraQuat: THREE.Quaternion, tilt: number): void {
+    const head = this.rig.head;
+    this.rig.root.updateMatrixWorld(true);
+    head.parent?.getWorldQuaternion(parentWorld);
+    wobble.setFromEuler(wobbleEuler.set(this.spring.z, 0, this.spring.x + tilt));
+    head.quaternion.copy(parentWorld.invert()).multiply(cameraQuat).multiply(wobble);
+  }
+
+  update(prev: Readonly<FighterState>, cur: Readonly<FighterState>, alpha: number, time: number, dt: number, cameraQuat: THREE.Quaternion): void {
     const root = this.rig.root;
     root.position.set(prev.x + (cur.x - prev.x) * alpha, 0, prev.z + (cur.z - prev.z) * alpha);
     this.heading = dampAngle(this.heading, Math.atan2(cur.facingX, cur.facingZ), TURN_RATE, dt);
     root.rotation.y = this.heading;
-    const pose = computePose({ kind: cur.action.kind, frame: cur.action.frame, duration: cur.action.duration, move: cur.action.move, moving: cur.moving, time });
+    const knockedOut = cur.action.kind === ActionKind.KnockedOut;
+    if (knockedOut && this.koStart < 0) this.koStart = time;
+    const pose = computePose({
+      kind: cur.action.kind, frame: cur.action.frame, duration: cur.action.duration, move: cur.action.move,
+      moving: cur.moving, time, mood: knockedOut ? Mood.None : this.mood, koSeconds: knockedOut ? time - this.koStart : -1,
+    });
+    this.applyPose(pose);
+    if (cur.moving) this.spring = kickSpring(this.spring, Math.sin(time * 11) * STEP_WOBBLE, 0);
+    this.spring = stepSpring(this.spring, dt);
+    this.faceCamera(cameraQuat, pose.tilt);
+    this.updateFace(cur, knockedOut, time, dt);
+    this.updateFlash(dt);
+    this.rig.marker.rotation.y = time * MARKER_SPIN;
+    this.rig.ringMaterial.opacity = pose.fall >= 1 && knockedOut ? KO_RING_OPACITY : RING_OPACITY;
+  }
+
+  private applyPose(pose: Readonly<Pose>): void {
     this.rig.armL.rotation.x = -pose.armL;
     this.rig.armR.rotation.x = -pose.armR;
     this.rig.legL.rotation.x = -pose.legL;
@@ -67,15 +112,28 @@ export class FighterView {
     this.rig.torso.rotation.x = pose.lean;
     this.rig.body.rotation.x = (-pose.fall * Math.PI) / 2;
     this.rig.body.position.y = pose.bob;
-    if (cur.moving) this.spring = kickSpring(this.spring, Math.sin(time * 11) * STEP_WOBBLE, 0);
-    this.spring = stepSpring(this.spring, dt);
-    this.rig.head.rotation.z = this.spring.x + pose.tilt;
-    this.rig.head.rotation.x = this.spring.z;
-    this.rig.head.rotation.y = -wrapAngle(this.heading) * HEAD_CAMERA_PULL * (1 - pose.fall);
-    this.updateFlash(dt);
-    this.rig.marker.rotation.y = time * MARKER_SPIN;
-    this.rig.marker.position.y = this.rig.marker.position.y + Math.sin(time * MARKER_SPIN) * MARKER_BOB * dt;
-    this.rig.ringMaterial.opacity = pose.fall >= 1 && cur.health <= 0 ? KO_RING_OPACITY : RING_OPACITY;
+  }
+
+  private updateFace(cur: Readonly<FighterState>, knockedOut: boolean, time: number, dt: number): void {
+    this.wince = Math.max(0, this.wince - dt);
+    const dizzy = cur.action.kind === ActionKind.GuardBroken;
+    const winning = this.mood === Mood.Win && !knockedOut;
+    const losing = this.mood === Mood.Lose && !knockedOut;
+    const target: Expression = {
+      hurt: Math.max(this.wince / WINCE_SECONDS, losing ? LOSE_HURT : 0, cur.action.kind === ActionKind.Hitstun ? 1 : 0),
+      happy: winning ? 1 : 0,
+      ko: knockedOut ? 1 : dizzy ? DIZZY_KO : 0,
+    };
+    this.expression = {
+      hurt: dampValue(this.expression.hurt, target.hurt, EXPRESSION_RATE, dt),
+      happy: dampValue(this.expression.happy, target.happy, EXPRESSION_RATE, dt),
+      ko: dampValue(this.expression.ko, target.ko, EXPRESSION_RATE, dt),
+    };
+    this.rig.card.setExpression(this.expression);
+    const squash = (this.wince / WINCE_SECONDS) * SQUASH;
+    this.rig.card.mesh.scale.set(1 + squash, 1 - squash, 1);
+    this.rig.stars.visible = knockedOut || dizzy;
+    this.rig.stars.rotation.y = time * STAR_SPIN;
   }
 
   private updateFlash(dt: number): void {
@@ -83,7 +141,7 @@ export class FighterView {
     for (const m of this.rig.flashMaterials) m.emissive.copy(FLASH_COLOR).multiplyScalar(this.flash * 0.8);
   }
 
-  get scale(): number {
-    return this.sizeScale;
+  dispose(): void {
+    this.rig.card.dispose();
   }
 }
