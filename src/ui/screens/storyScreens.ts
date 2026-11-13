@@ -5,8 +5,10 @@
  */
 import { make } from '@utku/engine';
 import { fighterById } from '../../roster/roster';
+import type { ShareCard } from '../../share/shareCards';
 import { currentStage, runScore, type StoryRun } from '../../story/storyRun';
 import { button, focusFirst, openScreen, portrait, type Screen } from '../screenKit';
+import { shareResultButton } from '../shareButtons';
 
 export const VICTORY_TEXT = 'YOU SAVED THE WORLD!';
 
@@ -55,7 +57,16 @@ function scoreTable(parent: HTMLElement, run: Readonly<StoryRun>): void {
 }
 
 /** The end of a story run; `unlocked` names a boss the win just made playable, or null. */
-export function storyEndScreen(parent: HTMLElement, run: Readonly<StoryRun>, won: boolean, newBest: boolean, unlocked: string | null, onDone: () => void): Screen {
+export interface StoryEndInfo {
+  won: boolean;
+  newBest: boolean;
+  /** Name of the boss this win unlocked, or null. */
+  unlocked: string | null;
+  card: ShareCard;
+}
+
+export function storyEndScreen(parent: HTMLElement, run: Readonly<StoryRun>, info: Readonly<StoryEndInfo>, onDone: () => void): Screen {
+  const { won, newBest, unlocked } = info;
   const root = openScreen(parent, false);
   make('h1', '', won ? VICTORY_TEXT : 'GAME OVER', root);
   if (won) make('p', 'tagline', `${fighterById(run.fighterId).name} beat the whole ladder.`, root);
@@ -63,7 +74,9 @@ export function storyEndScreen(parent: HTMLElement, run: Readonly<StoryRun>, won
   scoreTable(root, run);
   if (newBest) make('p', 'tagline', 'New best score!', root);
   if (unlocked) make('p', 'tagline', `Unlocked: ${unlocked} is now playable in Brawl and Party!`, root);
-  button(root, 'Continue', onDone, 'primary');
+  const row = make('div', 'menu-row', null, root);
+  button(row, 'Continue', onDone, 'primary');
+  shareResultButton(row, info.card);
   focusFirst(root);
   return { root };
 }

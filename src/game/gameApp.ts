@@ -11,9 +11,12 @@ import { MENU_TRACK } from '../audio/songs';
 import { PlayerId, type ControlFrame } from '../input/controlFrame';
 import type { InputHub } from '../input/inputHub';
 import { Difficulty } from '../ai/aiProfile';
+import { RIVALRIES } from '../rivalry/rivalries';
 import type { Rivalry } from '../rivalry/rivalryTypes';
 import { BRAWL_ORDER, fighterById, fightersIn } from '../roster/roster';
 import type { Category } from '../roster/rosterTypes';
+import { brawlCard, rivalryCard, storyCard, type ShareCard } from '../share/shareCards';
+import { ShareKind, type ShareTarget } from '../share/shareLink';
 import { buildLadder } from '../story/ladder';
 import { recordFight, RunStatus, runScore, startRun, type StoryRun } from '../story/storyRun';
 import { activateFocus, moveFocus } from '../ui/menuFocus';
@@ -32,7 +35,7 @@ import { MenuBackdrop } from '../view/menuBackdrop';
 import { defaultBrawl, defaultParty, RANDOM_FIGHTER, setFighter, toMatchPlan, type BrawlConfig } from './brawlConfig';
 import type { MatchPlan } from './matchPlan';
 import { MatchSession, type MatchOutcome } from './matchSession';
-import { rivalryMatchPlan, type RivalrySide } from './rivalryPlan';
+import { rivalryMatchPlan, RivalrySide } from './rivalryPlan';
 import { loadSave, recordBest, recordLeagueWin, recordRivalryWin, storeSave } from './saveData';
 import { lockReason, newlyUnlocked } from './unlocks';
 import { storyMatchPlan } from './storyPlan';
@@ -49,6 +52,13 @@ const NAV_KEYS: Readonly<Record<string, number>> = { ArrowUp: -1, ArrowLeft: -1,
 const CONFIRM_KEYS: ReadonlySet<string> = new Set(['Enter', ' ']);
 /** Range of random seeds for rivalry fights. */
 const RIVALRY_SEED_RANGE = 1_000_000;
+
+/** The share card for a finished Brawl or Party match, built from the plan's fighters and the winning side. */
+function resultCard(plan: Readonly<MatchPlan>, outcome: Readonly<MatchOutcome>, party: boolean): ShareCard {
+  const ids = (team: readonly { fighterId: string }[]): string[] => team.map((s) => s.fighterId);
+  const winners = outcome.winner === null ? [] : ids(plan.teams[outcome.winner]);
+  return brawlCard(plan.teams.flatMap(ids), winners, party);
+}
 
 export interface AppDeps {
   container: HTMLElement;
@@ -80,8 +90,16 @@ export class GameApp {
     window.addEventListener('keydown', (e) => this.onMenuKey(e));
   }
 
-  start(): void {
-    this.showTitle();
+  /** Opens the title, or what a shared link points at when target is not null. */
+  start(target: Readonly<ShareTarget> | null): void {
+    if (!target) return this.showTitle();
+    if (target.kind === ShareKind.Duel) {
+      this.brawl = setFighter(setFighter(defaultBrawl(this.brawl.arena), 0, 0, target.left), 1, 0, target.right);
+      return this.showBrawlSetup();
+    }
+    const rivalry = RIVALRIES.find((r) => r.id === target.rivalryId);
+    if (rivalry) this.showRivalrySides(rivalry);
+    else this.showTitle();
   }
 
   // ---- frame routing ----
@@ -251,7 +269,9 @@ export class GameApp {
     if (won) recordLeagueWin(this.save, run.category);
     const newBest = recordBest(this.save, run.category, run.fighterId, runScore(run));
     if (won) this.deps.audio.play(Sfx.Victory);
-    this.show((p) => storyEndScreen(p, run, won, newBest, unlocked?.name ?? null, () => this.showTitle()), ARENA_FOR_CATEGORY[run.category]);
+    const card = storyCard(run.category, run.fighterId, won, runScore(run).rank);
+    const info = { won, newBest, unlocked: unlocked?.name ?? null, card };
+    this.show((p) => storyEndScreen(p, run, info, () => this.showTitle()), ARENA_FOR_CATEGORY[run.category]);
   }
 
   // ---- rivalry battles ----
@@ -279,7 +299,12 @@ export class GameApp {
         recordRivalryWin(this.save, r.id);
         this.deps.audio.play(Sfx.Victory);
       }
-      this.showOverlay((p) => rivalryResultScreen(p, won, () => this.playRivalry(r, side), () => this.showRivalries(), () => this.showTitle()));
+      const card = rivalryCard(r, side === RivalrySide.Left ? r.left : r.right, won);
+      this.showOverlay((p) => rivalryResultScreen(p, won, card, {
+        onAgain: () => this.playRivalry(r, side),
+        onList: () => this.showRivalries(),
+        onMenu: () => this.showTitle(),
+      }));
     });
   }
 
@@ -307,9 +332,15 @@ export class GameApp {
 
   private startBrawl(plan: MatchPlan): void {
     this.startMatch(plan, (o) => {
-      const title = o.winner === null ? 'DRAW!' : o.winner === 0 ? 'LEFT TEAM WINS!' : 'RIGHT TEAM WINS!';
-      this.showOverlay((p) => brawlResultScreen(p, title, () => this.startBrawl({ ...plan, seed: plan.seed + 1 }),
-        () => this.showBrawlSetup(), () => this.showTitle()));
+      const card = resultCard(plan, o, false);
+      const duel = plan.teams.every((t) => t.length === 1);
+      const team = o.winner === 0 ? 'LEFT TEAM WINS!' : 'RIGHT TEAM WINS!';
+      const title = o.winner === null ? 'DRAW!' : duel ? card.subtitle.toUpperCase() : team;
+      this.showOverlay((p) => brawlResultScreen(p, title, card, {
+        onAgain: () => this.startBrawl({ ...plan, seed: plan.seed + 1 }),
+        onSetup: () => this.showBrawlSetup(),
+        onMenu: () => this.showTitle(),
+      }));
     });
   }
 
@@ -339,8 +370,11 @@ export class GameApp {
     this.startMatch(plan, (o) => {
       const winner = o.winner === null ? null : o.final.fighters.find((f) => f.team === o.winner);
       const title = winner ? `${fighterById(winner.fighterId).name.toUpperCase()} WINS!` : 'DRAW!';
-      this.showOverlay((p) => brawlResultScreen(p, title, () => this.startParty({ ...plan, seed: plan.seed + 1 }),
-        () => this.showPartySetup(), () => this.showTitle()));
+      this.showOverlay((p) => brawlResultScreen(p, title, resultCard(plan, o, true), {
+        onAgain: () => this.startParty({ ...plan, seed: plan.seed + 1 }),
+        onSetup: () => this.showPartySetup(),
+        onMenu: () => this.showTitle(),
+      }));
     });
   }
 }

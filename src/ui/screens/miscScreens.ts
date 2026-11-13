@@ -1,12 +1,14 @@
 /**
- * Smaller overlay screens: the pause menu, the brawl result, and the credits list.
+ * Smaller overlay screens: the pause menu, the brawl result with its Share button, and the credits list.
  * Credits show every face with its source, author and licence, generated from the face pipeline's credits file.
  * All of them are built from the shared screen kit so they look and navigate like the rest of the menus.
  */
 import { make } from '@utku/engine';
 import { FACE_CREDITS } from '../../roster/credits';
 import { fighterById } from '../../roster/roster';
+import type { ShareCard } from '../../share/shareCards';
 import { button, focusFirst, openScreen, portrait, type Screen } from '../screenKit';
+import { shareResultButton } from '../shareButtons';
 
 export function pauseScreen(parent: HTMLElement, onResume: () => void, onQuit: () => void): Screen {
   const root = openScreen(parent, true);
@@ -18,13 +20,20 @@ export function pauseScreen(parent: HTMLElement, onResume: () => void, onQuit: (
   return { root };
 }
 
-export function brawlResultScreen(parent: HTMLElement, title: string, onAgain: () => void, onSetup: () => void, onMenu: () => void): Screen {
+export interface BrawlResultActions {
+  onAgain: () => void;
+  onSetup: () => void;
+  onMenu: () => void;
+}
+
+export function brawlResultScreen(parent: HTMLElement, title: string, card: Readonly<ShareCard>, actions: BrawlResultActions): Screen {
   const root = openScreen(parent, true);
   make('h2', '', title, root);
   const col = make('div', 'menu-col', null, root);
-  button(col, 'Rematch', onAgain, 'primary');
-  button(col, 'Change setup', onSetup);
-  button(col, 'Main menu', onMenu);
+  button(col, 'Rematch', actions.onAgain, 'primary');
+  shareResultButton(col, card);
+  button(col, 'Change setup', actions.onSetup);
+  button(col, 'Main menu', actions.onMenu);
   focusFirst(root);
   return { root };
 }
