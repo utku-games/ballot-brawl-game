@@ -71,10 +71,13 @@ export const DEFAULT_LANDMARKS: Readonly<FaceLandmarks> = {
 export const CHIN_DROP = 1.0;
 /** Fade length (texture units) below the chin and at the oval's edge. */
 export const NECK_FADE = 0.025;
-/** How far below the detected jawline the cut starts, so the chin itself is never clipped. */
-export const JAW_MARGIN = 0.012;
-/** Where the side cut levels off between the mouth (0) and the bottom of the chin (1). */
-export const SIDE_LEVEL = 0.3;
+/** Detected jawlines sit slightly inside the real face edge; the outline is pushed out by this much. */
+export const JAW_SIDE_PAD = 0.035;
+/** Overlap between the region above the jawline and the jaw outline, so no seam opens between them. */
+const SEAM_OVERLAP = 0.01;
+/** Hair may stick out this far beside the face just below the temples, narrowing to nothing over this distance. */
+export const HAIR_TAPER_WIDTH = 0.22;
+export const HAIR_TAPER_LENGTH = 0.18;
 /** Jawline points needed before the jaw cut replaces the estimated chin. */
 const MIN_JAW_POINTS = 3;
 export const OVAL_FEATHER = 0.06;
@@ -143,24 +146,54 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/**
- * Cut line at column u: under the chin it follows the jawline's lower envelope, and toward the sides it levels off
- * a little below the mouth, so the neck and collar go while the line stays continuous with no notches.
- * Without a detected jawline the estimated chin is used as a straight cut.
- */
-export function jawCut(u: number, jaw: readonly TexturePoint[], fallbackChin: number, mouthY: number): number {
-  if (jaw.length < MIN_JAW_POINTS) return fallbackChin;
-  const bottom = Math.max(...jaw.map((p) => p.y));
-  const sideLevel = mouthY + (bottom - mouthY) * SIDE_LEVEL;
-  let envelope = -Infinity;
-  for (let i = 1; i < jaw.length; i += 1) {
-    const a = jaw[i - 1];
-    const b = jaw[i];
-    if (u < Math.min(a.x, b.x) || u > Math.max(a.x, b.x)) continue;
-    const t = b.x === a.x ? 1 : (u - a.x) / (b.x - a.x);
-    envelope = Math.max(envelope, a.y + (b.y - a.y) * t);
+function insidePolygon(u: number, v: number, poly: readonly TexturePoint[]): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i, i += 1) {
+    const a = poly[i];
+    const b = poly[j];
+    if (a.y > v !== b.y > v && u < ((b.x - a.x) * (v - a.y)) / (b.y - a.y) + a.x) inside = !inside;
   }
-  return Math.max(envelope, sideLevel) + JAW_MARGIN;
+  return inside;
+}
+
+/** Leftmost and rightmost polygon crossings on row v, or null when the row misses the polygon. */
+function rowSpan(v: number, poly: readonly TexturePoint[]): { min: number; max: number } | null {
+  let min = Infinity;
+  let max = -Infinity;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i, i += 1) {
+    const a = poly[i];
+    const b = poly[j];
+    if (a.y > v === b.y > v) continue;
+    const x = ((b.x - a.x) * (v - a.y)) / (b.y - a.y) + a.x;
+    min = Math.min(min, x);
+    max = Math.max(max, x);
+  }
+  return max < min ? null : { min, max };
+}
+
+/** The jawline pushed outward from its centre by JAW_SIDE_PAD (detections sit slightly inside the real edge). */
+export function paddedJaw(jaw: readonly TexturePoint[]): TexturePoint[] {
+  const cx = jaw.reduce((sum, p) => sum + p.x, 0) / jaw.length;
+  const cy = jaw.reduce((sum, p) => sum + p.y, 0) / jaw.length;
+  return jaw.map((p) => {
+    const d = Math.hypot(p.x - cx, p.y - cy) || 1;
+    return { x: p.x + ((p.x - cx) / d) * JAW_SIDE_PAD, y: p.y + ((p.y - cy) / d) * JAW_SIDE_PAD };
+  });
+}
+
+/**
+ * Whether texture point (u, v) belongs to the head: everything above the top of the jawline (hair, forehead); below it
+ * what lies inside the padded jawline plus a margin for hair that narrows to nothing a little lower down, so hair
+ * tapers into the face while necks, collars and raised shoulders beside the face are removed.
+ * Without a detected jawline everything above the estimated chin is kept.
+ */
+export function inHeadRegion(u: number, v: number, jaw: readonly TexturePoint[], fallbackChin: number): boolean {
+  if (jaw.length < MIN_JAW_POINTS) return v <= fallbackChin;
+  const top = Math.max(jaw[0].y, jaw[jaw.length - 1].y) + SEAM_OVERLAP;
+  if (v < top || insidePolygon(u, v, jaw)) return true;
+  const span = rowSpan(v, jaw);
+  const allowance = HAIR_TAPER_WIDTH * (1 - (v - top) / HAIR_TAPER_LENGTH);
+  return span !== null && allowance > 0 && u >= span.min - allowance && u <= span.max + allowance;
 }
 
 /** Shape multiplier for the cut-out at texture point (u, v): a soft head oval that also fades out below the cut line. */

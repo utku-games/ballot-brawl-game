@@ -6,7 +6,7 @@
  */
 import sharp from 'sharp';
 import {
-  alphaBounds, chinY, cropRect, jawCut, DEFAULT_LANDMARKS, headShape, refitRect, toHex, toTexture, type Crop, type FaceLandmarks,
+  alphaBounds, chinY, cropRect, inHeadRegion, paddedJaw, DEFAULT_LANDMARKS, headShape, refitRect, toHex, toTexture, type Crop, type FaceLandmarks,
   type PixelRect,
 } from './faceRules.ts';
 
@@ -82,13 +82,14 @@ async function skinTone(rgb: Buffer, lm: FaceLandmarks): Promise<string> {
 function shapedAlpha(mask: Buffer | null, lm: FaceLandmarks): Buffer {
   const alpha = Buffer.alloc(FACE_SIZE * FACE_SIZE);
   const chin = chinY(lm);
-  for (let x = 0; x < FACE_SIZE; x += 1) {
-    const u = (x + 0.5) / FACE_SIZE;
-    const cut = jawCut(u, lm.jaw, chin, lm.mouth.y);
-    for (let y = 0; y < FACE_SIZE; y += 1) {
+  const jaw = lm.jaw.length > 0 ? paddedJaw(lm.jaw) : [];
+  for (let y = 0; y < FACE_SIZE; y += 1) {
+    const v = (y + 0.5) / FACE_SIZE;
+    for (let x = 0; x < FACE_SIZE; x += 1) {
       const i = y * FACE_SIZE + x;
+      const u = (x + 0.5) / FACE_SIZE;
       const subject = mask ? mask[i] / BYTE_MAX : 1;
-      const a = subject * headShape(u, (y + 0.5) / FACE_SIZE, cut);
+      const a = inHeadRegion(u, v, jaw, chin) ? subject * headShape(u, v, 1) : 0;
       alpha[i] = a < MIN_ALPHA ? 0 : Math.round(a * BYTE_MAX);
     }
   }
