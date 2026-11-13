@@ -1,7 +1,7 @@
 /**
  * The photo sticker head: a gently curved card carrying the cut-out face texture, warped live for expressions.
  * Each fighter owns its card geometry so vertices can move around the eyes and mouth; updates are skipped while neutral.
- * The card uses alpha-to-coverage cut-outs, so it sorts like solid geometry and casts a head-shaped shadow.
+ * The card uses a hard alpha cut-out, so it sorts like solid geometry, leaves no ghost square and casts a head-shaped shadow.
  */
 import * as THREE from 'three';
 import type { FaceLandmarks } from '../roster/credits';
@@ -32,7 +32,7 @@ export class HeadCard {
     this.base = Float32Array.from(pos.array as Float32Array);
     this.geometry.computeVertexNormals();
     const material = new THREE.MeshStandardMaterial({
-      map: face, alphaTest: ALPHA_CUTOFF, alphaToCoverage: true, side: THREE.DoubleSide, roughness: SKIN_ROUGHNESS,
+      map: face, alphaTest: ALPHA_CUTOFF, side: THREE.DoubleSide, roughness: SKIN_ROUGHNESS,
     });
     this.mesh = new THREE.Mesh(this.geometry, material);
     this.mesh.castShadow = true;

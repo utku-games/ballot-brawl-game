@@ -42,7 +42,9 @@ async function analyze(sources: FaceSource[], paths: Map<string, string>): Promi
     }
     const { width = 0, height = 0 } = await sharp(list[i], SOURCE_READ).metadata();
     source.crop = cropFromFaceBox(r.box, width, height);
-    source.landmarks = r.eyeA && r.eyeB && r.mouth && r.mouthWidth ? { eyeA: r.eyeA, eyeB: r.eyeB, mouth: r.mouth, mouthWidth: r.mouthWidth } : null;
+    source.landmarks = r.eyeA && r.eyeB && r.mouth && r.mouthWidth
+      ? { eyeA: r.eyeA, eyeB: r.eyeB, mouth: r.mouth, mouthWidth: r.mouthWidth, jaw: r.jaw ?? [] }
+      : null;
   }
   writeFileSync(SOURCES_PATH, `${JSON.stringify({ sources }, null, 2)}\n`);
 }

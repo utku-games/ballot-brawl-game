@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { NEUTRAL, warpPoint, isNeutral } from './faceWarp';
 
-const LM = { eyeA: { x: 0.4, y: 0.4 }, eyeB: { x: 0.6, y: 0.4 }, mouth: { x: 0.5, y: 0.7 }, mouthWidth: 0.16 };
+const LM = { eyeA: { x: 0.4, y: 0.4 }, eyeB: { x: 0.6, y: 0.4 }, mouth: { x: 0.5, y: 0.7 }, mouthWidth: 0.16, jaw: [] };
 
 describe('warpPoint', () => {
   it('leaves a neutral face untouched', () => {

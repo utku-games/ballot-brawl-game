@@ -38,6 +38,8 @@ export interface FaceLandmarks {
   eyeB: FacePoint;
   mouth: FacePoint;
   mouthWidth: number;
+  /** Jawline outline (empty when detection failed). */
+  jaw: FacePoint[];
 }
 
 export const FACE_CREDITS: readonly FaceCredit[] = data.credits;

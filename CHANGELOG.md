@@ -5,6 +5,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-13
+
+### Fixed
+- Photo heads no longer show a faint square around them: near-transparent pixels are cleared and the head uses a
+  hard cut-out edge.
+- Necks and collars are cut away along each face's detected jawline instead of a straight line under an estimated chin.
+
 ## [0.2.0] - 2026-11-13
 
 ### Added

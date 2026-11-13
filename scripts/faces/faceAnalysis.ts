@@ -13,6 +13,7 @@ export interface PhotoAnalysis {
   eyeB: TexturePoint | null;
   mouth: TexturePoint | null;
   mouthWidth: number | null;
+  jaw: TexturePoint[] | null;
   mask: boolean;
 }
 
@@ -34,6 +35,7 @@ export function analyzePhotos(analysisDir: string, paths: readonly string[]): Ph
       eyeB: raw.eyeB ?? null,
       mouth: raw.mouth ?? null,
       mouthWidth: raw.mouthWidth ?? null,
+      jaw: raw.jaw ?? null,
       mask: raw.mask === true,
     };
   });

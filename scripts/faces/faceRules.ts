@@ -58,17 +58,25 @@ export interface FaceLandmarks {
   eyeB: TexturePoint;
   mouth: TexturePoint;
   mouthWidth: number;
+  /** Face outline from temple to temple along the jaw; empty when detection failed. */
+  jaw: TexturePoint[];
 }
 
 /** Landmarks used when detection fails (paintings drawn in profile, sketches). */
 export const DEFAULT_LANDMARKS: Readonly<FaceLandmarks> = {
-  eyeA: { x: 0.4, y: 0.45 }, eyeB: { x: 0.6, y: 0.45 }, mouth: { x: 0.5, y: 0.66 }, mouthWidth: 0.16,
+  eyeA: { x: 0.4, y: 0.45 }, eyeB: { x: 0.6, y: 0.45 }, mouth: { x: 0.5, y: 0.66 }, mouthWidth: 0.16, jaw: [],
 };
 
 /** How far below the mouth the chin sits, as a multiple of the eye-to-mouth distance. */
 export const CHIN_DROP = 1.0;
 /** Fade length (texture units) below the chin and at the oval's edge. */
-export const NECK_FADE = 0.05;
+export const NECK_FADE = 0.025;
+/** How far below the detected jawline the cut starts, so the chin itself is never clipped. */
+export const JAW_MARGIN = 0.012;
+/** Where the side cut levels off between the mouth (0) and the bottom of the chin (1). */
+export const SIDE_LEVEL = 0.3;
+/** Jawline points needed before the jaw cut replaces the estimated chin. */
+const MIN_JAW_POINTS = 3;
 export const OVAL_FEATHER = 0.06;
 /** Head oval: centre and radii in texture units. */
 export const OVAL_CENTER_Y = 0.47;
@@ -135,7 +143,27 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** Shape multiplier for the cut-out at texture point (u, v): a soft head oval that also fades out below the chin. */
+/**
+ * Cut line at column u: under the chin it follows the jawline's lower envelope, and toward the sides it levels off
+ * a little below the mouth, so the neck and collar go while the line stays continuous with no notches.
+ * Without a detected jawline the estimated chin is used as a straight cut.
+ */
+export function jawCut(u: number, jaw: readonly TexturePoint[], fallbackChin: number, mouthY: number): number {
+  if (jaw.length < MIN_JAW_POINTS) return fallbackChin;
+  const bottom = Math.max(...jaw.map((p) => p.y));
+  const sideLevel = mouthY + (bottom - mouthY) * SIDE_LEVEL;
+  let envelope = -Infinity;
+  for (let i = 1; i < jaw.length; i += 1) {
+    const a = jaw[i - 1];
+    const b = jaw[i];
+    if (u < Math.min(a.x, b.x) || u > Math.max(a.x, b.x)) continue;
+    const t = b.x === a.x ? 1 : (u - a.x) / (b.x - a.x);
+    envelope = Math.max(envelope, a.y + (b.y - a.y) * t);
+  }
+  return Math.max(envelope, sideLevel) + JAW_MARGIN;
+}
+
+/** Shape multiplier for the cut-out at texture point (u, v): a soft head oval that also fades out below the cut line. */
 export function headShape(u: number, v: number, chinY: number): number {
   const dx = (u - 0.5) / OVAL_RADIUS_X;
   const dy = (v - OVAL_CENTER_Y) / OVAL_RADIUS_Y;
