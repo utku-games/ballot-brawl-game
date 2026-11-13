@@ -56,16 +56,22 @@ export function rankFor(stagesCleared: number, totalDamage: number): Rank {
   return Rank.D;
 }
 
+/** Damage values that are negative or not numbers count as zero. */
+export function safeDamage(value: number): number {
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
 export function scoreRun(input: Readonly<ScoreInput>): ScoreBreakdown {
+  const totalDamage = safeDamage(input.totalDamage);
   let clearPoints = 0;
   for (let i = 0; i < input.stagesCleared; i += 1) clearPoints += stagePoints(i);
   const perfectPoints = input.perfects * PERFECT_BONUS;
-  const damagePenalty = Math.round(input.totalDamage * DAMAGE_PENALTY);
+  const damagePenalty = Math.round(totalDamage * DAMAGE_PENALTY);
   return {
     clearPoints,
     perfectPoints,
     damagePenalty,
     total: Math.max(0, clearPoints + perfectPoints - damagePenalty),
-    rank: rankFor(input.stagesCleared, input.totalDamage),
+    rank: rankFor(input.stagesCleared, totalDamage),
   };
 }

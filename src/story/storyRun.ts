@@ -6,7 +6,7 @@
 import { InvalidStateError } from '../core/errors';
 import type { Category } from '../roster/rosterTypes';
 import type { StoryStage } from './ladder';
-import { scoreRun, type ScoreBreakdown } from './scoring';
+import { safeDamage, scoreRun, type ScoreBreakdown } from './scoring';
 
 /** Retries allowed after a lost fight before the run ends. */
 export const STORY_CONTINUES = 3;
@@ -48,10 +48,11 @@ export function currentStage(run: Readonly<StoryRun>): StoryStage {
 
 export function recordFight(run: Readonly<StoryRun>, result: Readonly<FightResult>): StoryRun {
   if (run.status !== RunStatus.Fighting) throw new InvalidStateError('The story run is already over');
-  const totalDamage = run.totalDamage + Math.max(0, result.damageTaken);
+  const damage = safeDamage(result.damageTaken);
+  const totalDamage = run.totalDamage + damage;
   if (result.won) {
     const stageIndex = run.stageIndex + 1;
-    const perfects = run.perfects + (result.damageTaken <= 0 ? 1 : 0);
+    const perfects = run.perfects + (damage <= 0 ? 1 : 0);
     const status = stageIndex >= run.stages.length ? RunStatus.Won : RunStatus.Fighting;
     return { ...run, stageIndex, totalDamage, perfects, status };
   }

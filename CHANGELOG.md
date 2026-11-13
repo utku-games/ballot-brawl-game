@@ -16,3 +16,6 @@ All notable changes to this project are documented here. The format follows
 - Roster of 36 caricatures in three categories (Politicians, Tycoons, Legends), each with a boss.
 - Story ladder of ten rising-difficulty opponents ending with the boss, continues, and a score based on
   the damage taken across the run.
+- Face pipeline: downloads Commons photos, rejects non-free licences, crops the head (macOS Vision helper
+  for detection), feathers an oval mask and writes WebP faces plus credits with author, licence and tone.
+- Faces and credits for all 36 fighters.

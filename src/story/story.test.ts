@@ -46,6 +46,8 @@ describe('scoring', () => {
     const hurt = scoreRun({ stagesCleared: 2, perfects: 0, totalDamage: 100 });
     expect(hurt.total).toBeLessThan(clean.total);
     expect(scoreRun({ stagesCleared: 0, perfects: 0, totalDamage: 9999 }).total).toBe(0);
+    expect(scoreRun({ stagesCleared: 1, perfects: 0, totalDamage: -50 }).total).toBe(stagePoints(0));
+    expect(scoreRun({ stagesCleared: 1, perfects: 0, totalDamage: Number.NaN }).total).toBe(stagePoints(0));
   });
 
   it('ranks by average damage per cleared stage', () => {

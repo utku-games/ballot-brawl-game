@@ -46,6 +46,12 @@ The site is static. `npm run deploy:preview` builds locally and uploads `dist/` 
 
 ## Images and licence
 
-Code is MIT licensed (see [LICENSE](LICENSE)). Face photos are not covered by the MIT licence: each
-one is public domain or under its own free licence, listed with author and source in
+Code is MIT licensed (see [LICENSE](LICENSE)). Face images in `public/faces/` are **not** covered by
+the MIT licence. Each is a cropped, resized and oval-masked derivative of a public domain or freely
+licensed photo on Wikimedia Commons, and keeps that photo's licence (images from CC BY-SA sources are
+shared under the same CC BY-SA licence). Author, licence and source of every image are listed in
 `src/roster/credits.json` and on the in-game credits screen.
+
+To change a face, edit `scripts/faces/faceSources.json` (a Commons file name and an optional crop) and
+run `npm run faces` (add `-- --detect` on macOS to find the face automatically). Non-free licences
+are rejected by the script.

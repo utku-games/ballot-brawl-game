@@ -1,0 +1,328 @@
+{
+  "sources": [
+    {
+      "id": "donald-trump",
+      "file": "Official Presidential Portrait of President Donald J. Trump (2025) (3x4).jpg",
+      "crop": {
+        "cx": 0.5336323976516724,
+        "cy": 0.42151078176498413,
+        "size": 0.9948161866539158
+      }
+    },
+    {
+      "id": "joe-biden",
+      "file": "Joe Biden presidential portrait.jpg",
+      "crop": {
+        "cx": 0.5015981942415237,
+        "cy": 0.2987218062877655,
+        "size": 0.6518717743456364
+      }
+    },
+    {
+      "id": "barack-obama",
+      "file": "President Barack Obama.jpg",
+      "crop": {
+        "cx": 0.4940272271633148,
+        "cy": 0.16926422490020185,
+        "size": 0.5372005581855774
+      }
+    },
+    {
+      "id": "bernie-sanders",
+      "file": "Bernie Sanders 2023.jpg",
+      "crop": {
+        "cx": 0.4566988945007324,
+        "cy": 0.3310782072544098,
+        "size": 0.989967889257241
+      }
+    },
+    {
+      "id": "boris-johnson",
+      "file": "Boris Johnson official portrait (cropped).jpg",
+      "crop": {
+        "cx": 0.49538348615169525,
+        "cy": 0.33927942204475403,
+        "size": 0.9864876032194352
+      }
+    },
+    {
+      "id": "keir-starmer",
+      "file": "Prime Minister Keir Starmer Portrait (cropped).jpg",
+      "crop": {
+        "cx": 0.49921995401382446,
+        "cy": 0.32979596954710944,
+        "size": 0.9608522951602936
+      }
+    },
+    {
+      "id": "emmanuel-macron",
+      "file": "Emmanuel Macron 2025 (cropped).jpg",
+      "crop": {
+        "cx": 0.4650264233350754,
+        "cy": 0.31039652581809946,
+        "size": 0.928811314702034
+      }
+    },
+    {
+      "id": "angela-merkel",
+      "file": "Angela Merkel Juli 2010 - 3zu4.jpg",
+      "crop": {
+        "cx": 0.47986991703510284,
+        "cy": 0.22137527358792436,
+        "size": 0.5015998274087906
+      }
+    },
+    {
+      "id": "justin-trudeau",
+      "file": "Justin Trudeau at the European Commission - 2025.jpg",
+      "crop": {
+        "cx": 0.5146754682064056,
+        "cy": 0.34022250080108646,
+        "size": 1.072097097337246
+      }
+    },
+    {
+      "id": "giorgia-meloni",
+      "file": "Giorgia Meloni Official 2024 (cropped).jpg",
+      "crop": {
+        "cx": 0.5183780044317245,
+        "cy": 0.3230145661830902,
+        "size": 0.7824720169401609
+      }
+    },
+    {
+      "id": "javier-milei",
+      "file": "Javier Milei en el Salón Blanco 2 (cropped).jpg",
+      "crop": {
+        "cx": 0.505389079451561,
+        "cy": 0.14095565795898438,
+        "size": 0.36937209048774094
+      }
+    },
+    {
+      "id": "winston-churchill",
+      "file": "Sir Winston Churchill - 19086236948 (restored).jpg",
+      "crop": {
+        "cx": 0.48620588332414627,
+        "cy": 0.23491049582388024,
+        "size": 0.39050904363393785
+      }
+    },
+    {
+      "id": "elon-musk",
+      "file": "Elon Musk (54816836217) (cropped 2) (b).jpg",
+      "crop": {
+        "cx": 0.5583713352680206,
+        "cy": 0.3270812730789185,
+        "size": 1.076746187042445
+      }
+    },
+    {
+      "id": "jeff-bezos",
+      "file": "Jeff Bezos at Amazon Spheres Grand Opening in Seattle - 2018 (39074799225) (cropped).jpg",
+      "crop": {
+        "cx": 0.4052567332983017,
+        "cy": 0.314499594449997,
+        "size": 1.1527400218136004
+      }
+    },
+    {
+      "id": "bill-gates",
+      "file": "Bill Gates at the European Commission - 2025 - P067383-987995 (cropped).jpg",
+      "crop": {
+        "cx": 0.5184572637081146,
+        "cy": 0.3655906150341034,
+        "size": 1.1533896110603743
+      }
+    },
+    {
+      "id": "mark-zuckerberg",
+      "file": "Mark Zuckerberg F8 2019 Keynote (32830578717) (cropped).jpg",
+      "crop": {
+        "cx": 0.5243202596902847,
+        "cy": 0.2952655762112574,
+        "size": 1.1345859587192535
+      }
+    },
+    {
+      "id": "warren-buffett",
+      "file": "Warren Buffett KU Visit.jpg",
+      "crop": {
+        "cx": 0.5548453480005264,
+        "cy": 0.3005708634853363,
+        "size": 0.5614855955354869
+      }
+    },
+    {
+      "id": "richard-branson",
+      "file": "5.3.10RichardBransonByDavidShankbone.jpg",
+      "crop": {
+        "cx": 0.5097469240427017,
+        "cy": 0.35976039242744445,
+        "size": 0.8716811371185147
+      }
+    },
+    {
+      "id": "larry-ellison",
+      "file": "Larry Ellison picture.png",
+      "crop": {
+        "cx": 0.5129205510020256,
+        "cy": 0.22569576684610218,
+        "size": 0.45978419929742814
+      }
+    },
+    {
+      "id": "jensen-huang",
+      "file": "Jensen Huang Stanford 2026-04-30 010 (cropped).jpg",
+      "crop": {
+        "cx": 0.38506750762462616,
+        "cy": 0.4078155052661896,
+        "size": 1.0586811867542565
+      }
+    },
+    {
+      "id": "oprah-winfrey",
+      "file": "Pre Inaugural Reception (52639556983) (cropped).jpg",
+      "crop": {
+        "cx": 0.5124320983886719,
+        "cy": 0.29368140052281894,
+        "size": 0.9702018916606903
+      }
+    },
+    {
+      "id": "steve-jobs",
+      "file": "Steve Jobs Headshot 2010-CROP2.jpg",
+      "crop": {
+        "cx": 0.5748918503522873,
+        "cy": 0.3705932650566101,
+        "size": 1.4248104695091022
+      }
+    },
+    {
+      "id": "jack-ma",
+      "file": "Enabling eCommerce- Small Enterprises, Global Players (39008130265) (cropped).jpg",
+      "crop": {
+        "cx": 0.5051338076591492,
+        "cy": 0.31679907447428796,
+        "size": 0.9554084241390228
+      }
+    },
+    {
+      "id": "john-d-rockefeller",
+      "file": "John-D-Rockefeller-sen.jpg",
+      "crop": {
+        "cx": 0.466680109500885,
+        "cy": 0.2733277088101906,
+        "size": 0.9079934060573578
+      }
+    },
+    {
+      "id": "albert-einstein",
+      "file": "Einstein 1921 by F Schmutzer - restoration.jpg",
+      "crop": {
+        "cx": 0.553409680724144,
+        "cy": 0.25487523329257966,
+        "size": 0.3947366605175193
+      }
+    },
+    {
+      "id": "isaac-newton",
+      "file": "GodfreyKneller-IsaacNewton-1689.jpg",
+      "crop": {
+        "cx": 0.5592517852783203,
+        "cy": 0.27352937698364255,
+        "size": 0.7820166879799217
+      }
+    },
+    {
+      "id": "leonardo-da-vinci",
+      "file": "Leonardo self.jpg",
+      "crop": {
+        "cx": 0.6,
+        "cy": 0.32,
+        "size": 0.72
+      }
+    },
+    {
+      "id": "william-shakespeare",
+      "file": "Shakespeare.jpg",
+      "crop": {
+        "cx": 0.4430938810110092,
+        "cy": 0.304014137506485,
+        "size": 0.6645211988314986
+      }
+    },
+    {
+      "id": "cleopatra",
+      "file": "Kleopatra-VII.-Altes-Museum-Berlin1.jpg",
+      "crop": {
+        "cx": 0.7188141047954559,
+        "cy": 0.43376909685134885,
+        "size": 1.2160868591127239
+      }
+    },
+    {
+      "id": "julius-caesar",
+      "file": "Retrato de Julio César (26724093101) (cropped).jpg",
+      "crop": {
+        "cx": 0.4697241559624672,
+        "cy": 0.2956614000797272,
+        "size": 1.3370668861176818
+      }
+    },
+    {
+      "id": "abraham-lincoln",
+      "file": "Abraham Lincoln O-77 matte collodion print.jpg",
+      "crop": {
+        "cx": 0.4635733366012573,
+        "cy": 0.3436297535896301,
+        "size": 0.9227469210745767
+      }
+    },
+    {
+      "id": "queen-victoria",
+      "file": "Queen Victoria by Bassano.jpg",
+      "crop": {
+        "cx": 0.3889010399580002,
+        "cy": 0.38328482818603515,
+        "size": 0.8082751808641477
+      }
+    },
+    {
+      "id": "marie-curie",
+      "file": "Marie Curie (1900) (cropped).jpg",
+      "crop": {
+        "cx": 0.4949829876422882,
+        "cy": 0.44960125396426487,
+        "size": 1.295837789773941
+      }
+    },
+    {
+      "id": "nikola-tesla",
+      "file": "Tesla circa 1890.jpeg",
+      "crop": {
+        "cx": 0.4130413681268692,
+        "cy": 0.3095171535355704,
+        "size": 0.8825646847486496
+      }
+    },
+    {
+      "id": "wolfgang-amadeus-mozart",
+      "file": "Wolfgang-amadeus-mozart 1.jpg",
+      "crop": {
+        "cx": 0.5722153186798096,
+        "cy": 0.339591588331097,
+        "size": 0.6911433100700378
+      }
+    },
+    {
+      "id": "napoleon-bonaparte",
+      "file": "Jacques-Louis David - The Emperor Napoleon in His Study at the Tuileries - Google Art Project.jpg",
+      "crop": {
+        "cx": 0.4825897589325905,
+        "cy": 0.1538347543233731,
+        "size": 0.2643118008971214
+      }
+    }
+  ]
+}

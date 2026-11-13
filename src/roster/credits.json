@@ -1,0 +1,364 @@
+{
+  "credits": [
+    {
+      "id": "donald-trump",
+      "file": "Official Presidential Portrait of President Donald J. Trump (2025) (3x4).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Official_Presidential_Portrait_of_President_Donald_J._Trump_(2025)_(3x4).jpg",
+      "author": "Daniel Torok",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#443733"
+    },
+    {
+      "id": "joe-biden",
+      "file": "Joe Biden presidential portrait.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Joe_Biden_presidential_portrait.jpg",
+      "author": "Adam Schultz",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#a19592"
+    },
+    {
+      "id": "barack-obama",
+      "file": "President Barack Obama.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:President_Barack_Obama.jpg",
+      "author": "Official White House Photo by Pete Souza",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#946e65"
+    },
+    {
+      "id": "bernie-sanders",
+      "file": "Bernie Sanders 2023.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bernie_Sanders_2023.jpg",
+      "author": "Palácio do Planalto from Brasilia, Brasil",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#aa999b"
+    },
+    {
+      "id": "boris-johnson",
+      "file": "Boris Johnson official portrait (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Boris_Johnson_official_portrait_(cropped).jpg",
+      "author": "Ben Shread",
+      "license": "OGL 3",
+      "licenseUrl": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#766261"
+    },
+    {
+      "id": "keir-starmer",
+      "file": "Prime Minister Keir Starmer Portrait (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Prime_Minister_Keir_Starmer_Portrait_(cropped).jpg",
+      "author": "Prime Minister's Office",
+      "license": "OGL 3",
+      "licenseUrl": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#a99080"
+    },
+    {
+      "id": "emmanuel-macron",
+      "file": "Emmanuel Macron 2025 (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Emmanuel_Macron_2025_(cropped).jpg",
+      "author": "Nebojša Tejić",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#b3a097"
+    },
+    {
+      "id": "angela-merkel",
+      "file": "Angela Merkel Juli 2010 - 3zu4.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Angela_Merkel_Juli_2010_-_3zu4.jpg",
+      "author": "Armin Linnartz",
+      "license": "CC BY-SA 3.0 de",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#ccaca6"
+    },
+    {
+      "id": "justin-trudeau",
+      "file": "Justin Trudeau at the European Commission - 2025.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Justin_Trudeau_at_the_European_Commission_-_2025.jpg",
+      "author": "European Union",
+      "license": "Attribution",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#87665f"
+    },
+    {
+      "id": "giorgia-meloni",
+      "file": "Giorgia Meloni Official 2024 (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Giorgia_Meloni_Official_2024_(cropped).jpg",
+      "author": "Governo Italiano",
+      "license": "CC BY 3.0 it",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/it/deed.en",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#7d6650"
+    },
+    {
+      "id": "javier-milei",
+      "file": "Javier Milei en el Salón Blanco 2 (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Javier_Milei_en_el_Sal%C3%B3n_Blanco_2_(cropped).jpg",
+      "author": "Cancillería Argentina",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#9c836f"
+    },
+    {
+      "id": "winston-churchill",
+      "file": "Sir Winston Churchill - 19086236948 (restored).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sir_Winston_Churchill_-_19086236948_(restored).jpg",
+      "author": "Unknown",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#4d4d4d"
+    },
+    {
+      "id": "elon-musk",
+      "file": "Elon Musk (54816836217) (cropped 2) (b).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Elon_Musk_(54816836217)_(cropped_2)_(b).jpg",
+      "author": "Gage Skidmore",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#a57d70"
+    },
+    {
+      "id": "jeff-bezos",
+      "file": "Jeff Bezos at Amazon Spheres Grand Opening in Seattle - 2018 (39074799225) (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Jeff_Bezos_at_Amazon_Spheres_Grand_Opening_in_Seattle_-_2018_(39074799225)_(cropped).jpg",
+      "author": "Seattle City Council from Seattle",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#6a5c49"
+    },
+    {
+      "id": "bill-gates",
+      "file": "Bill Gates at the European Commission - 2025 - P067383-987995 (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bill_Gates_at_the_European_Commission_-_2025_-_P067383-987995_(cropped).jpg",
+      "author": "Bogdan Hoyaux / European Union",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#7b7794"
+    },
+    {
+      "id": "mark-zuckerberg",
+      "file": "Mark Zuckerberg F8 2019 Keynote (32830578717) (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mark_Zuckerberg_F8_2019_Keynote_(32830578717)_(cropped).jpg",
+      "author": "Anthony Quintano from Westminster, United States",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#5b6caa"
+    },
+    {
+      "id": "warren-buffett",
+      "file": "Warren Buffett KU Visit.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Warren_Buffett_KU_Visit.jpg",
+      "author": "Mark Hirschey",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#806447"
+    },
+    {
+      "id": "richard-branson",
+      "file": "5.3.10RichardBransonByDavidShankbone.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:5.3.10RichardBransonByDavidShankbone.jpg",
+      "author": "User:David Shankbone",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#b05240"
+    },
+    {
+      "id": "larry-ellison",
+      "file": "Larry Ellison picture.png",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Larry_Ellison_picture.png",
+      "author": "Oracle PR Hartmann Studios",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#a58693"
+    },
+    {
+      "id": "jensen-huang",
+      "file": "Jensen Huang Stanford 2026-04-30 010 (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Jensen_Huang_Stanford_2026-04-30_010_(cropped).jpg",
+      "author": "Anderseidesvik",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#897971"
+    },
+    {
+      "id": "oprah-winfrey",
+      "file": "Pre Inaugural Reception (52639556983) (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pre_Inaugural_Reception_(52639556983)_(cropped).jpg",
+      "author": "Maryland GovPics",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#63534c"
+    },
+    {
+      "id": "steve-jobs",
+      "file": "Steve Jobs Headshot 2010-CROP2.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Steve_Jobs_Headshot_2010-CROP2.jpg",
+      "author": "MetalGearLiquid, based on File:Steve_Jobs_Headshot_2010-CROP.jpg made by Matt Yohe",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#796061"
+    },
+    {
+      "id": "jack-ma",
+      "file": "Enabling eCommerce- Small Enterprises, Global Players (39008130265) (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Enabling_eCommerce-_Small_Enterprises,_Global_Players_(39008130265)_(cropped).jpg",
+      "author": "Foundations World Economic Forum",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#585b78"
+    },
+    {
+      "id": "john-d-rockefeller",
+      "file": "John-D-Rockefeller-sen.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:John-D-Rockefeller-sen.jpg",
+      "author": "Unknown",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#a69e9d"
+    },
+    {
+      "id": "albert-einstein",
+      "file": "Einstein 1921 by F Schmutzer - restoration.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Einstein_1921_by_F_Schmutzer_-_restoration.jpg",
+      "author": "Ferdinand Schmutzer / Adam Cuerden",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#776e55"
+    },
+    {
+      "id": "isaac-newton",
+      "file": "GodfreyKneller-IsaacNewton-1689.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:GodfreyKneller-IsaacNewton-1689.jpg",
+      "author": "Godfrey Kneller",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#594d48"
+    },
+    {
+      "id": "leonardo-da-vinci",
+      "file": "Leonardo self.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Leonardo_self.jpg",
+      "author": "Leonardo da Vinci",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#e2b37d"
+    },
+    {
+      "id": "william-shakespeare",
+      "file": "Shakespeare.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Shakespeare.jpg",
+      "author": "Attributed to John Taylor",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#564430"
+    },
+    {
+      "id": "cleopatra",
+      "file": "Kleopatra-VII.-Altes-Museum-Berlin1.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Kleopatra-VII.-Altes-Museum-Berlin1.jpg",
+      "author": "Louis le Grand",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#a79f90"
+    },
+    {
+      "id": "julius-caesar",
+      "file": "Retrato de Julio César (26724093101) (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Retrato_de_Julio_C%C3%A9sar_(26724093101)_(cropped).jpg",
+      "author": "Ángel M. Felicísimo from Mérida, España",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#534a43"
+    },
+    {
+      "id": "abraham-lincoln",
+      "file": "Abraham Lincoln O-77 matte collodion print.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+      "author": "Alexander Gardner",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#828282"
+    },
+    {
+      "id": "queen-victoria",
+      "file": "Queen Victoria by Bassano.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Queen_Victoria_by_Bassano.jpg",
+      "author": "Alexander Bassano",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#8a8a8a"
+    },
+    {
+      "id": "marie-curie",
+      "file": "Marie Curie (1900) (cropped).jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Marie_Curie_(1900)_(cropped).jpg",
+      "author": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#9c9c9c"
+    },
+    {
+      "id": "nikola-tesla",
+      "file": "Tesla circa 1890.jpeg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tesla_circa_1890.jpeg",
+      "author": "Napoleon Sarony",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#7d7d7d"
+    },
+    {
+      "id": "wolfgang-amadeus-mozart",
+      "file": "Wolfgang-amadeus-mozart 1.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Wolfgang-amadeus-mozart_1.jpg",
+      "author": "Barbara Krafft",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#715b4c"
+    },
+    {
+      "id": "napoleon-bonaparte",
+      "file": "Jacques-Louis David - The Emperor Napoleon in His Study at the Tuileries - Google Art Project.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_The_Emperor_Napoleon_in_His_Study_at_the_Tuileries_-_Google_Art_Project.jpg",
+      "author": "Jacques-Louis David",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "changes": "Cropped to the head, resized and given a feathered oval mask.",
+      "tone": "#654b31"
+    }
+  ]
+}
