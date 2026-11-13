@@ -29,7 +29,7 @@ export function ladderScreen(parent: HTMLElement, run: Readonly<StoryRun>, onFig
     portrait(rung, def.id, def.name);
     make('span', '', s.boss ? `BOSS: ${def.name}` : def.name, rung);
   });
-  make('p', '', `Score so far: ${runScore(run).total}  |  Damage taken: ${run.totalDamage}  |  Continues: ${run.continuesLeft}`, root);
+  make('p', '', `Score so far: ${runScore(run).total}  |  Damage taken: ${run.totalDamage}  |  Lives: ${run.continuesLeft}`, root);
   const row = make('div', 'menu-row', null, root);
   button(row, 'FIGHT!', onFight, 'primary');
   button(row, 'Quit', onQuit, 'small');
@@ -70,9 +70,9 @@ export function fightResultScreen(parent: HTMLElement, won: boolean, damage: num
   const root = openScreen(parent, true);
   make('h2', '', won ? 'YOU WIN!' : 'YOU LOST', root);
   make('p', 'tagline', `Damage taken this fight: ${damage}`, root);
-  if (!won) make('p', '', continuesLeft > 0 ? `Continues left: ${continuesLeft}` : 'No continues left.', root);
+  if (!won) make('p', '', continuesLeft === 1 ? 'Last life: one more loss ends the run.' : `Lives left: ${continuesLeft}`, root);
   const row = make('div', 'menu-row', null, root);
-  button(row, won ? 'Next' : continuesLeft > 0 ? 'Retry' : 'See score', onNext, 'primary');
+  button(row, won ? 'Next' : 'Retry', onNext, 'primary');
   button(row, 'Quit', onQuit, 'small');
   focusFirst(root);
   return { root };

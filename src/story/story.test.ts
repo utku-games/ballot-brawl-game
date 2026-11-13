@@ -73,7 +73,21 @@ describe('story run', () => {
     expect(run.stageIndex).toBe(0);
     expect(run.continuesLeft).toBe(STORY_CONTINUES - 1);
     expect(run.totalDamage).toBe(50);
-    for (let i = 0; i < STORY_CONTINUES; i += 1) run = recordFight(run, { won: false, damageTaken: 1 });
+    for (let i = 1; i < STORY_CONTINUES - 1; i += 1) run = recordFight(run, { won: false, damageTaken: 1 });
+    expect(run.status).toBe(RunStatus.Fighting);
+    run = recordFight(run, { won: false, damageTaken: 1 });
     expect(run.status).toBe(RunStatus.Lost);
+    expect(run.continuesLeft).toBe(0);
+  });
+
+  it('ends the run on exactly the third loss, with no extra fight', () => {
+    let run = startRun(Category.Politicians, PLAYER, ladder);
+    let fights = 0;
+    while (run.status === RunStatus.Fighting) {
+      run = recordFight(run, { won: false, damageTaken: 1 });
+      fights += 1;
+    }
+    expect(fights).toBe(STORY_CONTINUES);
+    expect(() => recordFight(run, { won: false, damageTaken: 1 })).toThrow(InvalidStateError);
   });
 });

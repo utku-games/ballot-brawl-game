@@ -1,6 +1,7 @@
 /**
  * The state of one story run and how a fight result moves it forward.
- * A win advances to the next stage (and finishes the run after the boss); a loss spends a continue or ends the run.
+ * A win advances to the next stage (and finishes the run after the boss); a loss spends a continue, and spending the
+ * last one ends the run straight away, so the player never gets a hidden extra fight.
  * Damage from every attempt is kept so the final score reflects the whole climb.
  */
 import { InvalidStateError } from '../core/errors';
@@ -8,7 +9,7 @@ import type { Category } from '../roster/rosterTypes';
 import type { StoryStage } from './ladder';
 import { safeDamage, scoreRun, type ScoreBreakdown } from './scoring';
 
-/** Retries allowed after a lost fight before the run ends. */
+/** Lost fights allowed in a run: each loss spends one, and the loss that spends the last one ends the run. */
 export const STORY_CONTINUES = 3;
 
 export enum RunStatus {
@@ -56,8 +57,9 @@ export function recordFight(run: Readonly<StoryRun>, result: Readonly<FightResul
     const status = stageIndex >= run.stages.length ? RunStatus.Won : RunStatus.Fighting;
     return { ...run, stageIndex, totalDamage, perfects, status };
   }
-  if (run.continuesLeft > 0) return { ...run, totalDamage, continuesLeft: run.continuesLeft - 1 };
-  return { ...run, totalDamage, status: RunStatus.Lost };
+  const continuesLeft = Math.max(0, run.continuesLeft - 1);
+  if (continuesLeft > 0) return { ...run, totalDamage, continuesLeft };
+  return { ...run, totalDamage, continuesLeft, status: RunStatus.Lost };
 }
 
 export function runScore(run: Readonly<StoryRun>): ScoreBreakdown {

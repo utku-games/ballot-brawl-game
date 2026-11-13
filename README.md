@@ -16,7 +16,7 @@ Playable: Story and Brawl modes, 36 fighters, three arenas. See [ROADMAP.md](ROA
 - **Brawl**: 1v1 up to 4v4, every slot set to Player 1, Player 2 or CPU.
 - **Story**: choose Politicians, Tycoons or Legends, pick a fighter and beat 10 opponents in a row,
   ending with the boss (Churchill, Rockefeller or Napoleon). Each fight is harder than the last; you
-  get three continues. Beat the boss and you saved the world. The score comes from the damage you take
+  have three lives: the third lost fight ends the run and shows your score. Beat the boss and you saved the world. The score comes from the damage you take
   across the run (plus stage clears and perfect fights), with an S to D rank and a saved best score.
 
 ## Fighting

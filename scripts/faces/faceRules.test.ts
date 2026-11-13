@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
-  alphaBounds, chinY, creditEntry, JAW_MARGIN, jawCut, SIDE_LEVEL, cropFromFaceBox, cropRect, DEFAULT_LANDMARKS, HEAD_FILL, headShape, isAllowedLicense,
+  alphaBounds, chinY, creditEntry, inHeadRegion, JAW_SIDE_PAD, paddedJaw, cropFromFaceBox, cropRect, DEFAULT_LANDMARKS, HEAD_FILL, headShape, isAllowedLicense,
   NECK_FADE, refitRect, stripHtml, toHex, toTexture,
 } from './faceRules.ts';
 
@@ -78,30 +78,31 @@ describe('sticker shaping', () => {
   });
 });
 
-describe('jawCut', () => {
+describe('inHeadRegion', () => {
   const jaw = [
     { x: 0.2, y: 0.4 }, { x: 0.25, y: 0.62 }, { x: 0.35, y: 0.76 }, { x: 0.5, y: 0.82 },
     { x: 0.65, y: 0.76 }, { x: 0.75, y: 0.62 }, { x: 0.8, y: 0.4 },
   ];
-  const mouthY = 0.66;
 
-  it('follows the jaw under the chin', () => {
-    expect(jawCut(0.5, jaw, 0.9, mouthY)).toBeCloseTo(0.82 + JAW_MARGIN);
+  it('keeps the face and everything above the jawline', () => {
+    expect(inHeadRegion(0.5, 0.6, jaw, 0.9)).toBe(true);
+    expect(inHeadRegion(0.05, 0.2, jaw, 0.9)).toBe(true);
   });
 
-  it('levels off at the sides and is continuous at the jaw edges', () => {
-    const side = mouthY + (0.82 - mouthY) * SIDE_LEVEL + JAW_MARGIN;
-    expect(jawCut(0.05, jaw, 0.9, mouthY)).toBeCloseTo(side);
-    expect(jawCut(0.21, jaw, 0.9, mouthY)).toBeCloseTo(side);
-    let last = jawCut(0, jaw, 0.9, mouthY);
-    for (let u = 0.01; u <= 1; u += 0.01) {
-      const cut = jawCut(u, jaw, 0.9, mouthY);
-      expect(Math.abs(cut - last)).toBeLessThan(0.05);
-      last = cut;
-    }
+  it('removes the neck below the chin and shoulders beside the jaw', () => {
+    expect(inHeadRegion(0.5, 0.9, jaw, 0.9)).toBe(false);
+    expect(inHeadRegion(0.1, 0.6, jaw, 0.9)).toBe(false);
+    expect(inHeadRegion(0.9, 0.7, jaw, 0.9)).toBe(false);
   });
 
-  it('falls back to the estimated chin without a jawline', () => {
-    expect(jawCut(0.5, [], 0.77, mouthY)).toBe(0.77);
+  it('leaves no seam between the hair region and the face outline', () => {
+    for (let u = 0.25; u <= 0.75; u += 0.01) expect(inHeadRegion(u, 0.41, jaw, 0.9)).toBe(true);
+  });
+
+  it('pads the jawline outward and falls back to the chin without one', () => {
+    const padded = paddedJaw(jaw);
+    expect(padded[3].y).toBeCloseTo(0.82 + JAW_SIDE_PAD, 2);
+    expect(inHeadRegion(0.5, 0.7, [], 0.77)).toBe(true);
+    expect(inHeadRegion(0.5, 0.8, [], 0.77)).toBe(false);
   });
 });
