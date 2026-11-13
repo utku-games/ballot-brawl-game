@@ -116,8 +116,8 @@ A look becomes a model in two steps.
 2. **Thin mesh layer.** A Three.js adapter builds the meshes from the specs and attaches them to the rig.
 
 ```ts
-type Anchor = 'body' | 'hips' | 'torso' | 'armL' | 'armR' | 'legL' | 'legR' | 'head' | 'handR';
-type ColorSlot = 'main' | 'accent' | 'skin' | 'hair' | 'fixed';
+type Anchor = 'body' | 'torso' | 'armL' | 'armR' | 'legL' | 'legR' | 'card' | 'handR'; // body = hip height on the body group
+type ColorSlot = 'main' | 'main-dark' | 'accent' | 'skin' | 'hair' | 'fixed';
 interface PartSpec {
   shape: 'box' | 'capsule' | 'cylinder' | 'cone' | 'sphere' | 'torus';
   anchor: Anchor;
@@ -136,14 +136,14 @@ interface PartSpec {
 | `view/outfitParts.ts` | Outfit and neckwear to part specs; pure, tested |
 | `view/headwearParts.ts` | Headwear to part specs, placed from the head top; pure, tested |
 | `view/propParts.ts` | Prop to part specs in the right hand; pure, tested |
-| `view/outfitMeshes.ts` | Part specs to meshes; caches geometry per shape and size, materials per colour |
+| `view/outfitMeshes.ts` | Part specs to meshes; caches geometry per shape and size; materials per fighter |
 | `view/bobbleheadParts.ts` | Base geometry becomes per-build, cached once per build |
 | `view/fighterModel.ts` | Assembles the body from build dimensions and attaches the parts |
 
 Rig integration:
 - **Body types:** the fixed `LEG_LENGTH`, `TORSO_HEIGHT` and similar constants become per-build dimensions. The
   head card, silhouette and expressions are unchanged.
-- **Headwear:** anchored to the head group at the top of the face silhouette (from the credit silhouette rows), so
+- **Headwear:** anchored to the head card at the top of the face silhouette (from the credit silhouette rows), so
   hats billboard, wobble and squash with the face.
 - **Long garments** (Robe, Gown, Toga, the frock-coat tails): skirts hang from the hips; legs still animate
   underneath so kicks poke out.
@@ -151,7 +151,8 @@ Rig integration:
 - **Hit flash:** outfit materials join `flashMaterials` so the whole fighter still flashes on hits.
 - **Simulation:** untouched. `combatProfile`, hit areas and `sizeScale` stay as they are.
 
-Performance: geometries are shared per shape and size, and materials per colour, so a 4v4 adds only a modest
+Performance: geometries are shared per shape and size, and each fighter caches its materials by colour (never across
+fighters, so a hit flash stays on the fighter that was hit), so a 4v4 adds only a modest
 number of draw calls. Target: no visible frame-rate drop against 0.2.3 in a phone-sized 4v4.
 
 ## Error handling
