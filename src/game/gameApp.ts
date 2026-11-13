@@ -4,9 +4,10 @@
  * It owns the current screen or match session, the menu backdrop and the save data, and routes each frame to whichever is active.
  * Menus are navigable by mouse, touch, keyboard arrows and gamepad; touch fight buttons appear only during matches.
  */
-import { createRng, type GameRenderer, type Rng } from '@utku/engine';
+import { createRng, MusicIntensity, type GameRenderer, type Rng } from '@utku/engine';
 import type { GameAudio } from '../audio/gameAudio';
 import { Sfx } from '../audio/sfxTable';
+import { MENU_TRACK } from '../audio/songs';
 import { PlayerId, type ControlFrame } from '../input/controlFrame';
 import type { InputHub } from '../input/inputHub';
 import { Difficulty } from '../ai/aiProfile';
@@ -91,6 +92,7 @@ export class GameApp {
     else if (this.session) this.session.frame(0, frames);
     else this.backdrop.render(dt);
     this.padMenu(dt, frames[PlayerId.One]);
+    this.deps.audio.update();
   }
 
   private menuRoot(): HTMLElement | null {
@@ -135,6 +137,8 @@ export class GameApp {
     this.screen = make(this.deps.container);
     this.confirmLock = MENU_CONFIRM_LOCK_SECONDS;
     this.deps.audio.play(Sfx.MenuSelect);
+    this.deps.audio.playTrack(MENU_TRACK);
+    this.deps.audio.setIntensity(MusicIntensity.Drive);
   }
 
   private showOverlay(make: (parent: HTMLElement) => Screen): void {
