@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-13
+
 ### Added
 - Six new fighters in the existing leagues: Benjamin Netanyahu, Ali Khamenei, Xi Jinping, Shehbaz Sharif and
   Recep Tayyip Erdoğan join the Politicians, and Thomas Edison (throwing light bulbs) joins the Legends.
