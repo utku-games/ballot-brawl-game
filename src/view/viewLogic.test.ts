@@ -8,9 +8,9 @@ import { ActionKind } from '../fight/fightTypes';
 import { MoveKind, MOVES } from '../fight/moves';
 import { frameFighters, MAX_DISTANCE, MIN_DISTANCE } from './cameraFraming';
 import { RESTING_SPRING, kickSpring, stepSpring } from './headSpring';
-import { attackPhase, computePose } from './poseLogic';
+import { attackPhase, computePose, KO_FALL_SECONDS, koFall, Mood } from './poseLogic';
 
-const BASE = { frame: 0, duration: 0, move: null, moving: false, time: 0 };
+const BASE = { frame: 0, duration: 0, move: null, moving: false, time: 0, mood: Mood.None, koSeconds: -1 };
 
 describe('computePose', () => {
   it('extends the punching arm on the active frames', () => {
@@ -23,7 +23,20 @@ describe('computePose', () => {
 
   it('raises both arms when defending and lies down when knocked out', () => {
     expect(computePose({ ...BASE, kind: ActionKind.Defend }).armL).toBeGreaterThan(1);
-    expect(computePose({ ...BASE, kind: ActionKind.KnockedOut, frame: 100 }).fall).toBe(1);
+    expect(computePose({ ...BASE, kind: ActionKind.KnockedOut, koSeconds: 2 }).fall).toBe(1);
+  });
+
+  it('falls over time after a knockout even though the action frame never advances', () => {
+    expect(koFall(-1).fall).toBe(0);
+    expect(koFall(KO_FALL_SECONDS / 2).fall).toBeGreaterThan(0);
+    expect(koFall(KO_FALL_SECONDS / 2).fall).toBeLessThan(1);
+    expect(computePose({ ...BASE, kind: ActionKind.KnockedOut, frame: 0, koSeconds: KO_FALL_SECONDS * 3 }).fall).toBe(1);
+  });
+
+  it('celebrates a win with raised arms and slumps a loss', () => {
+    expect(computePose({ ...BASE, kind: ActionKind.Idle, mood: Mood.Win }).armL).toBeGreaterThan(2);
+    expect(computePose({ ...BASE, kind: ActionKind.Idle, mood: Mood.Lose }).lean).toBeGreaterThan(0.3);
+    expect(computePose({ ...BASE, kind: ActionKind.KnockedOut, mood: Mood.Win, koSeconds: 5 }).fall).toBe(1);
   });
 
   it('falls and gets back up during a knockdown', () => {

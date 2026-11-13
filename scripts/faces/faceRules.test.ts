@@ -4,7 +4,10 @@
  * Credits must carry plain-text authors and the licence exactly as Commons reports it.
  */
 import { describe, expect, it } from 'vitest';
-import { creditEntry, cropFromFaceBox, cropRect, isAllowedLicense, stripHtml, toHex } from './faceRules.ts';
+import {
+  alphaBounds, chinY, creditEntry, cropFromFaceBox, cropRect, DEFAULT_LANDMARKS, HEAD_FILL, headShape, isAllowedLicense,
+  NECK_FADE, refitRect, stripHtml, toHex, toTexture,
+} from './faceRules.ts';
 
 describe('isAllowedLicense', () => {
   it('accepts public domain and free licences', () => {
@@ -41,10 +44,36 @@ describe('credits', () => {
   it('strips HTML from the author and keeps the licence', () => {
     const entry = creditEntry('a', 'A.jpg', {
       license: 'CC BY 2.0 ', licenseUrl: 'https://example.org/l', artist: '<a href="x">Jane &amp; Co</a>', pageUrl: 'https://example.org/p',
-    }, toHex(255, 128, 0));
+    }, toHex(255, 128, 0), DEFAULT_LANDMARKS);
     expect(entry.author).toBe('Jane & Co');
     expect(entry.license).toBe('CC BY 2.0');
     expect(entry.tone).toBe('#ff8000');
     expect(stripHtml('')).toBe('');
+  });
+});
+
+describe('sticker shaping', () => {
+  it('keeps the head centre, fades below the chin and outside the oval', () => {
+    const chin = 0.8;
+    expect(headShape(0.5, 0.45, chin)).toBe(1);
+    expect(headShape(0.5, chin + NECK_FADE + 0.01, chin)).toBe(0);
+    expect(headShape(0.01, 0.01, chin)).toBe(0);
+  });
+
+  it('finds solid bounds and refits the crop around them', () => {
+    const size = 10;
+    const alpha = new Uint8Array(size * size);
+    for (let y = 2; y < 6; y += 1) for (let x = 3; x < 7; x += 1) alpha[y * size + x] = 255;
+    const bounds = alphaBounds(alpha, size);
+    expect(bounds).toEqual({ minX: 3, minY: 2, maxX: 6, maxY: 5 });
+    const rect = refitRect({ left: 0, top: 0, side: 100 }, bounds!, size);
+    expect(rect.side).toBe(Math.round(40 / HEAD_FILL));
+    expect(alphaBounds(new Uint8Array(size * size), size)).toBeNull();
+  });
+
+  it('maps image points into texture space and places the chin below the mouth', () => {
+    const p = toTexture({ x: 0.5, y: 0.5 }, { left: 40, top: 40, side: 20 }, 100, 100);
+    expect(p).toEqual({ x: 0.5, y: 0.5 });
+    expect(chinY(DEFAULT_LANDMARKS)).toBeGreaterThan(DEFAULT_LANDMARKS.mouth.y);
   });
 });
