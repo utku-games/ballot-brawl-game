@@ -18,6 +18,9 @@ export enum Sfx {
   MenuMove = 'menuMove',
   MenuSelect = 'menuSelect',
   Victory = 'victory',
+  Throw = 'throw',
+  Taunt = 'taunt',
+  PowerUp = 'powerUp',
 }
 
 /** Filter resonance of every noise layer. */
@@ -43,6 +46,9 @@ export const SFX: Readonly<Record<Sfx, readonly SfxLayer[]>> = {
   [Sfx.Bell]: [tone('triangle', 1320, 1320, 0, 0.8, 0.25), tone('sine', 2640, 2640, 0, 0.6, 0.1)],
   [Sfx.MenuMove]: [tone('square', 660, 660, 0, 0.04, 0.06)],
   [Sfx.MenuSelect]: [tone('square', 880, 1320, 0, 0.09, 0.08)],
+  [Sfx.Throw]: [noise('bandpass', 1200, 0, 0.25, 0.25), tone('triangle', 500, 900, 0, 0.2, 0.12)],
+  [Sfx.Taunt]: [tone('square', 392, 523, 0, 0.12, 0.1), tone('square', 523, 392, 0.12, 0.12, 0.1)],
+  [Sfx.PowerUp]: [tone('triangle', 660, 1320, 0, 0.25, 0.15), tone('sine', 990, 1980, 0.05, 0.25, 0.1)],
   [Sfx.Victory]: [
     tone('square', 523, 523, 0, 0.15, 0.12), tone('square', 659, 659, 0.15, 0.15, 0.12),
     tone('square', 784, 784, 0.3, 0.15, 0.12), tone('square', 1047, 1047, 0.45, 0.5, 0.14),

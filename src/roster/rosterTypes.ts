@@ -4,6 +4,7 @@
  * Stats are small integers that the fight layer turns into health, damage, speed and size.
  */
 import type { Build, Headwear, Neckwear, Outfit, Prop } from './lookTypes';
+import type { FighterSignature } from './signatureTypes';
 
 /** The three story categories; each has eleven regular fighters and one boss. */
 export enum Category {
@@ -51,6 +52,8 @@ export interface FighterDef {
   /** Name shown when the fighter performs their finisher. */
   finisher: string;
   look: FighterLook;
+  /** Finisher style, gesture and thrown object. */
+  signature: FighterSignature;
   /** The last opponent of the category's story ladder. */
   boss: boolean;
 }

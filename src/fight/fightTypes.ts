@@ -3,6 +3,7 @@
  * A MatchState holds every fighter of both teams; stepMatch turns it plus one FighterInput per fighter into the next state.
  * Events describe what happened during the last tick so the view, audio and HUD can react without diffing states.
  */
+import type { FinisherStyle } from '../roster/signatureTypes';
 import type { MoveKind } from './moves';
 
 /** Side index: 0 is the left team (players by default), 1 the right team. */
@@ -17,6 +18,7 @@ export interface FighterInput {
   punch: boolean;
   kick: boolean;
   special: boolean;
+  taunt: boolean;
   /** Held this tick. */
   defend: boolean;
 }
@@ -29,6 +31,8 @@ export enum ActionKind {
   GuardBroken = 'guardBroken',
   Knockdown = 'knockdown',
   KnockedOut = 'knockedOut',
+  /** Showing off: cannot act, earns meter if it ends without being hit. */
+  Taunt = 'taunt',
 }
 
 export interface FighterAction {
@@ -49,6 +53,8 @@ export interface CombatProfile {
   damageScale: number;
   speedScale: number;
   sizeScale: number;
+  /** How this fighter's meter finisher plays. */
+  finisher: FinisherStyle;
 }
 
 export interface FighterState {
@@ -80,6 +86,21 @@ export interface FighterState {
   damageTaken: number;
 }
 
+/** A thrown finisher in flight. */
+export interface ProjectileState {
+  /** Unique within the match: thrower slot and tick. */
+  id: string;
+  /** Slot id of the thrower. */
+  owner: string;
+  team: TeamIndex;
+  x: number;
+  z: number;
+  /** Unit flight direction on the floor. */
+  dirX: number;
+  dirZ: number;
+  ticksLeft: number;
+}
+
 export enum MatchPhase {
   Fighting = 'fighting',
   Over = 'over',
@@ -92,6 +113,9 @@ export enum EndReason {
 
 export type FightEvent =
   | { kind: 'swing'; attacker: string; move: MoveKind }
+  | { kind: 'throw'; attacker: string; projectile: string }
+  | { kind: 'taunt'; fighter: string }
+  | { kind: 'tauntDone'; fighter: string; meter: number }
   | { kind: 'hit'; attacker: string; target: string; move: MoveKind; damage: number; x: number; z: number }
   | { kind: 'block'; attacker: string; target: string; move: MoveKind; x: number; z: number }
   | { kind: 'guardBreak'; target: string }
@@ -104,11 +128,13 @@ export interface MatchState {
   ticksLeft: number;
   phase: MatchPhase;
   fighters: FighterState[];
+  /** Thrown finishers in flight. */
+  projectiles: ProjectileState[];
   winner: TeamIndex | null;
   events: FightEvent[];
 }
 
 /** An input that does nothing; used for knocked-out fighters and missing controllers. */
 export const IDLE_INPUT: Readonly<FighterInput> = {
-  moveX: 0, moveZ: 0, punch: false, kick: false, special: false, defend: false,
+  moveX: 0, moveZ: 0, punch: false, kick: false, special: false, taunt: false, defend: false,
 };

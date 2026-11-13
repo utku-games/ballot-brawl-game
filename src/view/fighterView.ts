@@ -11,6 +11,7 @@ import { dampAngle, dampValue } from '@utku/engine';
 import { ActionKind, type FighterState } from '../fight/fightTypes';
 import type { FaceCredit } from '../roster/credits';
 import type { FighterDef } from '../roster/rosterTypes';
+import type { FinisherStyle, Gesture } from '../roster/signatureTypes';
 import type { Expression } from './faceWarp';
 import { buildFighterRig, setFall, type FighterRig } from './fighterModel';
 import { kickSpring, RESTING_SPRING, stepSpring, type SpringState } from './headSpring';
@@ -45,9 +46,14 @@ export class FighterView {
   private expression: Expression = { hurt: 0, happy: 0, ko: 0 };
   private koStart = -1;
   private mood = Mood.None;
+  private intro = false;
+  private readonly style: FinisherStyle;
+  private readonly gesture: Gesture;
 
   constructor(def: FighterDef, tone: number, face: THREE.Texture, credit: FaceCredit, teamColor: number, sizeScale: number) {
     this.rig = buildFighterRig(def, tone, face, credit, teamColor);
+    this.style = def.signature.style;
+    this.gesture = def.signature.gesture;
     this.rig.root.scale.setScalar(sizeScale);
   }
 
@@ -61,6 +67,11 @@ export class FighterView {
   setMood(mood: Mood): void {
     this.mood = mood;
     if (mood !== Mood.None) this.rig.marker.visible = false;
+  }
+
+  /** Turns the match-intro gesture on or off. */
+  setIntro(on: boolean): void {
+    this.intro = on;
   }
 
   /** Reacts to being hit from direction (dirX, dirZ) in world space. */
@@ -93,6 +104,7 @@ export class FighterView {
     const pose = computePose({
       kind: cur.action.kind, frame: cur.action.frame, duration: cur.action.duration, move: cur.action.move,
       moving: cur.moving, time, mood: knockedOut ? Mood.None : this.mood, koSeconds: knockedOut ? time - this.koStart : -1,
+      style: this.style, gesture: this.gesture, intro: this.intro,
     });
     this.applyPose(pose);
     if (cur.moving) this.spring = kickSpring(this.spring, Math.sin(time * 11) * STEP_WOBBLE, 0);

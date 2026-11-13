@@ -65,3 +65,14 @@ describe('frames', () => {
     expect(Math.hypot(input.moveX, input.moveZ)).toBeCloseTo(1);
   });
 });
+
+describe('taunt', () => {
+  it('maps the taunt on every device and passes it to the fighter', () => {
+    expect(keyboardFrame(P1, NONE, new Set([P1.taunt])).taunt).toBe(true);
+    expect(keyboardFrame(KEY_LAYOUTS[PlayerId.Two], NONE, new Set(['Semicolon'])).taunt).toBe(true);
+    expect(padFrame(pad([PAD.b]), new Set()).taunt).toBe(true);
+    expect(padFrame(pad([PAD.b]), new Set()).special).toBe(false);
+    expect(mergeFrames(EMPTY_FRAME, { ...EMPTY_FRAME, taunt: true }).taunt).toBe(true);
+    expect(toFighterInput({ ...EMPTY_FRAME, taunt: true }).taunt).toBe(true);
+  });
+});
