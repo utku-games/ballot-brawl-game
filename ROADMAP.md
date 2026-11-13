@@ -25,4 +25,4 @@ Five pieces, built one at a time, each with its own spec, PR and release.
 | 4 | `feature/rivalry-battles` | ([spec](docs/specs/2026-11-13-rivalry-battles-design.md)) Rivalry Battles mode with two sections: Rivalries (Edison vs Tesla, Trump vs Xi, Musk vs Zuckerberg and more) and Special Edition (Pakistani leader vs goat, David Cameron vs pig, Erdoğan vs camel, more later); Netanyahu and Khamenei are never paired | done (PR #29, release 0.6.0) |
 | 5 | `feature/extras` | ([spec](docs/specs/2026-11-13-extras-design.md)) throwable items, arena hazards, flying knockouts, a final-knockout replay (ring-outs and a party mode deferred) | done (PR #32, release 0.7.0) |
 | 6 | `feature/ring-outs` | ([spec](docs/specs/2026-11-13-ring-outs-design.md)) ring-outs on The Rooftop, an open platform arena | built, in review |
-| 7 | tbd | party mode: free-for-all battles for more than two sides | planned |
+| 7 | `feature/party-mode` | ([spec](docs/specs/2026-11-13-party-mode-design.md)) Party: free-for-all for three or four fighters | built, in review |
