@@ -5,6 +5,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Online: both sides ping once a second, so a phone that loses signal or a frozen tab shows "Connection lost"
+  after 8 seconds instead of hanging. The host can start a rematch only once the guest is back in the lobby
+  (the lobby says so while waiting). The guest checks every streamed fight state in depth before drawing it.
+  Online protocol version 2: both players need the updated game.
+
 ### Fixed
 - The goat and camel faces no longer carry background patches (the goat's white body behind its horn, a second
   camel beside the first): the face pipeline takes hand-drawn erase polygons per face.

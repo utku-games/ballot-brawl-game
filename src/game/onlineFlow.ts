@@ -8,6 +8,7 @@ import { fighterById } from '../roster/roster';
 import { brawlCard } from '../share/shareCards';
 import { HostedRoom, joinRoom, LinkFailure, NetLinkError, openRoom, type PeerConnection } from '../net/peerLink';
 import { MsgKind, PROTOCOL_VERSION, type NetMessage, type StartInfo } from '../net/protocol';
+import { Liveness } from '../net/liveness';
 import { makeRoomCode, normalizeRoomCode } from '../net/roomCode';
 import type { Screen } from '../ui/screenKit';
 import { lobbyScreen, onlineMenuScreen, onlineResultScreen, statusScreen, waitingScreen } from '../ui/screens/onlineScreens';
@@ -37,8 +38,11 @@ const FAILURE_TEXT: Readonly<Record<LinkFailure, string>> = {
   [LinkFailure.CodeTaken]: 'Could not open a room. Please try again.',
   [LinkFailure.RoomNotFound]: 'No room with that code. Check the code and that your friend is still hosting.',
   [LinkFailure.Network]: 'Could not reach the other player. Check your connection and try again.',
-  [LinkFailure.Protocol]: 'Your friend has a different version of the game. Both of you reload the page.',
+  [LinkFailure.Protocol]: 'The other game sent something unexpected, perhaps from a different version. Both of you reload the page.',
+  [LinkFailure.Silent]: 'Connection lost. Your opponent may have lost signal or closed the game.',
 };
+/** How often the keep-alive check runs. */
+const PULSE_MS = 500;
 const BAD_CODE_TEXT = 'Room codes are five letters and numbers.';
 const LEFT_TEXT = 'Your opponent left the game.';
 
@@ -52,6 +56,10 @@ export class OnlineFlow {
   private extras = true;
   private net: OnlineMatchNet | null = null;
   private inLobby = false;
+  /** True while the other player is in the lobby, so the host may start. */
+  private theirsHere = false;
+  private liveness: Liveness | null = null;
+  private pulse: ReturnType<typeof setInterval> | null = null;
   /** Bumped on every leave, so replies to an abandoned attempt are ignored. */
   private attempt = 0;
 
@@ -119,6 +127,9 @@ export class OnlineFlow {
     this.role = role;
     this.mine = null;
     this.theirs = null;
+    this.theirsHere = false;
+    this.liveness = new Liveness(Date.now());
+    this.pulse = setInterval(() => this.checkPulse(), PULSE_MS);
     conn.onMessage((m) => this.receive(m));
     conn.onClose((failure) => this.leave(failure === null ? LEFT_TEXT : FAILURE_TEXT[failure]));
     conn.send({ kind: MsgKind.Hello, version: PROTOCOL_VERSION });
@@ -126,8 +137,21 @@ export class OnlineFlow {
     this.showLobby();
   }
 
+  private checkPulse(): void {
+    const now = Date.now();
+    if (this.liveness?.lost(now)) this.leave(FAILURE_TEXT[LinkFailure.Silent]);
+    else if (this.liveness?.pingDue(now)) this.conn?.send({ kind: MsgKind.Ping });
+  }
+
   private receive(m: Readonly<NetMessage>): void {
+    this.liveness?.heard(Date.now());
     switch (m.kind) {
+      case MsgKind.Ping:
+        return;
+      case MsgKind.Here:
+        if (this.theirsHere === m.inLobby) return;
+        this.theirsHere = m.inLobby;
+        return this.refreshLobby();
       case MsgKind.Pick:
         this.theirs = m.fighterId;
         return this.refreshLobby();
@@ -156,8 +180,11 @@ export class OnlineFlow {
 
   private showLobby(): void {
     this.net = null;
+    if (!this.inLobby) this.conn?.send({ kind: MsgKind.Here, inLobby: true });
     this.inLobby = true;
-    const view = { host: this.role === NetRole.Host, mine: this.mine, theirs: this.theirs, arena: this.arena, extras: this.extras };
+    const view = {
+      host: this.role === NetRole.Host, mine: this.mine, theirs: this.theirs, theirsHere: this.theirsHere, arena: this.arena, extras: this.extras,
+    };
     this.shell.show((p) => lobbyScreen(p, view, {
       onPick: () => this.pick(),
       onArena: (a) => this.changeSettings(a, this.extras),
@@ -188,7 +215,7 @@ export class OnlineFlow {
   }
 
   private startAsHost(): void {
-    if (!this.mine || !this.theirs || !this.conn) return;
+    if (!this.mine || !this.theirs || !this.theirsHere || !this.conn) return;
     const info: StartInfo = { hostFighter: this.mine, guestFighter: this.theirs, arena: this.arena, extras: this.extras, seed: Math.floor(this.rng() * SEED_RANGE) };
     this.conn.send({ kind: MsgKind.Start, ...info });
     this.beginMatch(info);
@@ -197,7 +224,8 @@ export class OnlineFlow {
   private beginMatch(info: Readonly<StartInfo>): void {
     if (!this.conn) return;
     this.inLobby = false;
-    const net = new OnlineMatchNet(this.role, this.conn);
+    this.theirsHere = false;
+    const net = new OnlineMatchNet(this.role, this.conn, [info.hostFighter, info.guestFighter]);
     this.net = net;
     this.shell.startMatch(onlineMatchPlan(info, this.role), (o) => this.showResult(info, o), net, () => this.leave(null));
   }
@@ -213,6 +241,9 @@ export class OnlineFlow {
   /** Tells the other player and closes any room or connection, without changing screens (used when the page closes). */
   disconnect(): void {
     this.attempt += 1;
+    if (this.pulse !== null) clearInterval(this.pulse);
+    this.pulse = null;
+    this.liveness = null;
     this.conn?.send({ kind: MsgKind.Leave });
     this.conn?.close();
     this.conn = null;
