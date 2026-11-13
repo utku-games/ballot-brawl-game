@@ -6,8 +6,8 @@
 import { defineConfig } from 'vitest/config';
 
 const DEV_SERVER_PORT = 5175;
-/** Everything from node_modules (three.js and the engine) goes in one long-lived vendor chunk. */
-const VENDOR_CHUNK = { name: 'vendor', test: /node_modules/ };
+/** three.js and the engine go in one long-lived vendor chunk; PeerJS stays in its own chunk, loaded only for online play. */
+const VENDOR_CHUNK = { name: 'vendor', test: /node_modules[\\/](three|@utku)[\\/]/ };
 /** three.js alone is about 700 kB minified, so the vendor chunk exceeds Vite's 500 kB warning; limit in kB. */
 const CHUNK_SIZE_WARNING_KB = 900;
 

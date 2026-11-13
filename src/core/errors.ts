@@ -15,3 +15,6 @@ export class RosterDataError extends GameError {}
 
 /** A fighter model cannot be assembled (a costume part names a rig point that does not exist). */
 export class RigBuildError extends GameError {}
+
+/** A network message is malformed, from another game version, or arrives when it makes no sense. */
+export class NetProtocolError extends GameError {}

@@ -42,6 +42,14 @@ describe('share links', () => {
     expect(parseShareTarget('?duel=goat~winston-churchill')).toBeNull();
   });
 
+  it('round-trips a join link and rejects bad codes', () => {
+    const url = shareUrl(BASE, { kind: ShareKind.Join, code: 'ABC23' });
+    expect(url).toBe('https://example.test/?join=ABC23');
+    expect(parseShareTarget(queryOf(url))).toEqual({ kind: ShareKind.Join, code: 'ABC23' });
+    expect(parseShareTarget('?join=abc23')).toEqual({ kind: ShareKind.Join, code: 'ABC23' });
+    expect(parseShareTarget('?join=AB0')).toBeNull();
+  });
+
   it('prefers the rivalry parameter', () => {
     expect(parseShareTarget('?rivalry=currents&duel=goat~pig')).toEqual({ kind: ShareKind.Rivalry, rivalryId: 'currents' });
   });
