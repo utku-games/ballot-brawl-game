@@ -10,13 +10,15 @@ import sharp from 'sharp';
 import { downloadOnce, imageInfo, type ImageInfo } from './commonsClient.ts';
 import { analyzePhotos, maskPath } from './faceAnalysis.ts';
 import { renderFace, type ImageLandmarks } from './faceRender.ts';
-import { creditEntry, cropFromFaceBox, isAllowedLicense, type Crop, type CreditEntry } from './faceRules.ts';
+import { creditEntry, cropFromFaceBox, isAllowedLicense, type Crop, type CreditEntry, type ErasePolygon } from './faceRules.ts';
 
 const ROOT = join(import.meta.dirname, '..', '..');
 const SOURCES_PATH = join(ROOT, 'scripts', 'faces', 'faceSources.json');
 const CACHE_DIR = join(ROOT, 'scripts', 'faces', 'cache');
 const ANALYSIS_DIR = join(CACHE_DIR, 'analysis');
 const OUTPUT_DIR = join(ROOT, 'public', 'faces');
+/** Faces without hand-set erase circles keep everything the subject mask kept. */
+const NO_ERASE: readonly ErasePolygon[] = [];
 const CREDITS_PATH = join(ROOT, 'src', 'roster', 'credits.json');
 const SOURCE_READ = { failOn: 'none' } as const;
 
@@ -29,6 +31,8 @@ interface FaceSource {
   manual?: boolean;
   crop: Crop | null;
   landmarks: ImageLandmarks | null;
+  /** Background patches the subject mask kept, cut away by hand in the finished sticker's coordinates (applied after the refit); absent means none. */
+  erase?: ErasePolygon[];
 }
 
 /** Drops a cached photo and its analysis when the fighter's source file changed, so the new photo is fetched. */
@@ -81,7 +85,7 @@ async function main(): Promise<void> {
     if (!source.crop) throw new FaceLicenseError(`${source.id} has no crop`);
     const mask = maskPath(ANALYSIS_DIR, source.id);
     const out = join(OUTPUT_DIR, `${source.id}.webp`);
-    const result = await renderFace(paths.get(source.id) ?? '', existsSync(mask) ? mask : null, source.crop, source.landmarks, out);
+    const result = await renderFace(paths.get(source.id) ?? '', existsSync(mask) ? mask : null, source.crop, source.landmarks, source.erase ?? NO_ERASE, out);
     const info = infos.get(source.id);
     if (info) credits.push(creditEntry(source.id, source.file, info.meta, result.tone, result.landmarks, result.silhouette));
   }

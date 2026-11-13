@@ -25,6 +25,10 @@ export const HUD_CSS = `
 .hud-fill { height: 100%; width: 100%; background: ${THEME.health}; transform-origin: left; transition: transform 120ms linear; }
 .hud-fill.low { background: ${THEME.healthLow}; }
 .hud-row.down { opacity: 0.35; filter: grayscale(1); }
+.hud.compact .hud-team { gap: 2px; }
+.hud.compact .hud-face { width: clamp(20px, 3.6vw, 34px); height: clamp(20px, 3.6vw, 34px); }
+.hud.compact .hud-name { font-size: clamp(9px, 1.3vw, 12px); }
+.hud.compact .hud-bar { height: clamp(5px, 1vw, 9px); }
 .hud-row.player .hud-face { box-shadow: 0 0 0 2px var(--player); }
 .hud-timer { font-family: ${THEME.font}; font-size: clamp(26px, 5vw, 48px); text-shadow: 0 3px 8px #000; min-width: 2.4em; text-align: center; }
 .hud-power { position: absolute; left: 50%; transform: translateX(-50%); bottom: max(10px, env(safe-area-inset-bottom));

@@ -6,7 +6,7 @@
  */
 import sharp from 'sharp';
 import {
-  alphaBounds, chinY, cropRect, inHeadRegion, paddedJaw, SILHOUETTE_CELLS, silhouetteRows, DEFAULT_LANDMARKS, headShape, refitRect, toHex, toTexture, type Crop, type FaceLandmarks,
+  alphaBounds, chinY, cropRect, inHeadRegion, isErased, type ErasePolygon, paddedJaw, SILHOUETTE_CELLS, silhouetteRows, DEFAULT_LANDMARKS, headShape, refitRect, toHex, toTexture, type Crop, type FaceLandmarks,
   type PixelRect,
 } from './faceRules.ts';
 
@@ -80,7 +80,7 @@ async function skinTone(rgb: Buffer, lm: FaceLandmarks): Promise<string> {
   return toHex(r.mean, g.mean, b.mean);
 }
 
-function shapedAlpha(mask: Buffer | null, lm: FaceLandmarks): Buffer {
+function shapedAlpha(mask: Buffer | null, lm: FaceLandmarks, erase: readonly ErasePolygon[]): Buffer {
   const alpha = Buffer.alloc(FACE_SIZE * FACE_SIZE);
   const chin = chinY(lm);
   const jaw = lm.jaw.length > 0 ? paddedJaw(lm.jaw) : [];
@@ -90,7 +90,7 @@ function shapedAlpha(mask: Buffer | null, lm: FaceLandmarks): Buffer {
       const i = y * FACE_SIZE + x;
       const u = (x + 0.5) / FACE_SIZE;
       const subject = mask ? mask[i] / BYTE_MAX : 1;
-      const a = inHeadRegion(u, v, jaw, chin) ? subject * headShape(u, v, 1) : 0;
+      const a = inHeadRegion(u, v, jaw, chin) && !isErased(u, v, erase) ? subject * headShape(u, v, 1) : 0;
       alpha[i] = a < MIN_ALPHA ? 0 : Math.round(a * BYTE_MAX);
     }
   }
@@ -102,17 +102,17 @@ async function outline(alpha: Buffer): Promise<Buffer> {
     .blur(OUTLINE_BLUR).threshold(OUTLINE_THRESHOLD).extractChannel(0).raw().toBuffer();
 }
 
-/** Writes the sticker WebP for one face and returns its tone and texture landmarks. */
-export async function renderFace(imagePath: string, maskFile: string | null, crop: Readonly<Crop>, img: ImageLandmarks | null, outPath: string): Promise<RenderResult> {
+/** Writes the sticker WebP for one face (minus any hand-set erase polygons) and returns its tone and texture landmarks. */
+export async function renderFace(imagePath: string, maskFile: string | null, crop: Readonly<Crop>, img: ImageLandmarks | null, erase: readonly ErasePolygon[], outPath: string): Promise<RenderResult> {
   const { width = 0, height = 0 } = await sharp(imagePath, SOURCE_READ).metadata();
   const first = cropRect(crop, width, height);
-  const firstAlpha = shapedAlpha(maskFile ? await cropped(maskFile, first, 1, width, height) : null, textureLandmarks(img, first, width, height));
+  const firstAlpha = shapedAlpha(maskFile ? await cropped(maskFile, first, 1, width, height) : null, textureLandmarks(img, first, width, height), []);
   const bounds = alphaBounds(firstAlpha, FACE_SIZE);
   const rect = bounds ? refitRect(first, bounds, FACE_SIZE) : first;
   const landmarks = textureLandmarks(img, rect, width, height);
   const rgb = await cropped(imagePath, rect, 3, width, height);
   const mask = maskFile ? await cropped(maskFile, rect, 1, width, height) : null;
-  const alpha = shapedAlpha(maskFile ? mask : null, landmarks);
+  const alpha = shapedAlpha(maskFile ? mask : null, landmarks, erase);
   const border = await outline(alpha);
   const out = Buffer.alloc(FACE_SIZE * FACE_SIZE * CHANNELS_RGBA);
   const finalAlpha = new Uint8Array(FACE_SIZE * FACE_SIZE);

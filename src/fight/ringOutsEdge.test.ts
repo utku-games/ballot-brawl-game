@@ -66,6 +66,22 @@ describe('ring-outs edge cases', () => {
     expect(state.fighters[1].x).toBeLessThan(ARENA_HALF_WIDTH);
   });
 
+  it('leaves a teetering fighter where knockback left them, without snapping back or letting them walk off', () => {
+    const s = platform(1);
+    s.fighters[0].x = -3;
+    const teeter = ARENA_HALF_WIDTH - 0.05;
+    setKnock(s, 1, ActionKind.Hitstun, teeter, 0, 0, 0);
+    s.fighters[1].action.duration = 2;
+    const idle = run(s, 6, [IDLE_INPUT, IDLE_INPUT]).state;
+    expect(idle.fighters[1].action.kind).toBe(ActionKind.Idle);
+    expect(idle.fighters[1].x).toBeCloseTo(teeter, 5);
+    const out = run(idle, 20, [IDLE_INPUT, input({ moveX: 1 })]).state;
+    expect(out.fighters[1].x).toBeLessThanOrEqual(teeter);
+    expect(out.fighters[1].ringedOut).toBe(false);
+    const back = run(idle, 20, [IDLE_INPUT, input({ moveX: -1 })]).state;
+    expect(back.fighters[1].x).toBeLessThan(teeter - 0.5);
+  });
+
   it('ends a 4v4 once a whole team is rung out, and rung-out fighters stay inert', () => {
     const s = platform(4);
     s.fighters.forEach((f, i) => { f.x = f.team === 0 ? -6 : 6; f.z = -3 + i % 4 * 2; });

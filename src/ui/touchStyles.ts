@@ -30,6 +30,6 @@ export const TOUCH_CSS = `
 .touch-swap { right: calc(max(14px, env(safe-area-inset-right)) + 172px); bottom: max(24px, env(safe-area-inset-bottom)); }
 .touch-taunt { right: calc(max(14px, env(safe-area-inset-right)) + 172px); bottom: calc(max(24px, env(safe-area-inset-bottom)) + 66px);
   font-size: 11px; }
-.touch-pause { right: max(12px, env(safe-area-inset-right)); top: calc(max(8px, env(safe-area-inset-top)) + 64px);
+.touch-pause { left: 50%; margin-left: -22px; top: calc(max(8px, env(safe-area-inset-top)) + 52px);
   width: 44px; height: 44px; font-size: 16px; }
 `;
