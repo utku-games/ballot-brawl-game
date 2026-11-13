@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Party: a free-for-all mode for three or four fighters, each on their own side in their own colour (blue, red,
+  green, gold); the last one standing wins, or the healthiest at time over. Items, hazards and every arena are
+  available, including The Rooftop for ring-outs.
+
+### Changed
+- The Brawl and Party result screens offer "Change setup" instead of "Change teams".
+
+### Added
 - The Rooftop: a new Brawl arena, an open platform above the city with no walls. Hard hits near the edge knock
   fighters off for a ring-out, which counts as a knockout; walking never takes anyone over.
 

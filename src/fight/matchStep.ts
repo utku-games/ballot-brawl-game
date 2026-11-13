@@ -27,19 +27,23 @@ interface Outcome {
   reason: EndReason;
 }
 
+function teamsIn(fighters: readonly FighterState[]): TeamIndex[] {
+  return [...new Set(fighters.map((f) => f.team))].sort();
+}
+
+/** The match ends when at most one side has living fighters, or at time over with the healthiest side winning. */
 function decideOutcome(fighters: readonly FighterState[], timeUp: boolean): Outcome {
-  const alive0 = livingOnTeam(fighters, 0).length;
-  const alive1 = livingOnTeam(fighters, 1).length;
+  const teams = teamsIn(fighters);
+  const standing = teams.filter((t) => livingOnTeam(fighters, t).length > 0);
   const ko = EndReason.KnockOut;
-  if (alive0 === 0 && alive1 === 0) return { over: true, winner: null, reason: ko };
-  if (alive0 === 0) return { over: true, winner: 1, reason: ko };
-  if (alive1 === 0) return { over: true, winner: 0, reason: ko };
+  if (standing.length === 0) return { over: true, winner: null, reason: ko };
+  if (standing.length === 1) return { over: true, winner: standing[0], reason: ko };
   const time = EndReason.TimeOver;
   if (!timeUp) return { over: false, winner: null, reason: time };
-  const h0 = teamHealthFraction(fighters, 0);
-  const h1 = teamHealthFraction(fighters, 1);
-  if (h0 === h1) return { over: true, winner: null, reason: time };
-  return { over: true, winner: h0 > h1 ? 0 : 1, reason: time };
+  const health = standing.map((t) => teamHealthFraction(fighters, t));
+  const best = Math.max(...health);
+  const leaders = standing.filter((_, i) => health[i] === best);
+  return { over: true, winner: leaders.length === 1 ? leaders[0] : null, reason: time };
 }
 
 /** On an open platform, rung-out fighters and fighters mid-knockback are not held in by the walls. */

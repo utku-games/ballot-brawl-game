@@ -1,7 +1,8 @@
 /**
- * Brawl mode setup as pure data: team sizes from 1 to 4, a fighter (or Random) and a controller (P1, P2 or CPU) per slot,
- * the CPU difficulty and the arena.
- * Player 1 always holds the first slot of the left team; Player 2 can take any other slot, but only one.
+ * Brawl and Party setup as pure data: sides of 1 to 4 fighters, a fighter (or Random) and a controller (P1, P2 or CPU)
+ * per slot, the CPU difficulty, the arena and items and hazards.
+ * Player 1 always holds the first slot of the first side; Player 2 can take any other slot, but only one; a Party is
+ * three or four one-fighter sides.
  * toMatchPlan resolves Random picks without duplicates using a seeded engine Rng.
  */
 import type { Rng } from '@utku/engine';
@@ -28,7 +29,8 @@ export interface SlotConfig {
 }
 
 export interface BrawlConfig {
-  teams: [SlotConfig[], SlotConfig[]];
+  /** Two teams in Brawl; three or four one-fighter sides in a Party free-for-all. */
+  teams: SlotConfig[][];
   difficulty: Difficulty;
   arena: ArenaKind;
   /** Throwable items and falling anvils; on by default. */
@@ -46,11 +48,11 @@ export function defaultBrawl(arena: ArenaKind): BrawlConfig {
   };
 }
 
-function cloneTeams(config: Readonly<BrawlConfig>): [SlotConfig[], SlotConfig[]] {
-  return [config.teams[0].map((s) => ({ ...s })), config.teams[1].map((s) => ({ ...s }))];
+function cloneTeams(config: Readonly<BrawlConfig>): SlotConfig[][] {
+  return config.teams.map((team) => team.map((s) => ({ ...s })));
 }
 
-export function setTeamSize(config: Readonly<BrawlConfig>, team: 0 | 1, size: number): BrawlConfig {
+export function setTeamSize(config: Readonly<BrawlConfig>, team: number, size: number): BrawlConfig {
   const n = Math.min(MAX_TEAM_SIZE, Math.max(1, Math.round(size)));
   const teams = cloneTeams(config);
   const slots = teams[team].slice(0, n);
@@ -59,17 +61,17 @@ export function setTeamSize(config: Readonly<BrawlConfig>, team: 0 | 1, size: nu
   return { ...config, teams };
 }
 
-export function setFighter(config: Readonly<BrawlConfig>, team: 0 | 1, index: number, fighterId: string): BrawlConfig {
+export function setFighter(config: Readonly<BrawlConfig>, team: number, index: number, fighterId: string): BrawlConfig {
   const teams = cloneTeams(config);
-  if (!teams[team][index]) throw new MatchSetupError(`No slot ${team}:${index}`);
+  if (!teams[team]?.[index]) throw new MatchSetupError(`No slot ${team}:${index}`);
   teams[team][index].fighterId = fighterId;
   return { ...config, teams };
 }
 
 /** Toggles a slot between CPU and Player 2 (Player 1's own slot cannot change). */
-export function togglePlayerTwo(config: Readonly<BrawlConfig>, team: 0 | 1, index: number): BrawlConfig {
+export function togglePlayerTwo(config: Readonly<BrawlConfig>, team: number, index: number): BrawlConfig {
   const teams = cloneTeams(config);
-  const slot = teams[team][index];
+  const slot = teams[team]?.[index];
   if (!slot || slot.controller === Controller.P1) return { ...config, teams };
   const becomeP2 = slot.controller !== Controller.P2;
   for (const t of teams) for (const s of t) if (s.controller === Controller.P2) s.controller = Controller.Cpu;
@@ -97,12 +99,35 @@ const CONTROLLER_PLAYER: Readonly<Record<Controller, PlayerId | null>> = {
 export function toMatchPlan(config: Readonly<BrawlConfig>, rng: Rng): MatchPlan {
   const ids = resolveFighters(config, rng);
   const level = DIFFICULTY_LEVEL[config.difficulty];
-  const plan = (team: 0 | 1): SlotPlan[] => config.teams[team].map((s, i) => ({
+  const plan = (slots: readonly SlotConfig[], team: number): SlotPlan[] => slots.map((s, i) => ({
     fighterId: ids[team][i],
     player: CONTROLLER_PLAYER[s.controller],
     cpuLevel: level,
     damageScale: 1,
     boss: false,
   }));
-  return { teams: [plan(0), plan(1)], arena: config.arena, seed: Math.floor(rng() * SEED_RANGE), ...PLAIN_FIGHT, extras: config.extras };
+  return { teams: config.teams.map(plan), arena: config.arena, seed: Math.floor(rng() * SEED_RANGE), ...PLAIN_FIGHT, extras: config.extras };
+}
+
+/** Fewest and most sides in a Party free-for-all. */
+export const PARTY_MIN_SIDES = 3;
+export const PARTY_MAX_SIDES = 4;
+
+/** A four-way Party: Player 1 against three CPU fighters, all Random, with items and hazards on. */
+export function defaultParty(arena: ArenaKind): BrawlConfig {
+  const cpu = (): SlotConfig[] => [{ ...CPU_SLOT }];
+  return {
+    teams: [[{ fighterId: RANDOM_FIGHTER, controller: Controller.P1 }], cpu(), cpu(), cpu()],
+    difficulty: Difficulty.Normal,
+    arena,
+    extras: true,
+  };
+}
+
+/** Sets how many one-fighter sides a Party has, keeping existing picks and adding CPU sides. */
+export function setPartySides(config: Readonly<BrawlConfig>, sides: number): BrawlConfig {
+  const n = Math.min(PARTY_MAX_SIDES, Math.max(PARTY_MIN_SIDES, Math.round(sides)));
+  const teams = cloneTeams(config).slice(0, n);
+  while (teams.length < n) teams.push([{ ...CPU_SLOT }]);
+  return { ...config, teams };
 }
