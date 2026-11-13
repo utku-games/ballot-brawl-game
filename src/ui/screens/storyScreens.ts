@@ -1,6 +1,6 @@
 /**
  * Story mode screens: the ladder of ten opponents before each fight, and the end screens.
- * The ladder shows beaten, current and upcoming opponents with the boss last, plus the running score and continues.
+ * The ladder shows beaten, current and upcoming opponents with the boss last, plus the running score and lives left.
  * The victory screen announces "You saved the world!" with the score breakdown and rank; the game over screen offers a restart.
  */
 import { make } from '@utku/engine';
