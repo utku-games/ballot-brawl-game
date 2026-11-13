@@ -3,6 +3,7 @@
  * Fighters are plain data so adding a new caricature means adding one entry and one face image, not code.
  * Stats are small integers that the fight layer turns into health, damage, speed and size.
  */
+import type { Build, Headwear, Neckwear, Outfit, Prop } from './lookTypes';
 
 /** The three story categories; each has eleven regular fighters and one boss. */
 export enum Category {
@@ -25,7 +26,14 @@ export interface FighterStats {
 }
 
 export interface FighterLook {
+  build: Build;
+  outfit: Outfit;
+  neckwear: Neckwear;
+  headwear: Headwear;
+  prop: Prop;
+  /** Main colour: the outfit. */
   suitColor: number;
+  /** Neckwear and trim. */
   accentColor: number;
   skinColor: number;
   hairColor: number;

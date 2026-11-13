@@ -154,3 +154,20 @@ export function computePose(input: Readonly<PoseInput>): Pose {
       return input.moving ? movingPose(input.time) : { ...STANDING_POSE, bob: Math.sin(input.time * IDLE_RATE) * IDLE_BOB };
   }
 }
+
+/** How flat a skirt folds once its wearer lies on the floor, as a fraction of its radius. */
+export const SKIRT_FOLD = 0.3;
+
+export interface SkirtFold {
+  /** Scale across the skirt's floor-facing axis. */
+  scale: number;
+  /** Lift along that axis, so the flattened skirt rests on the floor instead of sinking into it. */
+  lift: number;
+}
+
+/** Folds a skirt of the given hem radius as the body falls (fall 0 standing, 1 flat on the floor). */
+export function skirtFold(fall: number, radius: number): SkirtFold {
+  const f = Math.min(1, Math.max(0, fall));
+  const scale = 1 - (1 - SKIRT_FOLD) * f;
+  return { scale, lift: radius * SKIRT_FOLD * f * 0.5 };
+}

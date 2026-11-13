@@ -12,3 +12,6 @@ export class MatchSetupError extends GameError {}
 
 /** Roster or credits data is inconsistent (duplicate id, missing face credit, bad stats). */
 export class RosterDataError extends GameError {}
+
+/** A fighter model cannot be assembled (a costume part names a rig point that does not exist). */
+export class RigBuildError extends GameError {}

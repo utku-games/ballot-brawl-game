@@ -9,7 +9,8 @@ anyone depicted. There is no gore: knocked-out fighters just fall over.
 
 ## Status
 
-Playable: Story and Brawl modes, 36 fighters, three arenas. See [ROADMAP.md](ROADMAP.md).
+Playable: Story and Brawl modes, 36 fighters with their own body types and costumes, three arenas. See
+[ROADMAP.md](ROADMAP.md).
 
 ## Modes
 
@@ -50,6 +51,17 @@ npm run dev        # http://localhost:5175, also reachable from a phone on the s
 npm test
 npm run build
 ```
+
+## Costumes
+
+Each roster entry has a `kit`: build, outfit, neckwear, headwear and hand prop, chosen from the catalogue in
+`src/roster/lookTypes.ts`. Pure modules in `src/view` (`buildShapes`, `outfitParts`, `neckwearParts`,
+`headwearParts`, `propParts`) turn a kit into simple 3D shapes; `outfitMeshes.ts` builds them on the fighter.
+Looks are visual only and never change the fight.
+
+With `npm run dev` running, `http://localhost:5175/lineup.html?category=legends&half=0&pose=idle` shows six fighters
+of a category side by side (`half` 0 or 1, `pose` idle, punch or ko) to check costumes. The page is never part of
+the production build.
 
 ## Deploy
 

@@ -12,7 +12,7 @@ import { ActionKind, type FighterState } from '../fight/fightTypes';
 import type { FaceCredit } from '../roster/credits';
 import type { FighterDef } from '../roster/rosterTypes';
 import type { Expression } from './faceWarp';
-import { buildFighterRig, type FighterRig } from './fighterModel';
+import { buildFighterRig, setFall, type FighterRig } from './fighterModel';
 import { kickSpring, RESTING_SPRING, stepSpring, type SpringState } from './headSpring';
 import { computePose, Mood, type Pose } from './poseLogic';
 
@@ -110,7 +110,7 @@ export class FighterView {
     this.rig.legL.rotation.x = -pose.legL;
     this.rig.legR.rotation.x = -pose.legR;
     this.rig.torso.rotation.x = pose.lean;
-    this.rig.body.rotation.x = (-pose.fall * Math.PI) / 2;
+    setFall(this.rig, pose.fall);
     this.rig.body.position.y = pose.bob;
   }
 
@@ -141,7 +141,9 @@ export class FighterView {
     for (const m of this.rig.flashMaterials) m.emissive.copy(FLASH_COLOR).multiplyScalar(this.flash * 0.8);
   }
 
+  /** Frees the head card and this fighter's own materials; shared geometry stays for other fighters. */
   dispose(): void {
     this.rig.card.dispose();
+    this.rig.materials.dispose();
   }
 }
