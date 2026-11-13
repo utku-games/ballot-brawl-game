@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-14
+
 ### Changed
 - Online: switching apps on a phone or hiding the tab no longer ends the game after 8 seconds. The page tells the
   other player it is away, which then waits up to two minutes, and a page whose own timers were frozen starts a fresh
