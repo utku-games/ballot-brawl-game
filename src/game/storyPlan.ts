@@ -6,7 +6,7 @@
 import { PlayerId } from '../input/controlFrame';
 import { currentStage, type StoryRun } from '../story/storyRun';
 import { ARENA_FOR_CATEGORY } from '../view/arenaKinds';
-import type { MatchPlan } from './matchPlan';
+import { PLAIN_FIGHT, type MatchPlan } from './matchPlan';
 
 /** Player-side skill used if the CPU ever drives the player's fighter (it never should in story mode). */
 const PLAYER_SIDE_LEVEL = 0.5;
@@ -21,5 +21,6 @@ export function storyMatchPlan(run: Readonly<StoryRun>, attempt: number): MatchP
     ],
     arena: ARENA_FOR_CATEGORY[run.category],
     seed: run.stageIndex * SEED_STRIDE + attempt,
+    ...PLAIN_FIGHT,
   };
 }

@@ -11,7 +11,7 @@ import { MAX_TEAM_SIZE } from '../fight/fightConstants';
 import { PlayerId } from '../input/controlFrame';
 import { ROSTER } from '../roster/roster';
 import type { ArenaKind } from '../view/arenaKinds';
-import type { MatchPlan, SlotPlan } from './matchPlan';
+import { PLAIN_FIGHT, type MatchPlan, type SlotPlan } from './matchPlan';
 
 export const RANDOM_FIGHTER = 'random';
 const SEED_RANGE = 1_000_000;
@@ -101,5 +101,5 @@ export function toMatchPlan(config: Readonly<BrawlConfig>, rng: Rng): MatchPlan 
     damageScale: 1,
     boss: false,
   }));
-  return { teams: [plan(0), plan(1)], arena: config.arena, seed: Math.floor(rng() * SEED_RANGE) };
+  return { teams: [plan(0), plan(1)], arena: config.arena, seed: Math.floor(rng() * SEED_RANGE), ...PLAIN_FIGHT };
 }

@@ -33,6 +33,9 @@ export const MENU_CSS = `
 .card .card-nick { font-size: 12px; color: ${THEME.inkSoft}; text-align: center; }
 .card .card-best { font-size: 12px; color: ${THEME.gold}; }
 .card.boss img { border-color: ${THEME.gold}; }
+.grid.wide { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+.card.rivalry .pair { display: flex; align-items: center; gap: 8px; font-family: ${THEME.font}; font-size: 16px; }
+.card.rivalry .pair img { width: 64px; height: 64px; }
 .stats { display: grid; grid-template-columns: auto 1fr; gap: 2px 6px; width: 100%; font-size: 10px; color: ${THEME.inkSoft}; }
 .stat-bar { height: 6px; align-self: center; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
 .stat-bar > div { height: 100%; background: ${THEME.gold}; }

@@ -33,6 +33,10 @@ const HIT_BURST: Readonly<Record<MoveKind, BurstKind>> = {
 };
 const KO_SHAKE = 0.3;
 const QUAKE_SHAKE = 0.5;
+/** Ambient light never drops below this, so fighters stay faintly visible in a blackout. */
+const MIN_AMBIENT = 0.15;
+/** Normal light level, restored when the match ends. */
+const FULL_LIGHT = 1;
 /** A rush drops a dust puff every this many ticks. */
 const TRAIL_EVERY = 3;
 
@@ -57,6 +61,11 @@ export class MatchView {
     this.effects = new HitEffects(view.scene);
     this.projectiles = new ProjectileView(view.scene, new Map(state.fighters.map((f) => [f.slotId, fighterById(f.fighterId)])));
     this.camera = new CameraRig(view.camera);
+  }
+
+  /** Sets the arena light level (0 dark .. 1 normal) for the Blackout twist. */
+  setLight(level: number): void {
+    this.view.setLightLevels(level, Math.max(level, MIN_AMBIENT), 0);
   }
 
   /** Turns every fighter's intro gesture on or off. */
@@ -138,5 +147,6 @@ export class MatchView {
     }
     this.effects.dispose();
     this.projectiles.dispose();
+    this.setLight(FULL_LIGHT);
   }
 }
