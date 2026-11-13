@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-13
+
 ### Added
 - Brawl items: briefcases, gavels and money bags appear on the floor; walk over one to pick it up and Punch to throw it.
 - Brawl hazards: a cartoon anvil drops where a red ring warns, knocking down anyone underneath on either team.
