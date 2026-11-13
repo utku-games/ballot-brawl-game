@@ -6,7 +6,7 @@
  */
 import sharp from 'sharp';
 import {
-  alphaBounds, chinY, cropRect, inHeadRegion, paddedJaw, DEFAULT_LANDMARKS, headShape, refitRect, toHex, toTexture, type Crop, type FaceLandmarks,
+  alphaBounds, chinY, cropRect, inHeadRegion, paddedJaw, SILHOUETTE_CELLS, silhouetteRows, DEFAULT_LANDMARKS, headShape, refitRect, toHex, toTexture, type Crop, type FaceLandmarks,
   type PixelRect,
 } from './faceRules.ts';
 
@@ -36,6 +36,7 @@ export interface ImageLandmarks {
 export interface RenderResult {
   tone: string;
   landmarks: FaceLandmarks;
+  silhouette: string[];
 }
 
 function textureLandmarks(img: ImageLandmarks | null, rect: Readonly<PixelRect>, w: number, h: number): FaceLandmarks {
@@ -114,11 +115,13 @@ export async function renderFace(imagePath: string, maskFile: string | null, cro
   const alpha = shapedAlpha(maskFile ? mask : null, landmarks);
   const border = await outline(alpha);
   const out = Buffer.alloc(FACE_SIZE * FACE_SIZE * CHANNELS_RGBA);
+  const finalAlpha = new Uint8Array(FACE_SIZE * FACE_SIZE);
   for (let i = 0; i < FACE_SIZE * FACE_SIZE; i += 1) {
     const a = alpha[i] / BYTE_MAX;
     for (let c = 0; c < CHANNELS_RGB; c += 1) out[i * 4 + c] = Math.round(rgb[i * 3 + c] * a + BYTE_MAX * (1 - a));
-    out[i * 4 + 3] = Math.max(alpha[i], border[i]);
+    finalAlpha[i] = Math.max(alpha[i], border[i]);
+    out[i * 4 + 3] = finalAlpha[i];
   }
   await sharp(out, { raw: { width: FACE_SIZE, height: FACE_SIZE, channels: CHANNELS_RGBA } }).webp({ quality: WEBP_QUALITY, alphaQuality: 100 }).toFile(outPath);
-  return { tone: await skinTone(rgb, landmarks), landmarks };
+  return { tone: await skinTone(rgb, landmarks), landmarks, silhouette: silhouetteRows(finalAlpha, FACE_SIZE, SILHOUETTE_CELLS) };
 }

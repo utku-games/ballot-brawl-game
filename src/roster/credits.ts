@@ -26,6 +26,8 @@ export interface FaceCredit {
   tone: string;
   /** Eye and mouth positions in face-texture coordinates (0..1, origin top left). */
   landmarks: FaceLandmarks;
+  /** Head silhouette grid: hex rows, top to bottom, one bit per cell. */
+  silhouette: string[];
 }
 
 export interface FacePoint {
