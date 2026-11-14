@@ -14,22 +14,26 @@ export const RING_OUT_SOURCE = 'ringout';
 
 const KNOCKED_BACK: ReadonlySet<ActionKind> = new Set([ActionKind.Hitstun, ActionKind.Knockdown, ActionKind.GuardBroken]);
 
-/** True when this fighter is mid-knockback and could be carried over the edge. */
-export function canRingOut(f: Readonly<FighterState>): boolean {
-  return isAlive(f) && !f.ringedOut && KNOCKED_BACK.has(f.action.kind);
+/**
+ * True when this fighter is mid-knockback this tick and could be carried over the edge; before is their state at the
+ * start of the tick, so the tick on which hitstun runs out still carries them the full distance.
+ */
+export function canRingOut(f: Readonly<FighterState>, before: Readonly<FighterState>): boolean {
+  const knocked = KNOCKED_BACK.has(f.action.kind) || KNOCKED_BACK.has(before.action.kind);
+  return isAlive(f) && !f.ringedOut && knocked;
 }
 
-/** Knocks out every fighter whose knockback carried them off the platform this tick. */
-export function applyRingOuts(fighters: FighterState[], events: FightEvent[]): void {
-  for (const f of fighters) {
-    if (!canRingOut(f) || isInsideArena(f)) continue;
+/** Knocks out every fighter whose knockback carried them off the platform this tick (befores in the same order). */
+export function applyRingOuts(fighters: FighterState[], befores: readonly Readonly<FighterState>[], events: FightEvent[]): void {
+  fighters.forEach((f, i) => {
+    if (!canRingOut(f, befores[i]) || isInsideArena(f)) return;
     f.ringedOut = true;
     f.health = 0;
     f.holding = null;
     f.action = { kind: ActionKind.KnockedOut, frame: 0, duration: 0, move: null, hitIds: [] };
     events.push({ kind: 'ringOut', target: f.slotId, x: f.x, z: f.z });
     events.push({ kind: 'ko', target: f.slotId, by: RING_OUT_SOURCE });
-  }
+  });
 }
 
 function limit(half: number, radius: number, before: number): number {

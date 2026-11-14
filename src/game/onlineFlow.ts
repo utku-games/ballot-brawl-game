@@ -58,6 +58,10 @@ export class OnlineFlow {
   private inLobby = false;
   /** True while the other player is in the lobby, so the host may start. */
   private theirsHere = false;
+  /** True while the other player's page is hidden. */
+  private peerAway = false;
+  /** Host: the match offered to the guest, begun or dropped by the guest's answer; null when none is waiting. */
+  private offered: StartInfo | null = null;
   private liveness: Liveness | null = null;
   private pulse: ReturnType<typeof setInterval> | null = null;
   /** Bumped on every leave, so replies to an abandoned attempt are ignored. */
@@ -128,6 +132,8 @@ export class OnlineFlow {
     this.mine = null;
     this.theirs = null;
     this.theirsHere = false;
+    this.peerAway = false;
+    this.offered = null;
     this.liveness = new Liveness(Date.now());
     this.pulse = setInterval(() => this.checkPulse(), PULSE_MS);
     conn.onMessage((m) => this.receive(m));
@@ -150,11 +156,16 @@ export class OnlineFlow {
       case MsgKind.Ping:
         return;
       case MsgKind.Away:
-        return this.liveness?.setPeerAway(m.away);
+        this.peerAway = m.away;
+        this.liveness?.setPeerAway(m.away);
+        if (this.net) this.net.peerAway = m.away;
+        return;
       case MsgKind.Here:
         if (this.theirsHere === m.inLobby) return;
         this.theirsHere = m.inLobby;
         return this.refreshLobby();
+      case MsgKind.Ready:
+        return this.acceptReady(m.accepted);
       case MsgKind.Pick:
         this.theirs = m.fighterId;
         return this.refreshLobby();
@@ -164,8 +175,7 @@ export class OnlineFlow {
         this.extras = m.extras;
         return this.refreshLobby();
       case MsgKind.Start:
-        if (this.role === NetRole.Guest) this.beginMatch(m);
-        return;
+        return this.answerStart(m);
       case MsgKind.Leave:
         return this.leave(LEFT_TEXT);
       case MsgKind.Input:
@@ -218,18 +228,33 @@ export class OnlineFlow {
     this.conn?.send({ kind: MsgKind.Settings, arena: this.arena, extras: this.extras });
   }
 
+  /** Host: offers the match; the guest answers every Start, and the host begins only when it was accepted. */
   private startAsHost(): void {
-    if (!this.mine || !this.theirs || !this.theirsHere || !this.conn) return;
+    if (!this.mine || !this.theirs || !this.theirsHere || !this.conn || this.offered) return;
     const info: StartInfo = { hostFighter: this.mine, guestFighter: this.theirs, arena: this.arena, extras: this.extras, seed: Math.floor(this.rng() * SEED_RANGE) };
+    this.offered = info;
     this.conn.send({ kind: MsgKind.Start, ...info });
-    this.beginMatch(info);
+  }
+
+  private acceptReady(accepted: boolean): void {
+    const info = this.offered;
+    this.offered = null;
+    if (this.role === NetRole.Host && info && accepted) this.beginMatch(info);
+    else this.refreshLobby();
+  }
+
+  /** Guest: accepts a Start on the lobby screen and begins; declines it while choosing a fighter. */
+  private answerStart(info: Readonly<StartInfo>): void {
+    if (this.role !== NetRole.Guest) return;
+    this.conn?.send({ kind: MsgKind.Ready, accepted: this.inLobby });
+    if (this.inLobby) this.beginMatch(info);
   }
 
   private beginMatch(info: Readonly<StartInfo>): void {
     if (!this.conn) return;
     this.inLobby = false;
     this.theirsHere = false;
-    const net = new OnlineMatchNet(this.role, this.conn, [info.hostFighter, info.guestFighter]);
+    const net = new OnlineMatchNet(this.role, this.conn, [info.hostFighter, info.guestFighter], this.peerAway);
     this.net = net;
     this.shell.startMatch(onlineMatchPlan(info, this.role), (o) => this.showResult(info, o), net, () => this.leave(null));
   }
@@ -255,6 +280,7 @@ export class OnlineFlow {
     if (this.pulse !== null) clearInterval(this.pulse);
     this.pulse = null;
     this.liveness = null;
+    this.offered = null;
     this.conn?.send({ kind: MsgKind.Leave });
     this.conn?.close();
     this.conn = null;

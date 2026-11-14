@@ -53,6 +53,8 @@ const SLOWMO_SECONDS = 0.9;
 const SLOWMO_SCALE = 0.3;
 /** Normal arena light, used outside the fight itself (intro, knockout outro, result screen). */
 const FULL_LIGHT = 1;
+const AWAY_BANNER = 'OPPONENT AWAY';
+const BACK_BANNER = 'FIGHT!';
 const PLAYERS: readonly PlayerId[] = [PlayerId.One, PlayerId.Two];
 
 export class MatchSession {
@@ -77,6 +79,8 @@ export class MatchSession {
   private started = false;
   private readonly twist: Twist;
   private finished = false;
+  /** True while an online fight is held because the other player's page is hidden. */
+  private held = false;
   paused = false;
 
   constructor(plan: MatchPlan, private readonly deps: SessionDeps, private readonly onEnd: (o: MatchOutcome) => void, private readonly onPause: () => void) {
@@ -167,7 +171,18 @@ export class MatchSession {
     this.announceEvents(next);
   }
 
+  /** Shows or clears the away banner when the other player's page hides or returns; true while it is hidden. */
+  private holdForAway(net: MatchNet | null): boolean {
+    const away = net?.peerAway ?? false;
+    if (away !== this.held) {
+      this.held = away;
+      this.hud.announce(away ? AWAY_BANNER : BACK_BANNER, false, away);
+    }
+    return away;
+  }
+
   private simulate(dt: number, frames: Readonly<Record<PlayerId, ControlFrame>>): number {
+    if (this.holdForAway(this.deps.net) && this.deps.net?.role === NetRole.Host) return 1;
     const scale = this.slowmo > 0 ? SLOWMO_SCALE : 1;
     this.slowmo = Math.max(0, this.slowmo - dt);
     const plan = this.clock.advance(dt * scale);

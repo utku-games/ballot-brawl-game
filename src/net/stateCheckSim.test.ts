@@ -58,7 +58,7 @@ describe('state check on simulated matches', () => {
     const s = createMatch(buildMatchSetup(toMatchPlan(config, createRng(2))));
     s.fighters[1].x = 500;
     s.fighters[1].action = { ...s.fighters[1].action, kind: ActionKind.Hitstun };
-    applyRingOuts(s.fighters, s.events);
+    applyRingOuts(s.fighters, s.fighters, s.events);
     expect(s.fighters[1].ringedOut).toBe(true);
     expect(() => checkState(JSON.parse(JSON.stringify(s)), ids)).not.toThrow();
   });
