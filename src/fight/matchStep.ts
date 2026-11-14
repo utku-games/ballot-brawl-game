@@ -47,8 +47,8 @@ function decideOutcome(fighters: readonly FighterState[], timeUp: boolean): Outc
 }
 
 /** On an open platform, rung-out fighters and fighters mid-knockback are not held in by the walls. */
-function onOpenEdge(f: Readonly<FighterState>, ringOuts: boolean): boolean {
-  return ringOuts && (f.ringedOut || canRingOut(f));
+function onOpenEdge(f: Readonly<FighterState>, before: Readonly<FighterState>, ringOuts: boolean): boolean {
+  return ringOuts && (f.ringedOut || canRingOut(f, before));
 }
 
 /** Items and hazards for this tick: lands falling anvils, drops items from fallen fighters, hands out and spawns items. */
@@ -75,10 +75,10 @@ export function stepMatch(state: Readonly<MatchState>, inputs: readonly Readonly
   const projectiles = [...stepProjectiles(state.projectiles, fighters, events), ...spawnProjectiles(fighters, state.tick, events)];
   const extras = stepExtras(state, fighters, events);
   for (const f of fighters) slideKnockback(f);
-  if (state.ringOuts) applyRingOuts(fighters, events);
+  if (state.ringOuts) applyRingOuts(fighters, state.fighters, events);
   separateBodies(fighters);
   fighters.forEach((f, i) => {
-    if (onOpenEdge(f, state.ringOuts)) return;
+    if (onOpenEdge(f, state.fighters[i], state.ringOuts)) return;
     if (state.ringOuts) keepOnPlatform(f, state.fighters[i]);
     else keepInArena(f);
   });

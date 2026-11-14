@@ -5,6 +5,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Online: when a player switches away mid-fight, the fight holds (timer included) and both screens say
+  "OPPONENT AWAY" until they return, instead of the absent fighter standing still and taking hits.
+- Online: the host's Start now waits for the guest to confirm from the lobby, so a guest who opened the fighter
+  list at the same instant is never pulled into a fight. Online protocol version 4: both players need the update.
+
+### Fixed
+- The Rooftop: on the tick a fighter's hitstun runs out, the rest of that tick's knockback still carries them
+  (and can still ring them out) instead of being clamped back.
+
 ## [0.14.0] - 2026-11-14
 
 ### Changed

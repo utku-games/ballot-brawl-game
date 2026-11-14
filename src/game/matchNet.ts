@@ -14,6 +14,8 @@ export enum NetRole {
 
 export interface MatchNet {
   readonly role: NetRole;
+  /** True while the other player's page is hidden (an app switch); the host holds the fight until they return. */
+  readonly peerAway: boolean;
   /** Host: the guest's controls for the next tick. */
   takeRemoteFrame(): ControlFrame;
   /** Host: sends a state after each tick. */
