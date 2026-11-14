@@ -22,7 +22,8 @@ import { recordFight, RunStatus, runScore, startRun, type StoryRun } from '../st
 import { activateFocus, moveFocus } from '../ui/menuFocus';
 import type { Screen } from '../ui/screenKit';
 import { brawlSetupScreen } from '../ui/screens/brawlSetupScreen';
-import { brawlResultScreen, creditsScreen, pauseScreen } from '../ui/screens/miscScreens';
+import { brawlResultScreen, creditsScreen, fullscreenHelpScreen, pauseScreen } from '../ui/screens/miscScreens';
+import { enterFullscreen, isFullscreen, isInstalledApp } from '../ui/fullscreen';
 import { partySetupScreen } from '../ui/screens/partyScreens';
 import { trophiesScreen } from '../ui/screens/trophiesScreen';
 import { categoryScreen, fighterPickScreen } from '../ui/screens/pickScreens';
@@ -225,6 +226,7 @@ export class GameApp {
 
   private showTitle(): void {
     this.run = null;
+    const touch = window.matchMedia(COARSE_POINTER).matches;
     this.show((p) => titleScreen(p, {
       onStory: () => this.showCategories(),
       onRivalry: () => this.showRivalries(),
@@ -234,7 +236,14 @@ export class GameApp {
       onCredits: () => this.show((q) => creditsScreen(q, () => this.showTitle()), null),
       onTrophies: () => this.show((q) => trophiesScreen(q, this.save, () => this.showTitle()), ArenaKind.Museum),
       onToggleMute: () => this.toggleMute(),
-    }, this.save.muted, window.matchMedia(COARSE_POINTER).matches), ArenaKind.Parliament);
+      onFullscreen: () => void this.goFullscreen(),
+    }, this.save.muted, touch, touch && !isFullscreen() && !isInstalledApp()), ArenaKind.Parliament);
+  }
+
+  /** Goes full screen where the browser can, otherwise explains how (Add to Home Screen on iPhone). */
+  private async goFullscreen(): Promise<void> {
+    if (await enterFullscreen()) return this.showTitle();
+    this.show((q) => fullscreenHelpScreen(q, () => this.showTitle()), null);
   }
 
   private toggleMute(): boolean {

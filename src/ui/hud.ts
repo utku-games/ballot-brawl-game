@@ -34,11 +34,13 @@ export class Hud {
   private readonly ready: HTMLElement;
   private readonly banner: HTMLElement;
   private shownSeconds = -1;
+  private readonly top: HTMLElement;
 
   constructor(parent: HTMLElement, state: Readonly<MatchState>) {
     injectStyle('hud', HUD_CSS);
     this.root = make('div', 'hud', null, parent);
     const top = make('div', 'hud-top', null, this.root);
+    this.top = top;
     const left = make('div', 'hud-team', null, top);
     this.timer = make('div', 'hud-timer', '', top);
     const right = make('div', 'hud-team right', null, top);
@@ -94,6 +96,11 @@ export class Hud {
     this.meterFill.style.transform = `scaleX(${focus ? focus.meter / METER_MAX : 0})`;
     this.guardFill.style.transform = `scaleX(${focus ? focus.guard / GUARD_MAX : 0})`;
     this.ready.classList.toggle('on', !!focus && focus.meter >= METER_MAX && isAlive(focus));
+  }
+
+  /** How far down the screen the health panels reach, in CSS pixels. */
+  bottomEdge(): number {
+    return this.top.getBoundingClientRect().bottom;
   }
 
   /** Shows a banner; `hold` keeps it on screen until the next call. */

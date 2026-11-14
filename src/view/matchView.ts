@@ -16,6 +16,7 @@ import { FinisherStyle } from '../roster/signatureTypes';
 import { ARENA_STYLES, type ArenaKind } from './arenaKinds';
 import { buildArena, disposeArena } from './arenaModels';
 import { CameraRig } from './cameraRig';
+import type { ScreenInsets } from './screenInsets';
 import { faceTexture } from './faceTextures';
 import { FighterView } from './fighterView';
 import { BurstKind, HitEffects } from './hitEffects';
@@ -70,6 +71,11 @@ export class MatchView {
     this.extras = new ExtrasView(view.scene);
     this.projectiles = new ProjectileView(view.scene, new Map(state.fighters.map((f) => [f.slotId, fighterById(f.fighterId)])));
     this.camera = new CameraRig(view.camera);
+  }
+
+  /** Screen areas covered by the HUD and touch buttons; the camera keeps the fighters out of them. */
+  setInsets(insets: Readonly<ScreenInsets>): void {
+    this.camera.setInsets(insets);
   }
 
   /** Sets the arena light level (0 dark .. 1 normal) for the Blackout twist. */

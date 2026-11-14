@@ -1,6 +1,7 @@
 /**
  * Browser entry point of Ballot Brawl: creates the renderer, input hub, audio and touch controls, then starts the game app.
- * Audio is unlocked on the first tap or key press, as browsers require, and the canvas follows window resizes.
+ * Audio is unlocked on the first tap or key press, as browsers require; the first touch also asks for full screen where
+ * the browser allows it, and the canvas follows window resizes.
  * It is the only module that touches the page at startup, including reading and clearing a shared link's query.
  */
 import { createGameRenderer } from '@utku/engine';
@@ -9,6 +10,7 @@ import { PlatformError } from './core/errors';
 import { GameApp } from './game/gameApp';
 import { InputHub } from './input/inputHub';
 import { parseShareTarget } from './share/shareLink';
+import { canGoFullscreen, enterFullscreen } from './ui/fullscreen';
 import { TouchControls } from './ui/touchControls';
 
 const APP_ELEMENT_ID = 'app';
@@ -26,6 +28,13 @@ const unlock = (): void => audio.unlock();
 window.addEventListener('pointerdown', unlock);
 window.addEventListener('keydown', unlock);
 window.addEventListener('resize', () => renderer.resize());
+const TOUCH_POINTER = 'touch';
+const firstTouch = (e: PointerEvent): void => {
+  if (e.pointerType !== TOUCH_POINTER) return;
+  window.removeEventListener('pointerup', firstTouch);
+  if (canGoFullscreen()) void enterFullscreen();
+};
+window.addEventListener('pointerup', firstTouch);
 
 const app = new GameApp({ container, renderer, hub, audio, touch });
 const shared = parseShareTarget(location.search);

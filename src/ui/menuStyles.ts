@@ -1,6 +1,7 @@
 /**
  * Stylesheet for every menu screen: the title, selection grids, team setup, ladder, results, pause and credits.
- * Screens are full-viewport overlays above the 3D backdrop, scroll vertically on small phones and respect safe areas.
+ * Screens are full-viewport overlays above the 3D backdrop, scroll vertically on small phones and respect safe areas;
+ * short landscape phones get a compact two-column menu.
  * Buttons are real button elements so keyboard focus, Enter and screen readers work without extra code.
  */
 import { THEME } from './theme';
@@ -10,7 +11,9 @@ export const MENU_CSS = `
   display: flex; flex-direction: column; align-items: center; gap: 14px; color: ${THEME.ink}; font-family: ${THEME.bodyFont};
   padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   background: radial-gradient(ellipse at center, rgba(20,18,43,0.35), rgba(20,18,43,0.88)); box-sizing: border-box; }
-.screen.overlay { background: rgba(10,8,30,0.72); justify-content: center; }
+.screen.overlay { background: rgba(10,8,30,0.72); }
+.screen.overlay > :first-child { margin-top: auto; }
+.screen.overlay > :last-child { margin-bottom: auto; }
 .screen h1 { font-family: ${THEME.font}; font-size: clamp(44px, 11vw, 120px); margin: 2vh 0 0; line-height: 0.95; text-align: center;
   color: ${THEME.gold}; text-shadow: 0 6px 0 #6a2a00, 0 12px 30px rgba(0,0,0,0.6); letter-spacing: 1px; }
 .screen h2 { font-family: ${THEME.font}; font-size: clamp(24px, 5vw, 44px); margin: 4px 0; text-align: center; text-shadow: 0 4px 0 #000; }
@@ -67,5 +70,10 @@ export const MENU_CSS = `
 .credit a { color: ${THEME.guard}; }
 @media (max-height: 500px) { .screen h1 { font-size: 40px; margin: 0; } .screen { gap: 8px; } .menu-btn { padding: 8px 14px; }
   .card img { width: 52px; height: 52px; } .versus img { width: 72px; height: 72px; } .rank { font-size: 48px; } }
+@media (max-height: 500px) and (orientation: landscape) {
+  .screen { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: max(8px, env(safe-area-inset-bottom)); gap: 6px; }
+  .screen h1 { font-size: 30px; text-shadow: 0 3px 0 #6a2a00; } .screen h2 { font-size: 22px; } .tagline { font-size: 13px; }
+  .menu-col { display: grid; grid-template-columns: 1fr 1fr; width: min(620px, 100%); gap: 6px; }
+  .menu-btn { font-size: 15px; padding: 7px 12px; } .controls-hint, .disclaimer { font-size: 10px; } }
 .controls-hint { font-size: 12px; color: ${THEME.inkSoft}; text-align: center; }
 `;
