@@ -5,6 +5,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-11-14
+
+### Added
+- Full screen on phones and tablets: the first tap hides the browser's bars where the browser allows it (Android,
+  iPad), and a Full screen button on the title does the same or, on iPhone, explains Add to Home Screen.
+
+### Changed
+- The fight camera keeps fighters out of the areas the health bars and touch buttons cover, so nobody fights hidden
+  under the Punch button on a landscape phone or behind the controls in portrait. Portrait screens get a wider camera
+  view and may pull back far enough to show the whole arena width.
+- Short landscape phones get a compact layout: a two-column main menu that fits without scrolling, slimmer health
+  bars and smaller fight buttons. Result and pause overlays that do not fit now scroll from the top instead of
+  cutting off their first lines.
+
 ## [0.15.0] - 2026-11-14
 
 ### Changed

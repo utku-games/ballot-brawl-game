@@ -1,7 +1,7 @@
 /**
  * Stylesheet for the on-screen touch controls: the floating joystick and the Punch, Kick, Defend, Finisher and Swap buttons.
  * Buttons are large, thumb-reachable and sit inside the safe area on notched phones.
- * The Finisher button glows only while the power meter is full.
+ * The Finisher button glows only while the power meter is full, and short landscape phones get smaller buttons.
  */
 import { THEME } from './theme';
 
@@ -32,4 +32,10 @@ export const TOUCH_CSS = `
   font-size: 11px; }
 .touch-pause { left: 50%; margin-left: -22px; top: calc(max(8px, env(safe-area-inset-top)) + 52px);
   width: 44px; height: 44px; font-size: 16px; }
+@media (max-height: 500px) and (orientation: landscape) {
+  .touch-pad { grid-template-columns: repeat(2, 62px); grid-auto-rows: 62px; gap: 8px; }
+  .touch-btn { font-size: 11px; } .touch-small { width: 46px; height: 46px; } .touch-taunt { font-size: 10px; }
+  .touch-swap, .touch-taunt { right: calc(max(14px, env(safe-area-inset-right)) + 140px); }
+  .touch-taunt { bottom: calc(max(24px, env(safe-area-inset-bottom)) + 54px); }
+  .touch-pause { width: 38px; height: 38px; margin-left: -19px; top: calc(max(4px, env(safe-area-inset-top)) + 34px); } }
 `;

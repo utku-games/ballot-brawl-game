@@ -41,6 +41,9 @@ A few strict networks (some offices and mobile carriers) block direct connection
 
 ## Sharing
 
+On phones the first tap goes full screen where the browser allows it; on iPhone, add the game to the home screen
+(Share, Add to Home Screen) to play it full screen.
+
 Every result screen has a Share button: on phones it opens the share sheet with a result card image, and on desktops
 it copies the message and link and saves the card image. Links can open a fight directly:
 `?rivalry=currents` opens The War of the Currents side picker, and `?duel=goat~pig` opens a one-on-one Brawl setup

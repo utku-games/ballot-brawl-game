@@ -44,6 +44,10 @@ export const HUD_CSS = `
 .hud-banner.small { font-size: clamp(22px, 5.5vw, 56px); color: ${THEME.gold}; }
 .hud-banner.show { animation: hud-banner 1.4s ease-out forwards; }
 .hud-banner.hold { opacity: 1; animation: none; }
+@media (max-height: 500px) and (orientation: landscape) {
+  .hud { padding-top: max(4px, env(safe-area-inset-top)); } .hud-team { gap: 2px; width: clamp(130px, 28vw, 300px); }
+  .hud-face { width: 22px; height: 22px; } .hud-name { font-size: 10px; } .hud-bar { height: 6px; } .hud-timer { font-size: 24px; }
+  .hud-power { width: clamp(140px, 24vw, 260px); } .hud-ready { font-size: 11px; } }
 @keyframes hud-banner { 0% { opacity: 0; transform: scale(2.2); } 15% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(0.9); } }
 @keyframes hud-pulse { from { opacity: 0.55; } to { opacity: 1; } }
 `;
