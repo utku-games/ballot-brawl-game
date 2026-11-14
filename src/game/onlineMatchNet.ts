@@ -17,8 +17,11 @@ export class OnlineMatchNet implements MatchNet {
   private readonly remote = new RemoteInput();
   private readonly states = new SnapshotQueue<MatchState>();
 
-  /** fighters are the match's fighter ids in slot order, which every streamed state must match. */
-  constructor(readonly role: NetRole, private readonly conn: PeerConnection, private readonly fighters: readonly string[]) {}
+  /**
+   * fighters are the match's fighter ids in slot order, which every streamed state must match; peerAway is whether the
+   * other page was hidden when the match began.
+   */
+  constructor(readonly role: NetRole, private readonly conn: PeerConnection, private readonly fighters: readonly string[], public peerAway: boolean) {}
 
   receive(m: Readonly<NetMessage>): void {
     if (m.kind === MsgKind.Input && this.role === NetRole.Host) this.remote.push(m.frame);

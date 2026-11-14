@@ -1,15 +1,17 @@
 /**
  * Edge-case tests for ring-outs: knockback that stops just inside the edge, corners, whole teams going over, and guard states.
- * It also covers the last tick of the timer, projectile finishers and walls staying in force for non-knocked fighters.
+ * It also covers the last tick of the timer, projectile finishers, walls for non-knocked fighters and the tick hitstun ends.
  * Every test places fighters by hand on an open platform and steps the deterministic simulation.
  */
 import { describe, expect, it } from 'vitest';
 import { ARENA_HALF_DEPTH, ARENA_HALF_WIDTH } from '../core/arena';
 import { FinisherStyle } from '../roster/signatureTypes';
-import { METER_MAX } from './fightConstants';
+import { bodyRadius } from './bodyPhysics';
+import { METER_MAX, TICK_SECONDS } from './fightConstants';
 import { ActionKind, EndReason, IDLE_INPUT, MatchPhase, type MatchState } from './fightTypes';
 import { createMatch } from './matchSetup';
-import { entries, input, run, styled, tap } from './testFight';
+import { stepMatch } from './matchStep';
+import { duel, entries, input, run, styled, tap } from './testFight';
 
 function platform(perTeam: number): MatchState {
   return createMatch({ teams: [entries(perTeam), entries(perTeam)], extras: false, seed: 0, ringOuts: true });
@@ -141,5 +143,33 @@ describe('ring-outs edge cases', () => {
     const { state, events } = run(s, 5, [IDLE_INPUT, IDLE_INPUT]);
     expect(events.some((e) => e.kind === 'ringOut')).toBe(false);
     expect(state.fighters[1].x).toBeLessThanOrEqual(ARENA_HALF_WIDTH);
+  });
+});
+
+describe('knockback on the tick hitstun ends', () => {
+  const PUSH = 6;
+  const EDGE_GAP = 0.4;
+
+  function endingHitstun(edgeGap: number): MatchState {
+    const s = { ...duel(1.3), ringOuts: true };
+    const [a, b] = s.fighters;
+    b.x = ARENA_HALF_WIDTH - edgeGap;
+    a.x = b.x - 4;
+    b.pushX = PUSH;
+    b.action = { kind: ActionKind.Hitstun, frame: 9, duration: 10, move: null, hitIds: [] as string[] };
+    return s;
+  }
+
+  it('still carries the fighter the full slide', () => {
+    const s = endingHitstun(bodyRadius(endingHitstun(EDGE_GAP).fighters[1]) + 0.05);
+    const next = stepMatch(s, [IDLE_INPUT, IDLE_INPUT]);
+    expect(next.fighters[1].action.kind).toBe(ActionKind.Idle);
+    expect(next.fighters[1].x).toBeCloseTo(s.fighters[1].x + PUSH * TICK_SECONDS, 6);
+  });
+
+  it('rings the fighter out when that slide crosses the edge', () => {
+    const s = endingHitstun(PUSH * TICK_SECONDS / 2);
+    const next = stepMatch(s, [IDLE_INPUT, IDLE_INPUT]);
+    expect(next.fighters[1].ringedOut).toBe(true);
   });
 });
