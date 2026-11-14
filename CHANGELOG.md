@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-11-14
+
 ### Added
 - Full screen on phones and tablets: the first tap hides the browser's bars where the browser allows it (Android,
   iPad), and a Full screen button on the title does the same or, on iPhone, explains Add to Home Screen.
