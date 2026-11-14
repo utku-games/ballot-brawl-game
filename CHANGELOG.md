@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-14
+
 ### Changed
 - Online: when a player switches away mid-fight, the fight holds (timer included) and both screens say
   "OPPONENT AWAY" until they return, instead of the absent fighter standing still and taking hits.
