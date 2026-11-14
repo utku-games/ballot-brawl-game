@@ -7,7 +7,9 @@ import { describe, expect, it } from 'vitest';
 import { ActionKind } from '../fight/fightTypes';
 import { MoveKind, MOVES } from '../fight/moves';
 import { FinisherStyle, Gesture } from '../roster/signatureTypes';
-import { frameFighters, MAX_DISTANCE, MIN_DISTANCE } from './cameraFraming';
+import { ARENA_HALF_WIDTH } from '../core/arena';
+import { FRAME_MARGIN, fovForAspect, frameFighters, MAX_DISTANCE, MIN_DISTANCE, TALL_FOV_DEGREES, WIDE_FOV_DEGREES } from './cameraFraming';
+import { NO_INSETS } from './screenInsets';
 import { RESTING_SPRING, kickSpring, stepSpring } from './headSpring';
 import { gesturePose } from './gesturePoses';
 import { launchArc, LAUNCH_SECONDS, ringOutDrop } from './poseLogic';
@@ -65,17 +67,49 @@ describe('head spring', () => {
 describe('frameFighters', () => {
   const fov = Math.PI / 4;
   it('centres on the fighters and clamps the distance', () => {
-    const f = frameFighters({ points: [{ x: -2, z: 0 }, { x: 4, z: 0 }], aspect: 16 / 9, fovY: fov });
+    const f = frameFighters({ points: [{ x: -2, z: 0 }, { x: 4, z: 0 }], aspect: 16 / 9, fovY: fov, insets: NO_INSETS });
     expect(f.targetX).toBe(1);
     expect(f.distance).toBeGreaterThanOrEqual(MIN_DISTANCE);
-    expect(frameFighters({ points: [{ x: -100, z: 0 }, { x: 100, z: 0 }], aspect: 1, fovY: fov }).distance).toBe(MAX_DISTANCE);
+    expect(frameFighters({ points: [{ x: -100, z: 0 }, { x: 100, z: 0 }], aspect: 16 / 9, fovY: fov, insets: NO_INSETS }).distance).toBe(MAX_DISTANCE);
   });
 
   it('pulls back further on a portrait screen', () => {
     const points = [{ x: -6, z: 0 }, { x: 6, z: 0 }];
-    const wide = frameFighters({ points, aspect: 16 / 9, fovY: fov }).distance;
-    const tall = frameFighters({ points, aspect: 9 / 16, fovY: fov }).distance;
+    const wide = frameFighters({ points, aspect: 16 / 9, fovY: fov, insets: NO_INSETS }).distance;
+    const tall = frameFighters({ points, aspect: 9 / 16, fovY: fov, insets: NO_INSETS }).distance;
     expect(tall).toBeGreaterThan(wide);
+  });
+
+  it('widens the view on portrait screens', () => {
+    expect(fovForAspect(16 / 9)).toBe(WIDE_FOV_DEGREES);
+    expect(fovForAspect(0.4)).toBe(TALL_FOV_DEGREES);
+    expect(fovForAspect(0.75)).toBeGreaterThan(WIDE_FOV_DEGREES);
+  });
+
+  it('fits fighters at both arena edges on a portrait phone with its controls', () => {
+    const aspect = 390 / 660;
+    const insets = { top: 0.1, bottom: 0.25, left: 0, right: 0 };
+    const fovY = (fovForAspect(aspect) * Math.PI) / 180;
+    const points = [{ x: -ARENA_HALF_WIDTH + 0.5, z: 2 }, { x: ARENA_HALF_WIDTH - 0.5, z: -2 }];
+    const f = frameFighters({ points, aspect, fovY, insets });
+    const visibleHalfWidth = f.distance * Math.tan(fovY / 2) * aspect;
+    expect(visibleHalfWidth).toBeGreaterThanOrEqual(ARENA_HALF_WIDTH - 0.5 + FRAME_MARGIN - 1e-6);
+  });
+
+  it('keeps the old framing with no insets and leaves room for covered areas', () => {
+    const points = [{ x: -6, z: 0 }, { x: 6, z: 0 }];
+    const base = { points, aspect: 16 / 9, fovY: fov };
+    const clear = frameFighters({ ...base, insets: NO_INSETS });
+    expect(clear.pitchShift).toBeCloseTo(0);
+    expect(clear.yawShift).toBeCloseTo(0);
+    const right = frameFighters({ ...base, insets: { ...NO_INSETS, right: 0.3 } });
+    expect(right.distance).toBeGreaterThan(clear.distance);
+    expect(right.yawShift).toBeLessThan(0);
+    const bottom = frameFighters({ ...base, aspect: 9 / 16, insets: { ...NO_INSETS, bottom: 0.3 } });
+    expect(bottom.pitchShift).toBeLessThan(0);
+    const top = frameFighters({ ...base, insets: { ...NO_INSETS, top: 0.3 } });
+    expect(top.pitchShift).toBeGreaterThan(0);
+    expect(top.distance).toBeGreaterThanOrEqual(clear.distance);
   });
 });
 

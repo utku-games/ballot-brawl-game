@@ -23,6 +23,7 @@ import { Hud } from '../ui/hud';
 import { PLAYER_COLORS } from '../ui/theme';
 import type { TouchControls } from '../ui/touchControls';
 import { MatchView } from '../view/matchView';
+import { screenInsets } from '../view/screenInsets';
 import { playerSlots, updateAssignment } from './controlAssignment';
 import { NetRole, type MatchNet } from './matchNet';
 import { buildMatchSetup, cpuLevels, initialAssignment, type MatchPlan } from './matchPlan';
@@ -53,6 +54,8 @@ const SLOWMO_SECONDS = 0.9;
 const SLOWMO_SCALE = 0.3;
 /** Normal arena light, used outside the fight itself (intro, knockout outro, result screen). */
 const FULL_LIGHT = 1;
+/** Seconds between measurements of the screen areas the HUD and touch buttons cover. */
+const INSETS_EVERY_SECONDS = 1;
 const AWAY_BANNER = 'OPPONENT AWAY';
 const BACK_BANNER = 'FIGHT!';
 const PLAYERS: readonly PlayerId[] = [PlayerId.One, PlayerId.Two];
@@ -81,6 +84,8 @@ export class MatchSession {
   private finished = false;
   /** True while an online fight is held because the other player's page is hidden. */
   private held = false;
+  /** Seconds until the covered screen areas are measured again; 0 measures on the next frame. */
+  private insetsIn = 0;
   paused = false;
 
   constructor(plan: MatchPlan, private readonly deps: SessionDeps, private readonly onEnd: (o: MatchOutcome) => void, private readonly onPause: () => void) {
@@ -201,9 +206,19 @@ export class MatchSession {
     return plan.alpha;
   }
 
+  /** Tells the camera which screen areas the HUD and touch buttons cover, once a second (they move on resize). */
+  private measureInsets(dt: number): void {
+    this.insetsIn -= dt;
+    if (this.insetsIn > 0) return;
+    this.insetsIn = INSETS_EVERY_SECONDS;
+    const controls = this.deps.touch?.coveredRect() ?? null;
+    this.view.setInsets(screenInsets(window.innerWidth, window.innerHeight, this.hud.bottomEdge(), controls));
+  }
+
   /** Advances the session by one rendered frame. */
   frame(dt: number, frames: Readonly<Record<PlayerId, ControlFrame>>): void {
     if (this.finished) return;
+    this.measureInsets(dt);
     if (PLAYERS.some((p) => frames[p].pause) && !this.paused && this.outro < 0) {
       this.paused = true;
       this.onPause();

@@ -1,5 +1,5 @@
 /**
- * Smaller overlay screens: the pause menu, the brawl result with its Share button, and the credits list.
+ * Smaller screens: the pause menu, the brawl result with its Share button, the credits list and the full screen help.
  * Credits show every face with its source, author and licence, generated from the face pipeline's credits file.
  * All of them are built from the shared screen kit so they look and navigate like the rest of the menus.
  */
@@ -47,6 +47,22 @@ function link(parent: HTMLElement, text: string, href: string): void {
   a.href = href;
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
+}
+
+const FULLSCREEN_HELP = [
+  'This browser cannot hide its bars for a web page.',
+  'On iPhone: tap Share, then Add to Home Screen, and open Ballot Brawl from your home screen. It opens full screen.',
+  'Turning the phone sideways also gives the fight more room.',
+] as const;
+
+/** Explains how to play full screen where the browser cannot do it directly (iPhone Safari). */
+export function fullscreenHelpScreen(parent: HTMLElement, onBack: () => void): Screen {
+  const root = openScreen(parent, false);
+  make('h2', '', 'Full screen', root);
+  for (const line of FULLSCREEN_HELP) make('p', '', line, root);
+  button(root, 'Back', onBack, 'primary');
+  focusFirst(root);
+  return { root };
 }
 
 export function creditsScreen(parent: HTMLElement, onBack: () => void): Screen {

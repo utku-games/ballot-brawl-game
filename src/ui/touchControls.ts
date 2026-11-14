@@ -7,6 +7,7 @@
 import { make } from '@utku/engine';
 import { EMPTY_FRAME, type ControlFrame } from '../input/controlFrame';
 import { inStickZone, knobOffset, stickVector, type ScreenPoint } from '../input/touchLogic';
+import type { ScreenRect } from '../view/screenInsets';
 import { injectStyle } from './injectStyle';
 import { TOUCH_CSS } from './touchStyles';
 
@@ -18,6 +19,8 @@ export class TouchControls {
   private readonly knob: HTMLElement;
   private readonly finisher: HTMLElement;
   private readonly swapButton: HTMLElement;
+  private readonly pad: HTMLElement;
+  private readonly taunt: HTMLElement;
   private stickId: number | null = null;
   private anchor: ScreenPoint = { x: 0, y: 0 };
   private thumb: ScreenPoint = { x: 0, y: 0 };
@@ -31,17 +34,30 @@ export class TouchControls {
     this.knob = make('div', 'touch-knob', null, this.stick);
     make('div', 'touch-hint', 'Drag here to move', this.root);
     const pad = make('div', 'touch-pad', null, this.root);
+    this.pad = pad;
     this.finisher = this.button(pad, 'touch-btn finisher', 'FINISH', 'special');
     this.holdButton(pad, 'touch-btn defend', 'DEFEND');
     this.button(pad, 'touch-btn kick', 'KICK', 'kick');
     this.button(pad, 'touch-btn punch', 'PUNCH', 'punch');
-    this.button(this.root, 'touch-btn touch-small touch-taunt', 'TAUNT', 'taunt');
+    this.taunt = this.button(this.root, 'touch-btn touch-small touch-taunt', 'TAUNT', 'taunt');
     this.swapButton = this.button(this.root, 'touch-btn touch-small touch-swap', 'SWAP', 'swap');
     this.button(this.root, 'touch-btn touch-small touch-pause', 'II', 'pause');
     this.root.addEventListener('pointerdown', (e) => this.stickDown(e));
     this.root.addEventListener('pointermove', (e) => this.stickMove(e));
     this.root.addEventListener('pointerup', (e) => this.stickUp(e));
     this.root.addEventListener('pointercancel', (e) => this.stickUp(e));
+  }
+
+  /** The screen rectangle the fight buttons cover (pad, Taunt and Swap), or null while the controls are hidden. */
+  coveredRect(): ScreenRect | null {
+    const rects = [this.pad, this.taunt, this.swapButton].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0 && r.height > 0);
+    if (rects.length === 0) return null;
+    return {
+      left: Math.min(...rects.map((r) => r.left)),
+      top: Math.min(...rects.map((r) => r.top)),
+      right: Math.max(...rects.map((r) => r.right)),
+      bottom: Math.max(...rects.map((r) => r.bottom)),
+    };
   }
 
   private button(parent: HTMLElement, cls: string, label: string, action: Action): HTMLElement {
