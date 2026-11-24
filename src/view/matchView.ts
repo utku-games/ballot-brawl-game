@@ -24,6 +24,7 @@ import { Mood } from './poseLogic';
 import { ProjectileView } from './projectileView';
 import { ExtrasView } from './extrasView';
 import { HAZARD_SOURCE } from '../fight/hazards';
+import { useArenaEnvironment } from './renderLook';
 
 /** Floor ring colour per side: blue, red, then green and gold for party free-for-alls; mirrored by the HUD theme. */
 export const TEAM_COLORS: readonly [number, number, number, number] = [0x3a8dff, 0xff4a4a, 0x3ac86a, 0xf2c23a];
@@ -58,7 +59,7 @@ export class MatchView {
   private firstFrame = true;
 
   constructor(private readonly view: GameRenderer, state: Readonly<MatchState>, arena: ArenaKind) {
-    view.setEnvironment(ARENA_STYLES[arena].environment);
+    useArenaEnvironment(view, ARENA_STYLES[arena].environment);
     this.arena = buildArena(arena);
     view.scene.add(this.arena);
     for (const f of state.fighters) {

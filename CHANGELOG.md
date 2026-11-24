@@ -5,6 +5,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-24
+
+### Fixed
+- Arena lighting: the sun now shines from each arena's own direction, so fighters and props cast real shadows.
+  Before, the game never aimed the sun, so it shone straight down from just above the floor and fighters cast no sun
+  shadows.
+
+### Changed
+- Sharper, softer-edged shadows sized to the arena, a gentle colour grade (a little more colour and contrast, darker
+  corners), a faint rim light that lifts fighters off the dark backdrops, and a higher bloom threshold so white walls
+  and statues no longer glow (`src/view/renderLook.ts`).
+- Engine updated from 0.2.0 to 0.5.0, now installed from `utku-games/utku-engine`. The new render features are
+  opt-in, so the game looks the same: lineup screenshots match the previous build.
+
 ## [0.16.0] - 2026-11-14
 
 ### Added

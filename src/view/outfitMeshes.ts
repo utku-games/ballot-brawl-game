@@ -9,6 +9,7 @@ import { RigBuildError } from '../core/errors';
 import { Build, Headwear, Neckwear, Outfit, Prop } from '../roster/lookTypes';
 import type { FighterLook } from '../roster/rosterTypes';
 import { Anchor, ColorSlot, Shape, type Paint, type PartSpec } from './partSpec';
+import { addFighterRim } from './renderLook';
 
 const ROUGHNESS = 0.7;
 /** Trousers are the main colour darkened by this factor. */
@@ -36,6 +37,7 @@ export class MaterialSet {
     let m = this.byColor.get(color);
     if (!m) {
       m = new THREE.MeshStandardMaterial({ color, roughness: ROUGHNESS });
+      addFighterRim(m);
       this.byColor.set(color, m);
     }
     return m;
