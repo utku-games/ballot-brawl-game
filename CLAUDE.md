@@ -16,7 +16,7 @@ npm run deploy:preview       # build and publish a Vercel preview (after `npx ve
 ## Architecture
 
 `ARCHITECTURE.md` is the binding contract between subsystems and lists the allowed import directions.
-Generic code lives in the shared engine `@utku/engine` (private repo `UttyWotty/utku-engine`, pinned by
+Generic code lives in the shared engine `@utku/engine` (private repo `utku-games/utku-engine`, pinned by
 tag); never copy engine code into this repo.
 
 ## Conventions

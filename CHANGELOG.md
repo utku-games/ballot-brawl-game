@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Engine updated from 0.2.0 to 0.5.0, now installed from `utku-games/utku-engine`. The new render features are
+  opt-in, so the game looks the same: lineup screenshots match the previous build.
+
 ## [0.16.0] - 2026-11-14
 
 ### Added
