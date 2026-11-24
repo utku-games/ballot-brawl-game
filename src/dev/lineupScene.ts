@@ -12,6 +12,7 @@ import { fightersIn } from '../roster/roster';
 import { Category } from '../roster/rosterTypes';
 import { ARENA_FOR_CATEGORY, ARENA_STYLES } from '../view/arenaKinds';
 import { buildArena } from '../view/arenaModels';
+import { applyRenderLook, useArenaEnvironment } from '../view/renderLook';
 import { faceTexture } from '../view/faceTextures';
 import { buildFighterRig, setFall, type FighterRig } from '../view/fighterModel';
 import { ActionKind } from '../fight/fightTypes';
@@ -83,7 +84,8 @@ function start(): void {
   const half = Number(params.get('half') ?? '0');
   const view = createGameRenderer(container);
   const arena = ARENA_FOR_CATEGORY[category];
-  view.setEnvironment(ARENA_STYLES[arena].environment);
+  applyRenderLook(view);
+  useArenaEnvironment(view, ARENA_STYLES[arena].environment);
   view.scene.add(buildArena(arena));
   const defs = fightersIn(category).slice(half * COLUMNS, (half + 1) * COLUMNS);
   const rigs = fightersIn(category).slice(half * COLUMNS, (half + 1) * COLUMNS).map((def, i) => {
