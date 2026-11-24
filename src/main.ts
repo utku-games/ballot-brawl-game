@@ -12,6 +12,7 @@ import { InputHub } from './input/inputHub';
 import { parseShareTarget } from './share/shareLink';
 import { canGoFullscreen, enterFullscreen } from './ui/fullscreen';
 import { TouchControls } from './ui/touchControls';
+import { applyRenderLook } from './view/renderLook';
 
 const APP_ELEMENT_ID = 'app';
 const MS_PER_SECOND = 1000;
@@ -20,6 +21,7 @@ const MAX_FRAME_SECONDS = 0.1;
 const container = document.getElementById(APP_ELEMENT_ID);
 if (!container) throw new PlatformError(`Missing #${APP_ELEMENT_ID} element`);
 const renderer = createGameRenderer(container);
+applyRenderLook(renderer);
 const hub = new InputHub(window);
 const audio = new GameAudio();
 const touch = new TouchControls(container);

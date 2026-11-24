@@ -7,6 +7,7 @@ import type { GameRenderer } from '@utku/engine';
 import * as THREE from 'three';
 import { ARENA_STYLES, type ArenaKind } from './arenaKinds';
 import { buildArena, disposeArena } from './arenaModels';
+import { useArenaEnvironment } from './renderLook';
 
 const ORBIT_RADIUS = 13;
 const ORBIT_HEIGHT = 5.5;
@@ -27,7 +28,7 @@ export class MenuBackdrop {
     this.kind = kind;
     this.arena = buildArena(kind);
     this.view.scene.add(this.arena);
-    this.view.setEnvironment(ARENA_STYLES[kind].environment);
+    useArenaEnvironment(this.view, ARENA_STYLES[kind].environment);
   }
 
   hide(): void {
