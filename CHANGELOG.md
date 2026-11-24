@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-24
+
 ### Fixed
 - Arena lighting: the sun now shines from each arena's own direction, so fighters and props cast real shadows.
   Before, the game never aimed the sun, so it shone straight down from just above the floor and fighters cast no sun
