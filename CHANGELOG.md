@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Fighters are glossy vinyl toy figures (hands and neck in skin) instead of matte plastic, using the engine's surface
+  presets (utku-engine 0.6.0).
+- Arenas use real surfaces: wooden planks in The Chamber, polished marble tiles and columns in The Grand Gallery, a
+  satin-gloss grid floor on The Trading Floor, a glossy studio floor, paving on The Rooftop, and gold metal trim. Screens
+  and tickers glow in saturated colour. Each arena shares one small set of materials.
+- Upgraded utku-engine to 0.6.0. Its quality governor now takes back a step down that does not speed frames up.
+
 ## [0.17.0] - 2026-11-24
 
 ### Fixed
