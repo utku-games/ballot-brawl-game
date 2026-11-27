@@ -37,7 +37,7 @@ import { ARENA_FOR_CATEGORY, ArenaKind } from '../view/arenaKinds';
 import { MenuBackdrop } from '../view/menuBackdrop';
 import { defaultBrawl, defaultParty, RANDOM_FIGHTER, setFighter, toMatchPlan, type BrawlConfig } from './brawlConfig';
 import type { MatchNet } from './matchNet';
-import type { MatchPlan } from './matchPlan';
+import { usesPlayerTwo, type MatchPlan } from './matchPlan';
 import { MatchSession, type MatchOutcome } from './matchSession';
 import { OnlineFlow } from './onlineFlow';
 import { rivalryMatchPlan, RivalrySide } from './rivalryPlan';
@@ -195,11 +195,7 @@ export class GameApp {
   private endSession(): void {
     this.session?.dispose();
     this.session = null;
-    this.setTouchVisible(false);
-  }
-
-  private setTouchVisible(visible: boolean): void {
-    this.controls.setInMatch(visible);
+    this.controls.setInMatch(false, false);
   }
 
   private startMatch(plan: MatchPlan, onEnd: (o: MatchOutcome) => void): void {
@@ -213,10 +209,10 @@ export class GameApp {
     this.endSession();
     this.backdrop.hide();
     this.deps.hub.flush();
-    this.setTouchVisible(true);
+    this.controls.setInMatch(true, net === null && usesPlayerTwo(plan));
     const deps = { renderer: this.deps.renderer, hudParent: this.deps.container, audio: this.deps.audio, touch: this.deps.touch, net };
     this.session = new MatchSession(plan, deps, (o) => {
-      this.setTouchVisible(false);
+      this.controls.setInMatch(false, false);
       onEnd(o);
     }, () => this.showOverlay((p) => pauseScreen(p, () => this.resume(), onQuit)));
   }

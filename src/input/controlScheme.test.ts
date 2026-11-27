@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { EMPTY_FRAME } from './controlFrame';
 import {
-  CONTROL_LEGENDS, ControlScheme, DEFAULT_SCHEME, frameIsActive, InputDevice, nextScheme, parseScheme, resolveDevice, SCHEME_ORDER, schemeLabel,
+  CONTROL_LEGENDS, controlLegend, ControlScheme, DEFAULT_SCHEME, frameIsActive, InputDevice, nextScheme, parseScheme, resolveDevice, SCHEME_ORDER, schemeLabel,
 } from './controlScheme';
 
 describe('control scheme setting', () => {
@@ -47,6 +47,24 @@ describe('resolveDevice', () => {
     expect(CONTROL_LEGENDS[InputDevice.Touch]).toBeNull();
     expect(CONTROL_LEGENDS[InputDevice.Keyboard]).toContain('J punch');
     expect(CONTROL_LEGENDS[InputDevice.Gamepad]).toContain('Y special');
+  });
+});
+
+describe('controlLegend', () => {
+  it('shows Player 1 alone in one-player matches', () => {
+    expect(controlLegend(InputDevice.Keyboard, false)).toBe(CONTROL_LEGENDS[InputDevice.Keyboard]);
+    expect(controlLegend(InputDevice.Gamepad, false)).toBe(CONTROL_LEGENDS[InputDevice.Gamepad]);
+  });
+
+  it('adds Player 2 when two players share the device', () => {
+    const keys = controlLegend(InputDevice.Keyboard, true) ?? '';
+    expect(keys.split('\n')).toEqual([`P1  ${CONTROL_LEGENDS[InputDevice.Keyboard]}`, expect.stringContaining('Arrows move')]);
+    expect(keys).toContain('R-Shift special');
+    expect(controlLegend(InputDevice.Gamepad, true)).toContain('P2 pad 2');
+  });
+
+  it('never shows a legend for touch', () => {
+    expect(controlLegend(InputDevice.Touch, true)).toBeNull();
   });
 });
 

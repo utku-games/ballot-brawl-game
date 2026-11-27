@@ -5,6 +5,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.22.1] - 2026-11-27
+
+### Fixed
+
+- The controls legend shows both players' keys in local two-player matches (Player 2: arrows with comma, period,
+  slash, right Shift, semicolon and quote), and notes that the second gamepad drives Player 2. Online matches keep
+  one line for the player on this device.
+
 ## [0.22.0] - 2026-11-27
 
 ### Added
