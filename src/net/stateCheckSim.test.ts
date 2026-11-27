@@ -15,10 +15,10 @@ import { ROSTER } from '../roster/roster';
 import { ArenaKind } from '../view/arenaKinds';
 import { checkState } from './stateCheck';
 
-const GAMES = 6;
+const GAMES = 8;
 const TICKS = 12000;
 const MOVE_RANGE = 2;
-/** Six 12000-tick matches take about 2 s alone but can pass 5 s when the whole suite and a type check share the CPU. */
+/** Eight 12000-tick matches (enough for a projectile now that chasing punches become charge moves) take about 3 s alone but can pass 5 s when the whole suite and a type check share the CPU. */
 const LONG_SIMULATION_TIMEOUT_MS = 20000;
 
 function randomInput(r: () => number, s: MatchState, me: number): FighterInput {

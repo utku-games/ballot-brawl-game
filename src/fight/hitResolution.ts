@@ -97,7 +97,7 @@ function applyHit(c: Contact, events: FightEvent[]): void {
     t.action = action(ActionKind.KnockedOut, 0);
     knock *= KNOCKDOWN_KNOCKBACK_SCALE;
     events.push({ kind: 'ko', target: t.slotId, by: c.attacker.slotId });
-  } else if (t.combo >= KNOCKDOWN_COMBO || c.move === MoveKind.Finisher) {
+  } else if (t.combo >= KNOCKDOWN_COMBO || data.knockdown) {
     t.action = action(ActionKind.Knockdown, KNOCKDOWN_TICKS);
     t.combo = 0;
     knock *= KNOCKDOWN_KNOCKBACK_SCALE;

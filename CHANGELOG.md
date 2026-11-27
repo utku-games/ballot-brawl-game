@@ -5,6 +5,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-27
+
+### Added
+
+- Directional moves: Punch or Kick while moving toward the opponent performs a charge move (flying punch, headbutt,
+  shoulder charge, dropkick, bicycle kick, slide kick), and while moving away an evasive move (uppercut, spinning
+  backfist, backflip kick, spin kick). Charge moves dash in and hit harder, evasive moves back off while they swing,
+  dropkicks and slide kicks knock down. Each fighter gets one of four kits (Bruiser, Acrobat, Brawler, Trickster)
+  from their stats, and the CPU uses them too. Flips and spins are animated.
+
+### Changed
+
+- Online play needs both players on this version (protocol 5), since matches now stream the new move kinds.
+
 ## [0.19.0] - 2026-11-27
 
 ### Added

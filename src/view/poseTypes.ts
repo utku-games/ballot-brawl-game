@@ -16,11 +16,15 @@ export interface Pose {
   bob: number;
   /** Sideways head tilt, radians. */
   tilt: number;
+  /** Whole-body pitch on top of the fall, radians: positive somersaults forward, negative flips backwards. */
+  flip: number;
+  /** Whole-body turn about the vertical axis, radians (spinning moves). */
+  spin: number;
 }
 
 /** Arms held slightly forward, ready to fight. */
 export const GUARD_ARM = 0.35;
 
 export const STANDING_POSE: Readonly<Pose> = {
-  armL: GUARD_ARM, armR: GUARD_ARM, legL: 0, legR: 0, lean: 0, fall: 0, bob: 0, tilt: 0,
+  armL: GUARD_ARM, armR: GUARD_ARM, legL: 0, legR: 0, lean: 0, fall: 0, bob: 0, tilt: 0, flip: 0, spin: 0,
 };

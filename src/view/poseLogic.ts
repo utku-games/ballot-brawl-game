@@ -8,6 +8,7 @@ import { ActionKind } from '../fight/fightTypes';
 import { MoveKind, moveData, type MoveData } from '../fight/moves';
 import { FinisherStyle, type Gesture } from '../roster/signatureTypes';
 import { gesturePose } from './gesturePoses';
+import { directionalPose, isDirectionalMove } from './movePoses';
 import { GUARD_ARM, STANDING_POSE, type Pose } from './poseTypes';
 
 export { STANDING_POSE, type Pose } from './poseTypes';
@@ -98,6 +99,7 @@ function finisherPose(style: FinisherStyle, frame: number): Pose {
 }
 
 function attackPose(move: MoveKind, frame: number, style: FinisherStyle): Pose {
+  if (isDirectionalMove(move)) return directionalPose(move, frame);
   const m = moveData(move, style);
   if (move === MoveKind.Punch) {
     return { ...STANDING_POSE, armR: swing(m, frame, -0.5, 1.6, GUARD_ARM), lean: swing(m, frame, -0.1, 0.25, 0) };
