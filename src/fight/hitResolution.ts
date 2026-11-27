@@ -118,8 +118,13 @@ function countering(f: Readonly<FighterState>): boolean {
   return data.counter && isActiveFrame(data, f.action.frame);
 }
 
-/** Turns an attack that landed on a counter stance back on its attacker, with the counter's own damage and knockdown. */
+/**
+ * Turns an attack that landed on a counter stance back on its attacker, with the counter's own damage and knockdown.
+ * The stance always absorbs the hit; it only strikes back when the attacker can be hit, since a projectile's thrower
+ * may already be knocked out, down or invulnerable while getting up.
+ */
 function applyCounter(c: Contact, events: FightEvent[]): void {
+  if (!canBeHit(c.attacker)) return;
   const counter = c.target.action.move as MoveKind;
   c.target.action.hitIds.push(c.attacker.slotId);
   events.push({ kind: 'swing', attacker: c.target.slotId, move: counter });
