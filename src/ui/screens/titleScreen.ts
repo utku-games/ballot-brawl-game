@@ -19,9 +19,9 @@ export interface TitleActions {
 }
 
 const DISCLAIMER = 'Unofficial parody. Not affiliated with or endorsed by anyone depicted. No gore: losers just fall over.';
-const KEYS_HINT = 'P1: WASD move, J punch, K kick, L defend, I finisher, H taunt, U swap. P2: arrows and , . / Shift ; \' . Gamepads work too.';
-const BUTTONS_HINT = 'Or use the on-screen buttons: drag the left side to move; Punch, Kick, Defend, Finisher and Taunt on the right.';
-const MOVES_HINT = 'Punch or Kick while moving toward your rival for a charge move (flying punch, dropkick...), or away for an evasive one (backflip kick, spin kick...).';
+const KEYS_HINT = 'P1: WASD move, J punch, K kick, L defend, I special (finisher when the meter is full), H taunt, U swap. P2: arrows and , . / Shift ; \' . Gamepads work too.';
+const BUTTONS_HINT = 'Or use the on-screen buttons: drag the left side to move; Punch, Kick, Defend, Special and Taunt on the right.';
+const MOVES_HINT = 'Punch or Kick while moving toward your rival for a charge move (flying punch, dropkick...), or away for an evasive one (backflip kick, spin kick...). Special fires your signature move, then recharges.';
 
 /** offerFullscreen shows the Full screen button (touch devices not yet full screen). */
 export function titleScreen(parent: HTMLElement, actions: TitleActions, muted: boolean, touch: boolean, offerFullscreen: boolean): Screen {

@@ -1,6 +1,6 @@
 /**
  * The vocabulary of attacks: every move kind, its family (punch or kick, for sounds and hit effects), and the frame-data shape all moves share.
- * Directional moves also carry their body motion: a dash along the facing (negative backs away) during startup or active frames, and whether a hit knocks down.
+ * Moves also carry their body motion (a dash along the facing, negative backs away, during startup or active frames) and how they land: knockdowns, repeat hits, going through a block, or countering.
  * Pure types and constants; moves.ts holds the numbers.
  */
 
@@ -20,6 +20,13 @@ export enum MoveKind {
   SpinningBackfist = 'spinningBackfist',
   BackflipKick = 'backflipKick',
   SpinKick = 'spinKick',
+  Bite = 'bite',
+  Bullrush = 'bullrush',
+  LeapSlam = 'leapSlam',
+  Tornado = 'tornado',
+  Counter = 'counter',
+  Shockwave = 'shockwave',
+  Grab = 'grab',
 }
 
 /** Which basic attack a move sounds and lands like. */
@@ -56,6 +63,12 @@ export interface MoveData {
   dashPhase: DashPhase;
   /** True when a clean hit knocks the target down. */
   knockdown: boolean;
+  /** Active ticks between repeated hits on the same target; 0 hits each target once. */
+  rehitEvery: number;
+  /** True when the move goes through a block (grabs). */
+  beatsGuard: boolean;
+  /** True for a counter stance: it never hits by itself, but turns an attack landing during its active frames back on the attacker. */
+  counter: boolean;
 }
 
 /** Cosines of the arc half-angles moves use. */
@@ -65,5 +78,10 @@ export const ARC_FINISHER = Math.cos((Math.PI * 5) / 12);
 /** Every direction counts as inside the arc. */
 export const ARC_FULL = -1;
 
-/** The motion fields of a move that stays in place and does not knock down. */
-export const STILL: Pick<MoveData, 'dash' | 'dashPhase' | 'knockdown'> = { dash: 0, dashPhase: DashPhase.Active, knockdown: false };
+/** How an ordinary hit lands: once per target, blockable, not a counter. */
+export const PLAIN_HIT: Pick<MoveData, 'rehitEvery' | 'beatsGuard' | 'counter'> = { rehitEvery: 0, beatsGuard: false, counter: false };
+
+/** A move that stays in place, does not knock down and lands as an ordinary hit. */
+export const STILL: Pick<MoveData, 'dash' | 'dashPhase' | 'knockdown' | 'rehitEvery' | 'beatsGuard' | 'counter'> = {
+  dash: 0, dashPhase: DashPhase.Active, knockdown: false, ...PLAIN_HIT,
+};

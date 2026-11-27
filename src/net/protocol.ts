@@ -10,8 +10,8 @@ import type { ControlFrame } from '../input/controlFrame';
 import { ROSTER } from '../roster/roster';
 import { ArenaKind } from '../view/arenaKinds';
 
-/** Bumped whenever a message or the match state changes shape; both sides must match. 5: snapshots carry the directional move kinds. */
-export const PROTOCOL_VERSION = 5;
+/** Bumped whenever a message or the match state changes shape; both sides must match. 6: signature specials and their cooldown. */
+export const PROTOCOL_VERSION = 6;
 
 export enum MsgKind {
   Hello = 'hello',

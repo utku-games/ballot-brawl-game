@@ -21,6 +21,8 @@ export interface AiProfile {
   focusWeakest: boolean;
   /** Chance to lunge in with a charge move just outside reach, or swing an evasive move while backing off. */
   variantChance: number;
+  /** Chance to fire a recharged signature special when it would reach (or, for a counter, when attacked). */
+  specialChance: number;
 }
 
 export enum Difficulty {
@@ -38,10 +40,10 @@ export const DIFFICULTY_LEVEL: Readonly<Record<Difficulty, number>> = {
 type TunedFields = Omit<AiProfile, 'focusWeakest'>;
 
 const EASIEST: Readonly<TunedFields> = {
-  reactionTicks: 32, attackChance: 0.3, defendChance: 0.1, kickBias: 0.25, finisherChance: 0.2, retreatGuard: 0, variantChance: 0.1,
+  reactionTicks: 32, attackChance: 0.3, defendChance: 0.1, kickBias: 0.25, finisherChance: 0.2, retreatGuard: 0, variantChance: 0.1, specialChance: 0.15,
 };
 const HARDEST: Readonly<TunedFields> = {
-  reactionTicks: 6, attackChance: 0.85, defendChance: 0.75, kickBias: 0.45, finisherChance: 0.95, retreatGuard: 0.3, variantChance: 0.45,
+  reactionTicks: 6, attackChance: 0.85, defendChance: 0.75, kickBias: 0.45, finisherChance: 0.95, retreatGuard: 0.3, variantChance: 0.45, specialChance: 0.6,
 };
 /** Skill level from which the CPU starts picking on the weakest enemy. */
 const FOCUS_WEAKEST_LEVEL = 0.6;
@@ -61,6 +63,7 @@ export function profileForLevel(level: number): AiProfile {
     finisherChance: lerp(EASIEST.finisherChance, HARDEST.finisherChance, t),
     retreatGuard: lerp(EASIEST.retreatGuard, HARDEST.retreatGuard, t),
     variantChance: lerp(EASIEST.variantChance, HARDEST.variantChance, t),
+    specialChance: lerp(EASIEST.specialChance, HARDEST.specialChance, t),
     focusWeakest: t >= FOCUS_WEAKEST_LEVEL,
   };
 }

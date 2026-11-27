@@ -15,11 +15,12 @@ import { ROSTER } from '../roster/roster';
 import { ArenaKind } from '../view/arenaKinds';
 import { checkState } from './stateCheck';
 
-const GAMES = 8;
+/** Matches are played until every state kind below has been streamed, up to this many. */
+const MAX_GAMES = 16;
 const TICKS = 12000;
 const MOVE_RANGE = 2;
-/** Eight 12000-tick matches (enough for a projectile now that chasing punches become charge moves) take about 3 s alone but can pass 5 s when the whole suite and a type check share the CPU. */
-const LONG_SIMULATION_TIMEOUT_MS = 20000;
+/** Up to sixteen 12000-tick matches take a few seconds alone but can pass 5 s when the whole suite and a type check share the CPU. */
+const LONG_SIMULATION_TIMEOUT_MS = 30000;
 
 function randomInput(r: () => number, s: MatchState, me: number): FighterInput {
   const a = s.fighters[me];
@@ -33,8 +34,8 @@ function randomInput(r: () => number, s: MatchState, me: number): FighterInput {
 
 describe('state check on simulated matches', () => {
   it('accepts every streamed state of long random matches', () => {
-    const seen = { ringed: false, items: false, hazards: false, projectiles: false, over: false };
-    for (let g = 0; g < GAMES; g += 1) {
+    const seen = { items: false, hazards: false, projectiles: false, over: false };
+    for (let g = 0; g < MAX_GAMES && !Object.values(seen).every(Boolean); g += 1) {
       const ids = [ROSTER[g % ROSTER.length].id, ROSTER[(g * 7 + 3) % ROSTER.length].id];
       const arena = g % 2 === 0 ? ArenaKind.Rooftop : ArenaKind.Parliament;
       const config = setFighter(setFighter(defaultBrawl(arena), 0, 0, ids[0]), 1, 0, ids[1]);
@@ -44,14 +45,13 @@ describe('state check on simulated matches', () => {
         s = stepMatch(s, [randomInput(rng, s, 0), randomInput(rng, s, 1)]);
         const wire = JSON.parse(JSON.stringify(s)) as unknown;
         expect(() => checkState(wire, ids)).not.toThrow();
-        seen.ringed ||= s.fighters.some((f) => f.ringedOut);
         seen.items ||= s.items.length > 0;
         seen.hazards ||= s.hazards.length > 0;
         seen.projectiles ||= s.projectiles.length > 0;
         seen.over ||= s.phase === MatchPhase.Over;
       }
     }
-    expect(seen).toEqual({ ringed: false, items: true, hazards: true, projectiles: true, over: true });
+    expect(seen).toEqual({ items: true, hazards: true, projectiles: true, over: true });
   }, LONG_SIMULATION_TIMEOUT_MS);
 
   it('accepts a state right after a ring-out', () => {

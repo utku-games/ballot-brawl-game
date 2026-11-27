@@ -12,6 +12,7 @@ import {
 } from './fightConstants';
 import type { CombatProfile } from './fightTypes';
 import { kitForStats } from './moveKits';
+import type { SpecialMove } from './specialLibrary';
 
 /** Extra multipliers a mode applies on top of the stats (story stages scale CPU damage). */
 export interface ProfileModifiers {
@@ -27,7 +28,7 @@ function checkStat(name: string, value: number): void {
   }
 }
 
-export function combatProfile(stats: Readonly<FighterStats>, mods: Readonly<ProfileModifiers>, finisher: FinisherStyle): CombatProfile {
+export function combatProfile(stats: Readonly<FighterStats>, mods: Readonly<ProfileModifiers>, finisher: FinisherStyle, special: SpecialMove): CombatProfile {
   checkStat('power', stats.power);
   checkStat('speed', stats.speed);
   checkStat('toughness', stats.toughness);
@@ -40,5 +41,6 @@ export function combatProfile(stats: Readonly<FighterStats>, mods: Readonly<Prof
     sizeScale: mods.boss ? BOSS_SIZE_SCALE : 1,
     finisher,
     kit: kitForStats(stats),
+    special,
   };
 }
