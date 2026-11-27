@@ -3,6 +3,7 @@
  * A MatchState holds every fighter of both teams; stepMatch turns it plus one FighterInput per fighter into the next state.
  * Events describe what happened during the last tick so the view, audio and HUD can react without diffing states.
  */
+import type { MoveKit } from './moveKits';
 import type { FinisherStyle } from '../roster/signatureTypes';
 import type { MoveKind } from './moves';
 
@@ -55,6 +56,8 @@ export interface CombatProfile {
   sizeScale: number;
   /** How this fighter's meter finisher plays. */
   finisher: FinisherStyle;
+  /** Which directional moves Punch and Kick become when walking toward or away. */
+  kit: MoveKit;
 }
 
 export interface FighterState {

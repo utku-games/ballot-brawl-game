@@ -168,6 +168,8 @@ export class FighterView {
     this.rig.legR.rotation.x = -pose.legR;
     this.rig.torso.rotation.x = pose.lean;
     setFall(this.rig, pose.fall);
+    this.rig.body.rotation.x += pose.flip;
+    this.rig.body.rotation.y = pose.spin;
     this.rig.body.position.y = pose.bob;
   }
 

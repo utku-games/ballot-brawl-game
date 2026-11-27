@@ -80,6 +80,17 @@ with those two fighters (bosses cannot be linked, so they stay unlocked only thr
 | Taunt | H | ; | B | Taunt button |
 | Swap teammate | U | ' | LB | Swap button |
 
+Punch or Kick while moving toward the opponent performs a charge move; while moving away, an evasive move; standing
+still (or moving sideways), the plain punch or kick. Each fighter's kit comes from their stats
+(`src/fight/moveKits.ts`):
+
+| Kit | Who | Toward + Punch | Away + Punch | Toward + Kick | Away + Kick |
+|---|---|---|---|---|---|
+| Bruiser | power 4+ (and not slower) | Headbutt | Uppercut | Shoulder charge | Spin kick |
+| Acrobat | speed 4+ | Flying punch | Spinning backfist | Bicycle kick | Backflip kick |
+| Brawler | toughness 4+ | Flying punch | Uppercut | Dropkick (knocks down) | Spin kick |
+| Trickster | everyone else | Flying punch | Spinning backfist | Slide kick (knocks down) | Backflip kick |
+
 ## Setup
 
 Requires Node 22 or newer and read access to the private engine repository.

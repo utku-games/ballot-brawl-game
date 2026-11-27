@@ -93,6 +93,26 @@ function approach(self: Readonly<FighterState>, target: Readonly<FighterState>):
   return { x: x / len, z: z / len };
 }
 
+/** Extra distance a charge move covers with its dash, meters, so the CPU starts one from a little outside reach. */
+const CHARGE_EXTRA_REACH = 1.4;
+
+/**
+ * A charge move when the target is just outside reach, or an evasive move when backing off with the target close; null otherwise.
+ * The stick points toward or away from the target, which is what turns Punch or Kick into the fighter's kit move.
+ */
+function directionalAttack(
+  self: Readonly<FighterState>, target: Readonly<FighterState>, dist: number, retreating: boolean,
+  kick: boolean, profile: Readonly<AiProfile>, rng: Rng,
+): FighterInput | null {
+  const reach = reachTo(self, target, kick ? MoveKind.Kick : MoveKind.Punch);
+  const charging = dist > reach && dist <= reach + CHARGE_EXTRA_REACH;
+  const evading = retreating && dist <= reach;
+  if (!(charging || evading) || rng() >= profile.variantChance) return null;
+  const sign = charging ? 1 : -1;
+  const len = dist || 1;
+  return { ...IDLE_INPUT, moveX: ((target.x - self.x) / len) * sign, moveZ: ((target.z - self.z) / len) * sign, punch: !kick, kick };
+}
+
 function decide(state: Readonly<MatchState>, self: Readonly<FighterState>, profile: Readonly<AiProfile>, rng: Rng): AiDecision {
   const memory: AiMemory = { ...FRESH_MEMORY, cooldown: profile.reactionTicks };
   const target = pickTarget(state, self, profile);
@@ -109,6 +129,8 @@ function decide(state: Readonly<MatchState>, self: Readonly<FighterState>, profi
     return { input: { ...IDLE_INPUT, punch: true }, memory };
   }
   const kick = rng() < profile.kickBias;
+  const variant = directionalAttack(self, target, dist, guardLow, kick, profile, rng);
+  if (variant) return { input: variant, memory };
   if (dist <= reachTo(self, target, kick ? MoveKind.Kick : MoveKind.Punch)) {
     if (rng() < profile.attackChance) return { input: { ...IDLE_INPUT, punch: !kick, kick }, memory };
     return { input: { ...IDLE_INPUT }, memory };
