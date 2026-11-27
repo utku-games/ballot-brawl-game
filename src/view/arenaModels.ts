@@ -31,12 +31,14 @@ const BUILDING_WIDTH = 4;
 const BUILDING_HEIGHT = 40;
 
 /**
- * Emissive strength of screens, tickers and stage lights. Their lit base colour is black, so only the emission shows and the colour
- * stays saturated; it sits just under the game's bloom threshold (1.6) so they do not wash out to white.
+ * Screens, tickers and stage lights only emit: a black, fully matte, non-reflective base, so no sky or sun reflection
+ * washes their colour toward white, and an emissive strength under the game's bloom threshold (1.6) keeps them saturated.
  */
-const SCREEN_GLOW = 1.4;
-/** Satin gold: rough enough that the sun's highlight on the trim stays under the bloom threshold. */
-const TRIM_ROUGHNESS = 0.5;
+const SCREEN_GLOW = 1;
+const SCREEN_ROUGHNESS = 1;
+const NO_REFLECTION = 0;
+/** Brushed gold: rough enough that the sun's reflection on the trim spreads out instead of blooming into a hotspot. */
+const TRIM_ROUGHNESS = 0.75;
 /** The picture inside a gallery frame. */
 const CANVAS_COLOR = 0x3a3a52;
 const BLACK = 0x000000;
@@ -72,7 +74,7 @@ function arenaMaterials(style: ArenaStyle): ArenaMaterials {
     glow: (color) => {
       let m = glows.get(color);
       if (!m) {
-        const screen = createSurfaceMaterial('glow', { color, emissiveIntensity: SCREEN_GLOW });
+        const screen = createSurfaceMaterial('glow', { color, emissiveIntensity: SCREEN_GLOW, roughness: SCREEN_ROUGHNESS, envMapIntensity: NO_REFLECTION });
         screen.color.setHex(BLACK);
         glows.set(color, (m = screen));
       }
