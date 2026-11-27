@@ -1,7 +1,7 @@
 /**
  * Tests for the four finisher styles: Smash keeps the original numbers, Rush dashes through enemies, Quake hits all
  * around and Throw has no melee contact of its own.
- * Every style still needs a full meter and empties it on use.
+ * Every style still needs a full meter and empties it on use (without one the button fires the signature special).
  * Each test builds a duel, gives the attacker a style and a full meter, and checks positions, hits and events.
  */
 import { describe, expect, it } from 'vitest';
@@ -69,7 +69,7 @@ describe('finisher styles', () => {
     for (const style of Object.values(FinisherStyle)) {
       const empty = duel(1.2);
       empty.fighters[0].profile = styled(style);
-      expect(tap(empty, 2, [SPECIAL, IDLE_INPUT]).events.some((e) => e.kind === 'swing'), style).toBe(false);
+      expect(tap(empty, 2, [SPECIAL, IDLE_INPUT]).events.some((e) => e.kind === 'swing' && e.move === MoveKind.Finisher), style).toBe(false);
       const { state } = tap(armed(duel(1.2), style), 2, [SPECIAL, IDLE_INPUT]);
       expect(state.fighters[0].meter, style).toBeLessThan(METER_MAX);
     }

@@ -4,6 +4,7 @@
  * any rivalry twist to both teams' combat profiles.
  * Keeping this pure means mode logic can be tested without rendering anything.
  */
+import { signatureSpecialOf } from '../roster/signatureSpecials';
 import { combatProfile } from '../fight/combatProfile';
 import type { TeamIndex } from '../fight/fightTypes';
 import type { MatchSetup, TeamEntry } from '../fight/matchSetup';
@@ -42,7 +43,7 @@ export const PLAIN_FIGHT: Readonly<Pick<MatchPlan, 'banner' | 'twist' | 'extras'
 
 function entry(slot: Readonly<SlotPlan>, twist: Twist): TeamEntry {
   const def = fighterById(slot.fighterId);
-  const base = combatProfile(def.stats, { boss: slot.boss, damageScale: slot.damageScale }, def.signature.style);
+  const base = combatProfile(def.stats, { boss: slot.boss, damageScale: slot.damageScale }, def.signature.style, signatureSpecialOf(def.id).move);
   const mods = twistModifiers(twist);
   return {
     fighterId: slot.fighterId,

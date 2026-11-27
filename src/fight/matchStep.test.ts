@@ -79,9 +79,10 @@ describe('defending', () => {
 });
 
 describe('finisher', () => {
-  it('needs a full meter', () => {
+  it('needs a full meter (without one the button fires the signature special instead)', () => {
     const { events } = tap(duel(CLOSE), 2, [SPECIAL, IDLE_INPUT]);
-    expect(events.some((e) => e.kind === 'swing')).toBe(false);
+    expect(events.some((e) => e.kind === 'swing' && e.move === MoveKind.Finisher)).toBe(false);
+    expect(events.some((e) => e.kind === 'swing' && e.move === NEUTRAL_PROFILE.special)).toBe(true);
   });
 
   it('empties the meter and deals heavy damage with a knockdown', () => {

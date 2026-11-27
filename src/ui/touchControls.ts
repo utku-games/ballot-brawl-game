@@ -1,6 +1,6 @@
 /**
  * On-screen touch controls for phones and tablets: a floating joystick on the left half and big action buttons on the right.
- * Punch, Kick and Finisher register a press per tap; Defend counts while held; Taunt, Swap and Pause are small extra
+ * Punch, Kick and Special (the Finisher with a full meter) register a press per tap; Defend counts while held; Taunt, Swap and Pause are small extra
  * buttons.
  * The controls produce the same ControlFrame as the keyboard, so the match code does not know a touch screen is used.
  */
@@ -10,6 +10,10 @@ import { inStickZone, knobOffset, stickVector, type ScreenPoint } from '../input
 import type { ScreenRect } from '../view/screenInsets';
 import { injectStyle } from './injectStyle';
 import { TOUCH_CSS } from './touchStyles';
+
+/** The shared button's two labels: the signature special, or the Finisher once the meter is full. */
+const SPECIAL_LABEL = 'SPECIAL';
+const FINISH_LABEL = 'FINISH';
 
 type Action = 'punch' | 'kick' | 'special' | 'taunt' | 'swap' | 'pause';
 
@@ -35,7 +39,7 @@ export class TouchControls {
     make('div', 'touch-hint', 'Drag here to move', this.root);
     const pad = make('div', 'touch-pad', null, this.root);
     this.pad = pad;
-    this.finisher = this.button(pad, 'touch-btn finisher', 'FINISH', 'special');
+    this.finisher = this.button(pad, 'touch-btn finisher', SPECIAL_LABEL, 'special');
     this.holdButton(pad, 'touch-btn defend', 'DEFEND');
     this.button(pad, 'touch-btn kick', 'KICK', 'kick');
     this.button(pad, 'touch-btn punch', 'PUNCH', 'punch');
@@ -119,9 +123,14 @@ export class TouchControls {
     this.knob.style.transform = `translate(${k.x}px, ${k.y}px)`;
   }
 
-  /** Lights the Finisher button and shows Swap only when there are teammates. */
-  setState(finisherReady: boolean, canSwap: boolean): void {
+  /**
+   * The SPECIAL button reads FINISH and glows gold with a full meter, lights up when the signature special has
+   * recharged, and dims while it recharges; Swap shows only when there are teammates.
+   */
+  setState(finisherReady: boolean, specialReady: boolean, canSwap: boolean): void {
+    this.finisher.textContent = finisherReady ? FINISH_LABEL : SPECIAL_LABEL;
     this.finisher.classList.toggle('ready', finisherReady);
+    this.finisher.classList.toggle('special-ready', !finisherReady && specialReady);
     this.swapButton.style.display = canSwap ? '' : 'none';
   }
 

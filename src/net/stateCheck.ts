@@ -12,7 +12,7 @@ type Fields = Record<string, unknown>;
 const ACTIONS: ReadonlySet<string> = new Set(Object.values(ActionKind));
 const PHASES: ReadonlySet<string> = new Set(Object.values(MatchPhase));
 const TEAMS: ReadonlySet<unknown> = new Set([0, 1, 2, 3]);
-const FIGHTER_NUMBERS = ['x', 'z', 'facingX', 'facingZ', 'pushX', 'pushZ', 'health', 'guard', 'meter', 'combo', 'invulnerable', 'damageTaken'] as const;
+const FIGHTER_NUMBERS = ['x', 'z', 'facingX', 'facingZ', 'pushX', 'pushZ', 'health', 'guard', 'meter', 'specialCooldown', 'combo', 'invulnerable', 'damageTaken'] as const;
 const FLOOR_LISTS = ['projectiles', 'items', 'hazards'] as const;
 
 function fail(why: string): never {

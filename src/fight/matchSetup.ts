@@ -73,6 +73,7 @@ function spawnFighter(entry: Readonly<TeamEntry>, team: TeamIndex, teamCount: nu
     health: entry.profile.maxHealth,
     guard: GUARD_MAX,
     meter: 0,
+    specialCooldown: 0,
     action: { kind: ActionKind.Idle, frame: 0, duration: 0, move: null, hitIds: [] },
     combo: 0,
     invulnerable: 0,
