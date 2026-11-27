@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import type { GameRenderer } from '@utku/engine';
 import { ActionKind, MatchPhase, type FightEvent, type FighterState, type MatchState } from '../fight/fightTypes';
 import { isAlive } from '../fight/matchQueries';
-import { FINISHERS, isActiveFrame, MoveKind } from '../fight/moves';
+import { familyOf, FINISHERS, isActiveFrame, MoveFamily, MoveKind } from '../fight/moves';
 import { creditFor, toneOf } from '../roster/credits';
 import { fighterById } from '../roster/roster';
 import { FinisherStyle } from '../roster/signatureTypes';
@@ -31,11 +31,12 @@ export const TEAM_COLORS: readonly [number, number, number, number] = [0x3a8dff,
 
 const HIT_HEIGHT = 1.4;
 const FLOOR_HEIGHT = 0.1;
-const HIT_WOBBLE: Readonly<Record<MoveKind, number>> = { [MoveKind.Punch]: 4, [MoveKind.Kick]: 6, [MoveKind.Finisher]: 10, [MoveKind.Item]: 6 };
-const HIT_SHAKE: Readonly<Record<MoveKind, number>> = { [MoveKind.Punch]: 0.05, [MoveKind.Kick]: 0.12, [MoveKind.Finisher]: 0.45, [MoveKind.Item]: 0.15 };
-const HIT_BURST: Readonly<Record<MoveKind, BurstKind>> = {
-  [MoveKind.Punch]: BurstKind.Punch, [MoveKind.Kick]: BurstKind.Kick, [MoveKind.Finisher]: BurstKind.Finisher,
-  [MoveKind.Item]: BurstKind.Kick,
+/** Hit reactions by move family, so directional moves land like the punch or kick they grew from. */
+const HIT_WOBBLE: Readonly<Record<MoveFamily, number>> = { [MoveFamily.Punch]: 4, [MoveFamily.Kick]: 6, [MoveFamily.Finisher]: 10, [MoveFamily.Item]: 6 };
+const HIT_SHAKE: Readonly<Record<MoveFamily, number>> = { [MoveFamily.Punch]: 0.05, [MoveFamily.Kick]: 0.12, [MoveFamily.Finisher]: 0.45, [MoveFamily.Item]: 0.15 };
+const HIT_BURST: Readonly<Record<MoveFamily, BurstKind>> = {
+  [MoveFamily.Punch]: BurstKind.Punch, [MoveFamily.Kick]: BurstKind.Kick, [MoveFamily.Finisher]: BurstKind.Finisher,
+  [MoveFamily.Item]: BurstKind.Kick,
 };
 const KO_SHAKE = 0.3;
 const QUAKE_SHAKE = 0.5;
@@ -139,10 +140,10 @@ export class MatchView {
       const target = bySlot.get(e.target);
       if (attacker && target) {
         const len = Math.hypot(target.x - attacker.x, target.z - attacker.z) || 1;
-        this.fighters.get(e.target)?.hit((target.x - attacker.x) / len, (target.z - attacker.z) / len, HIT_WOBBLE[e.move]);
+        this.fighters.get(e.target)?.hit((target.x - attacker.x) / len, (target.z - attacker.z) / len, HIT_WOBBLE[familyOf(e.move)]);
       }
-      this.effects.burst(HIT_BURST[e.move], e.x, HIT_HEIGHT, e.z);
-      this.camera.addShake(HIT_SHAKE[e.move]);
+      this.effects.burst(HIT_BURST[familyOf(e.move)], e.x, HIT_HEIGHT, e.z);
+      this.camera.addShake(HIT_SHAKE[familyOf(e.move)]);
     } else if (e.kind === 'block') {
       this.effects.burst(BurstKind.Block, e.x, HIT_HEIGHT, e.z);
     } else if (e.kind === 'guardBreak') {

@@ -1,7 +1,8 @@
 /**
  * Development-only lineup page: shows six of one category's twelve fighters side by side to check every costume.
  * The query string picks the category, which half of it (0 or 1) and a pose: idle, punch, ko, gesture (each fighter's
- * looping gesture) or finisher (each fighter's finisher style at its first active frame), all with match lighting.
+ * looping gesture), finisher (each fighter's finisher style at its first active frame) or move (any move kind frozen at
+ * `frame`, for example ?pose=move&move=backflipKick&frame=12), all with match lighting.
  * It is served only by the dev server through lineup.html; production builds bundle index.html alone.
  */
 import * as THREE from 'three';
@@ -36,6 +37,14 @@ enum Pose {
   Ko = 'ko',
   Gesture = 'gesture',
   Finisher = 'finisher',
+  /** A chosen move (?move=) frozen at a chosen frame (?frame=). */
+  Move = 'move',
+}
+
+/** The move and frame shown by the move view. */
+interface MoveShot {
+  move: MoveKind;
+  frame: number;
 }
 
 /** Puts a computed joint pose on the rig, as FighterView does in a match. */
@@ -45,16 +54,20 @@ function setJoints(rig: FighterRig, p: Readonly<JointPose>): void {
   rig.legL.rotation.x = -p.legL;
   rig.legR.rotation.x = -p.legR;
   rig.torso.rotation.x = p.lean;
+  setFall(rig, p.fall);
+  rig.body.rotation.x += p.flip;
+  rig.body.rotation.y = p.spin;
   rig.body.position.y = p.bob;
 }
 
 /** The animated pose for the gesture and finisher views, or null for the static ones. */
-function livePose(def: FighterDef, pose: Pose, seconds: number): JointPose | null {
+function livePose(def: FighterDef, pose: Pose, seconds: number, shot: Readonly<MoveShot>): JointPose | null {
   if (pose === Pose.Gesture) return gesturePose(def.signature.gesture, seconds);
-  if (pose !== Pose.Finisher) return null;
-  const frame = FINISHERS[def.signature.style].startup + 1;
+  if (pose !== Pose.Finisher && pose !== Pose.Move) return null;
+  const frame = pose === Pose.Move ? shot.frame : FINISHERS[def.signature.style].startup + 1;
+  const move = pose === Pose.Move ? shot.move : MoveKind.Finisher;
   return computePose({
-    kind: ActionKind.Attack, frame, duration: 0, move: MoveKind.Finisher, moving: false, time: seconds, mood: Mood.None,
+    kind: ActionKind.Attack, frame, duration: 0, move, moving: false, time: seconds, mood: Mood.None,
     koSeconds: -1, style: def.signature.style, gesture: def.signature.gesture, intro: false,
   });
 }
@@ -82,6 +95,7 @@ function start(): void {
   const category = (params.get('category') as Category | null) ?? Category.Politicians;
   const pose = (params.get('pose') as Pose | null) ?? Pose.Idle;
   const half = Number(params.get('half') ?? '0');
+  const shot: MoveShot = { move: (params.get('move') as MoveKind | null) ?? MoveKind.Punch, frame: Number(params.get('frame') ?? '0') };
   const view = createGameRenderer(container);
   const arena = ARENA_FOR_CATEGORY[category];
   applyRenderLook(view);
@@ -102,7 +116,7 @@ function start(): void {
   const startedAt = last;
   const frame = (now: number): void => {
     rigs.forEach((rig, i) => {
-      const live = livePose(defs[i], pose, (now - startedAt) / MS_PER_SECOND);
+      const live = livePose(defs[i], pose, (now - startedAt) / MS_PER_SECOND, shot);
       if (live) setJoints(rig, live);
       faceCamera(rig, view.camera.quaternion);
     });

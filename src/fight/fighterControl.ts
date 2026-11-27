@@ -1,16 +1,16 @@
 /**
  * Per-fighter rules of one tick: action timers, guard regeneration, facing, starting attacks or defending, and walking.
- * A fighter can only act from Idle or Defend; attacks and taunts lock facing and movement until they finish.
- * The finisher needs a full power meter and empties it when it starts; a Rush finisher carries the fighter forward.
+ * A fighter can only act from Idle or Defend; attacks and taunts lock facing and movement until they finish, and Punch or Kick become the kit's charge or evasive move when the stick points toward or away from the opponent.
+ * The finisher needs a full power meter and empties it when it starts; moves with a dash (charge moves, evasive moves, the Rush finisher) carry the fighter along its facing.
  */
-import { FinisherStyle } from '../roster/signatureTypes';
 import {
   BASE_WALK_SPEED, DEFEND_SPEED_SCALE, GETUP_INVULNERABLE_TICKS, GUARD_MAX, GUARD_REGEN_PER_TICK, METER_MAX,
   TAUNT_METER, TAUNT_TICKS, TICK_SECONDS,
 } from './fightConstants';
 import { ActionKind, type FightEvent, type FighterInput, type FighterState } from './fightTypes';
 import { nearestEnemy } from './matchQueries';
-import { isActiveFrame, MoveKind, moveData, moveDuration, RUSH_SPEED } from './moves';
+import { AttackButton, attackFor, stickDirection } from './moveKits';
+import { isDashFrame, MoveKind, moveData, moveDuration } from './moves';
 
 /** Facing changes only when the enemy is farther than this, so stacked bodies do not spin. */
 const FACING_MIN_DISTANCE = 0.05;
@@ -57,14 +57,19 @@ function startAttack(f: FighterState, move: MoveKind, events: FightEvent[]): voi
   events.push({ kind: 'swing', attacker: f.slotId, move });
 }
 
+/** The kit's move for this button and the stick's direction relative to the fighter's facing. */
+function variant(f: Readonly<FighterState>, input: Readonly<FighterInput>, button: AttackButton): MoveKind {
+  return attackFor(button, stickDirection(input.moveX, input.moveZ, f.facingX, f.facingZ), f.profile.kit);
+}
+
 function chooseAction(f: FighterState, input: Readonly<FighterInput>, events: FightEvent[]): void {
   if (input.special && f.meter >= METER_MAX) {
     f.meter = 0;
     startAttack(f, MoveKind.Finisher, events);
   } else if (input.punch) {
-    startAttack(f, f.holding ? MoveKind.Item : MoveKind.Punch, events);
+    startAttack(f, f.holding ? MoveKind.Item : variant(f, input, AttackButton.Punch), events);
   } else if (input.kick) {
-    startAttack(f, MoveKind.Kick, events);
+    startAttack(f, variant(f, input, AttackButton.Kick), events);
   } else if (input.defend && f.guard > 0) {
     if (f.action.kind !== ActionKind.Defend) {
       f.action = { kind: ActionKind.Defend, frame: 0, duration: 0, move: null, hitIds: [] };
@@ -90,12 +95,13 @@ function walk(f: FighterState, input: Readonly<FighterInput>): void {
   f.moving = true;
 }
 
-/** Carries a Rush finisher forward along the fighter's facing during its active frames. */
-function rush(f: FighterState): void {
-  if (f.action.kind !== ActionKind.Attack || f.action.move !== MoveKind.Finisher || f.profile.finisher !== FinisherStyle.Rush) return;
-  if (!isActiveFrame(moveData(MoveKind.Finisher, FinisherStyle.Rush), f.action.frame)) return;
-  f.x += f.facingX * RUSH_SPEED * TICK_SECONDS;
-  f.z += f.facingZ * RUSH_SPEED * TICK_SECONDS;
+/** Carries an attacking fighter along its facing while the move's dash is on (negative dashes back away). */
+function dash(f: FighterState): void {
+  if (f.action.kind !== ActionKind.Attack || f.action.move === null) return;
+  const data = moveData(f.action.move, f.profile.finisher);
+  if (!isDashFrame(data, f.action.frame)) return;
+  f.x += f.facingX * data.dash * TICK_SECONDS;
+  f.z += f.facingZ * data.dash * TICK_SECONDS;
 }
 
 /** Applies one tick of input to a living fighter; mutates the (cloned) fighter. */
@@ -109,6 +115,6 @@ export function controlFighter(
     faceNearestEnemy(f, fighters);
     chooseAction(f, input, events);
   }
-  rush(f);
+  dash(f);
   walk(f, input);
 }

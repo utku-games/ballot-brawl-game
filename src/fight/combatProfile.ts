@@ -11,6 +11,7 @@ import {
   HEALTH_PER_TOUGHNESS, SPEED_PER_STAT, STAT_MIDDLE,
 } from './fightConstants';
 import type { CombatProfile } from './fightTypes';
+import { kitForStats } from './moveKits';
 
 /** Extra multipliers a mode applies on top of the stats (story stages scale CPU damage). */
 export interface ProfileModifiers {
@@ -38,5 +39,6 @@ export function combatProfile(stats: Readonly<FighterStats>, mods: Readonly<Prof
     speedScale: 1 + (stats.speed - STAT_MIDDLE) * SPEED_PER_STAT,
     sizeScale: mods.boss ? BOSS_SIZE_SCALE : 1,
     finisher,
+    kit: kitForStats(stats),
   };
 }

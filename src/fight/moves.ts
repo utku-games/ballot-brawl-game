@@ -1,77 +1,54 @@
 /**
- * Frame data for every attack: punch, kick, throwing a picked-up item, and the meter-powered finisher in four styles.
+ * Frame data for every attack: punch, kick, the directional moves (moveLibrary.ts), throwing a picked-up item, and the meter-powered finisher in four styles.
  * Startup, active and recovery are counted in 60 Hz ticks; reach is measured from the body edge.
  * Smash is a heavy close hit in a wide arc, Rush dashes through enemies, Quake hits all around and Throw hits at range
  * through a projectile (so it has no melee reach of its own).
  */
 import { FinisherStyle } from '../roster/signatureTypes';
+import { DIRECTIONAL_MOVES } from './moveLibrary';
+import { ARC_FINISHER, ARC_FULL, ARC_NARROW, ARC_WIDE, DashPhase, MoveFamily, MoveKind, STILL, type MoveData } from './moveTypes';
 
-export enum MoveKind {
-  Punch = 'punch',
-  Kick = 'kick',
-  Finisher = 'finisher',
-  /** Throwing a picked-up item; it hits through a projectile, not in melee. */
-  Item = 'item',
-}
+export { ARC_FULL, ARC_NARROW, ARC_WIDE, DashPhase, MoveFamily, MoveKind, type MoveData } from './moveTypes';
+export { DIRECTIONAL_MOVES, type DirectionalMove } from './moveLibrary';
 
-export interface MoveData {
-  startup: number;
-  active: number;
-  recovery: number;
-  damage: number;
-  /** Reach beyond the attacker's body radius, meters. */
-  reach: number;
-  /** Cosine of the half-angle of the hit arc in front of the attacker. */
-  arcCos: number;
-  /** Initial knockback speed on hit, m/s. */
-  knockback: number;
-  hitstun: number;
-  /** Guard drained when the hit is defended. */
-  guardDamage: number;
-}
-
-/** Cosines of the arc half-angles used below. */
-const ARC_NARROW = Math.cos(Math.PI / 4);
-const ARC_WIDE = Math.cos(Math.PI / 3);
-const ARC_FINISHER = Math.cos((Math.PI * 5) / 12);
+/** Rush finisher dash speed during its active frames, m/s. */
 export const RUSH_SPEED = 15;
 
-/** Every direction counts as inside the arc. */
-const ARC_FULL = -1;
-/** Rush dash speed during its active frames, m/s. */
-export const MOVES: Readonly<Record<MoveKind, MoveData>> = {
+const BASE_MOVES = {
   [MoveKind.Punch]: {
     startup: 5, active: 3, recovery: 10, damage: 6, reach: 0.75, arcCos: ARC_NARROW,
-    knockback: 1.2, hitstun: 21, guardDamage: 9,
+    knockback: 1.2, hitstun: 21, guardDamage: 9, family: MoveFamily.Punch, ...STILL,
   },
   [MoveKind.Kick]: {
     startup: 10, active: 4, recovery: 17, damage: 10, reach: 1.05, arcCos: ARC_WIDE,
-    knockback: 4.5, hitstun: 24, guardDamage: 18,
+    knockback: 4.5, hitstun: 24, guardDamage: 18, family: MoveFamily.Kick, ...STILL,
   },
   [MoveKind.Finisher]: {
     startup: 22, active: 8, recovery: 30, damage: 38, reach: 1.6, arcCos: ARC_FINISHER,
-    knockback: 9, hitstun: 40, guardDamage: 1000,
+    knockback: 9, hitstun: 40, guardDamage: 1000, family: MoveFamily.Finisher, ...STILL, knockdown: true,
   },
   [MoveKind.Item]: {
     startup: 8, active: 1, recovery: 14, damage: 14, reach: 0, arcCos: ARC_FULL,
-    knockback: 3.5, hitstun: 24, guardDamage: 25,
+    knockback: 3.5, hitstun: 24, guardDamage: 25, family: MoveFamily.Item, ...STILL,
   },
-};
+} as const satisfies Readonly<Record<string, MoveData>>;
 
-/** The finisher's frame data per style; Smash is the original finisher. */
+export const MOVES: Readonly<Record<MoveKind, MoveData>> = { ...BASE_MOVES, ...DIRECTIONAL_MOVES };
+
+/** The finisher's frame data per style; Smash is the original finisher. Every finisher knocks down. */
 export const FINISHERS: Readonly<Record<FinisherStyle, MoveData>> = {
   [FinisherStyle.Smash]: MOVES[MoveKind.Finisher],
   [FinisherStyle.Rush]: {
     startup: 14, active: 12, recovery: 26, damage: 32, reach: 0.8, arcCos: ARC_FULL,
-    knockback: 8, hitstun: 40, guardDamage: 1000,
+    knockback: 8, hitstun: 40, guardDamage: 1000, family: MoveFamily.Finisher, dash: RUSH_SPEED, dashPhase: DashPhase.Active, knockdown: true,
   },
   [FinisherStyle.Throw]: {
     startup: 16, active: 1, recovery: 24, damage: 34, reach: 0, arcCos: ARC_FULL,
-    knockback: 7, hitstun: 40, guardDamage: 1000,
+    knockback: 7, hitstun: 40, guardDamage: 1000, family: MoveFamily.Finisher, ...STILL, knockdown: true,
   },
   [FinisherStyle.Quake]: {
     startup: 24, active: 6, recovery: 30, damage: 28, reach: 1.1, arcCos: ARC_FULL,
-    knockback: 8, hitstun: 40, guardDamage: 1000,
+    knockback: 8, hitstun: 40, guardDamage: 1000, family: MoveFamily.Finisher, ...STILL, knockdown: true,
   },
 };
 
@@ -98,4 +75,15 @@ export function moveDuration(move: Readonly<MoveData>): number {
 /** True during the ticks in which the move can hit (frame counted from 0 at the start). */
 export function isActiveFrame(move: Readonly<MoveData>, frame: number): boolean {
   return frame >= move.startup && frame < move.startup + move.active;
+}
+
+/** True while the move's dash carries the body: during its startup or its active frames. */
+export function isDashFrame(move: Readonly<MoveData>, frame: number): boolean {
+  if (move.dash === 0) return false;
+  return move.dashPhase === DashPhase.Startup ? frame < move.startup : isActiveFrame(move, frame);
+}
+
+/** The basic attack a move sounds and lands like. */
+export function familyOf(move: MoveKind): MoveFamily {
+  return MOVES[move].family;
 }

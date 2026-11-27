@@ -11,7 +11,8 @@ import { ROSTER } from '../roster/roster';
 import { ArenaKind } from '../view/arenaKinds';
 
 /** Bumped whenever a message or the match state changes shape; both sides must match. */
-export const PROTOCOL_VERSION = 4;
+/** 5: snapshots carry the directional move kinds (charge and evasive moves). */
+export const PROTOCOL_VERSION = 5;
 
 export enum MsgKind {
   Hello = 'hello',
