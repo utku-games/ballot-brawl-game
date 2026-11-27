@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-27
+
 ### Added
 
 - Directional moves: Punch or Kick while moving toward the opponent performs a charge move (flying punch, headbutt,
