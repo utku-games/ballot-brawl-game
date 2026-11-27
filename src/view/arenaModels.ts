@@ -1,20 +1,29 @@
 /**
  * Builds the arena scenery: the fighting floor sized from the shared arena bounds, a border, and themed set pieces
- * behind it (green benches and a Speaker's chair, glowing ticker boards, or marble columns with picture frames).
+ * behind it (green benches with a seated crowd and a carved Speaker's chair, glowing ticker boards, or marble columns with picture frames).
  * Surfaces use the engine's material presets named in each arena's style (wood, polished marble, velvet, gold trim), with a procedural floor pattern; every arena shares one small material set, so it stays cheap on phones.
  * Each arena kind adds its own set pieces through a small builder function.
  */
 import * as THREE from 'three';
-import { createSurfaceMaterial } from '@utku/engine';
 import { ARENA_HALF_DEPTH, ARENA_HALF_WIDTH } from '../core/arena';
-import { arenaHasRingOuts, ArenaKind, ARENA_STYLES, type ArenaStyle, type SurfaceSpec } from './arenaKinds';
-import { floorTexture } from './floorTextures';
+import { arenaHasRingOuts, ArenaKind, ARENA_STYLES, type ArenaStyle } from './arenaKinds';
+import { BACK_Z, FLOOR_THICKNESS, WALL_HEIGHT, WALL_WIDTH, arenaMaterials, box, place, type ArenaMaterials } from './arenaKit';
+import { addPanelling, addSconces, addSpeakerChair, addWindows } from './arenaDressing';
+import { seatsOnBenches, type BenchRow, type SeatGap } from './crowdLayout';
+import { buildCrowd } from './crowdView';
 
-const FLOOR_THICKNESS = 0.3;
 const BORDER = 0.6;
-const BACK_Z = -ARENA_HALF_DEPTH - 3;
-const WALL_HEIGHT = 7;
-const WALL_WIDTH = ARENA_HALF_WIDTH * 2 + 12;
+/** The Chamber: bench row height step, depth and front position, seat spacing, and the room's dressing. */
+const BENCH_STEP = 0.5;
+const BENCH_DEPTH = 0.9;
+const BENCH_FRONT = 1.6;
+const SEAT_SPACING = 0.75;
+const CHAIR_CLEARANCE = 1.3;
+const CHAMBER_PANEL_HEIGHT = 2.4;
+const CHAMBER_WINDOWS: readonly number[] = [-9, -4.5, 4.5, 9];
+const CHAMBER_SCONCES: readonly number[] = [-11.3, -6.8, -2.3, 2.3, 6.8, 11.3];
+/** The Grand Gallery's dark wood dado below the paintings. */
+const GALLERY_PANEL_HEIGHT = 1.4;
 const PROP_COUNT = 7;
 const PROP_SPACING = (ARENA_HALF_WIDTH * 2) / (PROP_COUNT - 1);
 /** Width of the Studio's red carpet, meters. */
@@ -30,71 +39,6 @@ const SKYLINE_TOP_RANGE = 14;
 const BUILDING_WIDTH = 4;
 const BUILDING_HEIGHT = 40;
 
-/**
- * Screens, tickers and stage lights only emit: a black, fully matte, non-reflective base, so no sky or sun reflection
- * washes their colour toward white, and an emissive strength under the game's bloom threshold (1.6) keeps them saturated.
- */
-const SCREEN_GLOW = 1;
-const SCREEN_ROUGHNESS = 1;
-const NO_REFLECTION = 0;
-/** Brushed gold: rough enough that the sun's reflection on the trim spreads out instead of blooming into a hotspot. */
-const TRIM_ROUGHNESS = 0.75;
-/** The picture inside a gallery frame. */
-const CANVAS_COLOR = 0x3a3a52;
-const BLACK = 0x000000;
-
-/** The shared materials of one arena, built from its style. */
-interface ArenaMaterials {
-  floor: THREE.Material;
-  edge: THREE.Material;
-  wall: THREE.Material;
-  trim: THREE.Material;
-  accent: THREE.Material;
-  canvas: THREE.Material;
-  dark: THREE.Material;
-  glow: (color: number) => THREE.Material;
-}
-
-function surface(spec: SurfaceSpec, color: number): THREE.MeshStandardMaterial {
-  return createSurfaceMaterial(spec.preset, { ...spec.tweaks, color });
-}
-
-function arenaMaterials(style: ArenaStyle): ArenaMaterials {
-  const floor = surface(style.surfaces.floor, style.floor);
-  floor.map = floorTexture(style.floorPattern, ARENA_HALF_WIDTH * 2, ARENA_HALF_DEPTH * 2, style.floorTile);
-  const glows = new Map<number, THREE.Material>();
-  return {
-    floor,
-    edge: surface(style.surfaces.floor, style.floorEdge),
-    wall: surface(style.surfaces.wall, style.wall),
-    trim: createSurfaceMaterial('metal', { color: style.trim, roughness: TRIM_ROUGHNESS }),
-    accent: surface(style.surfaces.accent, style.accent),
-    canvas: createSurfaceMaterial('fabric', { color: CANVAS_COLOR }),
-    dark: createSurfaceMaterial('rubber', { color: BLACK }),
-    glow: (color) => {
-      let m = glows.get(color);
-      if (!m) {
-        const screen = createSurfaceMaterial('glow', { color, emissiveIntensity: SCREEN_GLOW, roughness: SCREEN_ROUGHNESS, envMapIntensity: NO_REFLECTION });
-        screen.color.setHex(BLACK);
-        glows.set(color, (m = screen));
-      }
-      return m;
-    },
-  };
-}
-
-function box(w: number, h: number, d: number, material: THREE.Material): THREE.Mesh {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
-  m.receiveShadow = true;
-  return m;
-}
-
-function place(group: THREE.Group, mesh: THREE.Mesh, x: number, y: number, z: number): THREE.Mesh {
-  mesh.position.set(x, y, z);
-  group.add(mesh);
-  return mesh;
-}
-
 function buildFloor(group: THREE.Group, m: ArenaMaterials): void {
   place(group, box(ARENA_HALF_WIDTH * 2 + BORDER * 2, FLOOR_THICKNESS, ARENA_HALF_DEPTH * 2 + BORDER * 2, m.edge), 0, -FLOOR_THICKNESS / 2 - 0.01, 0);
   place(group, box(ARENA_HALF_WIDTH * 2, FLOOR_THICKNESS, ARENA_HALF_DEPTH * 2, m.floor), 0, -FLOOR_THICKNESS / 2, 0);
@@ -103,12 +47,18 @@ function buildFloor(group: THREE.Group, m: ArenaMaterials): void {
   place(group, box(WALL_WIDTH, 0.3, 0.6, m.trim), 0, WALL_HEIGHT - 1, BACK_Z - 0.8);
 }
 
+/** The Chamber's three bench rows: seat height grows and each row sits further back. */
+const BENCH_ROWS: readonly BenchRow[] = [0, 1, 2].map((row) => ({ top: BENCH_STEP * (row + 1), z: BACK_Z + BENCH_FRONT - row * BENCH_DEPTH }));
+/** The Speaker's chair stands in the back row at the centre, so no one sits there. */
+const CHAIR_GAP: SeatGap = { row: 2, x0: -CHAIR_CLEARANCE, x1: CHAIR_CLEARANCE };
+
 function buildParliament(group: THREE.Group, _style: ArenaStyle, m: ArenaMaterials): void {
-  for (let row = 0; row < 3; row += 1) {
-    place(group, box(ARENA_HALF_WIDTH * 2 + 2, 0.5 + row * 0.5, 0.9, m.accent), 0, 0.25 + row * 0.25, BACK_Z + 1.6 - row * 0.9);
-  }
-  place(group, box(1.6, 3.2, 1.2, m.edge), 0, 1.6, BACK_Z - 0.2);
-  place(group, box(1.2, 0.4, 1.3, m.trim), 0, 3.3, BACK_Z - 0.2);
+  addPanelling(group, m, CHAMBER_PANEL_HEIGHT);
+  addWindows(group, m, CHAMBER_WINDOWS);
+  addSconces(group, m, CHAMBER_SCONCES);
+  for (const row of BENCH_ROWS) place(group, box(ARENA_HALF_WIDTH * 2 + 2, row.top, BENCH_DEPTH, m.accent), 0, row.top / 2, row.z);
+  addSpeakerChair(group, m, 0, BACK_Z - 0.2);
+  group.add(buildCrowd(seatsOnBenches(BENCH_ROWS, ARENA_HALF_WIDTH, SEAT_SPACING, [CHAIR_GAP])));
   place(group, box(1.2, 0.9, 0.6, m.trim), -ARENA_HALF_WIDTH - 1.5, 0.45, 0);
   place(group, box(1.2, 0.9, 0.6, m.trim), ARENA_HALF_WIDTH + 1.5, 0.45, 0);
 }
@@ -124,6 +74,7 @@ function buildTradingFloor(group: THREE.Group, style: ArenaStyle, m: ArenaMateri
 }
 
 function buildMuseum(group: THREE.Group, _style: ArenaStyle, m: ArenaMaterials): void {
+  addPanelling(group, m, GALLERY_PANEL_HEIGHT);
   const column = new THREE.CylinderGeometry(0.35, 0.4, WALL_HEIGHT - 1, 12);
   for (let i = 0; i < PROP_COUNT; i += 1) {
     const x = -ARENA_HALF_WIDTH + i * PROP_SPACING;

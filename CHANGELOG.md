@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-27
+
+### Added
+
+- The Chamber is a full room: a seated crowd of members on the benches (drawn as two instanced meshes, so it costs two
+  draw calls), a carved Speaker's chair with a green cushioned back and gold crest, wood panelling with a gold rail, tall
+  bright windows and glowing brass wall lamps.
+- The Grand Gallery has a dark wood dado below its paintings.
+
 ## [0.18.0] - 2026-11-27
 
 ### Changed
