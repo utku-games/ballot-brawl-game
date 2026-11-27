@@ -1,24 +1,25 @@
 /**
  * Turns pure costume part specs into Three.js meshes on the fighter rig, and owns each fighter's materials.
- * Primitive geometry is shared by every fighter at unit size and scaled per part; materials are cached per fighter by
- * colour, never shared across fighters, so a hit flash only lights up the fighter that was hit.
+ * Primitive geometry is shared by every fighter at unit size and scaled per part; materials (glossy vinyl, skin for hands) are cached per
+ * fighter by surface and colour, never shared across fighters, so a hit flash only lights up the fighter that was hit.
  * A part naming a rig point that does not exist raises RigBuildError instead of silently disappearing.
  */
 import * as THREE from 'three';
 import { RigBuildError } from '../core/errors';
 import { Build, Headwear, Neckwear, Outfit, Prop } from '../roster/lookTypes';
 import type { FighterLook } from '../roster/rosterTypes';
+import { createSurfaceMaterial } from '@utku/engine';
 import { Anchor, ColorSlot, Shape, type Paint, type PartSpec } from './partSpec';
 import { addFighterRim } from './renderLook';
+import { surfaceForPaint } from './surfaceLooks';
 
-const ROUGHNESS = 0.7;
 /** Trousers are the main colour darkened by this factor. */
 export const PANTS_DARKEN = 0.7;
 const SEGMENTS = 14;
 const RATIO_STEPS = 100;
 
 export class MaterialSet {
-  private readonly byColor = new Map<number, THREE.MeshStandardMaterial>();
+  private readonly byColor = new Map<string, THREE.MeshStandardMaterial>();
   private readonly slots: Readonly<Record<Exclude<ColorSlot, ColorSlot.Fixed>, number>>;
 
   constructor(look: Readonly<FighterLook>, tone: number) {
@@ -31,14 +32,16 @@ export class MaterialSet {
     };
   }
 
-  /** The material for a colour slot or fixed colour, created on first use. */
+  /** The material for a colour slot or fixed colour (vinyl, or skin for the skin slot), created on first use. */
   get(paint: Paint): THREE.MeshStandardMaterial {
     const color = typeof paint === 'number' ? paint : paint === ColorSlot.Fixed ? 0 : this.slots[paint];
-    let m = this.byColor.get(color);
+    const preset = surfaceForPaint(paint);
+    const key = `${preset}:${color}`;
+    let m = this.byColor.get(key);
     if (!m) {
-      m = new THREE.MeshStandardMaterial({ color, roughness: ROUGHNESS });
+      m = createSurfaceMaterial(preset, { color });
       addFighterRim(m);
-      this.byColor.set(color, m);
+      this.byColor.set(key, m);
     }
     return m;
   }

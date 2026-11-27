@@ -14,7 +14,7 @@
     "deploy:preview": "bash scripts/deploy.sh --preview"
   },
   "dependencies": {
-    "@utku/engine": "github:utku-games/utku-engine#v0.5.0",
+    "@utku/engine": "github:utku-games/utku-engine#v0.6.0",
     "peerjs": "1.5.5",
     "three": "^0.186.1"
   },
