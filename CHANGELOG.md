@@ -5,6 +5,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-11-27
+
+### Added
+
+- Controls setting on the title screen: Auto, Touch, Keyboard or Gamepad, remembered between visits. On desktop the
+  on-screen buttons no longer cover the fight; a small legend shows the keys (or gamepad buttons) instead. Auto follows
+  the device used last, so picking up a gamepad or tapping the screen switches it during a match.
+
 ## [0.21.0] - 2026-11-27
 
 ### Added

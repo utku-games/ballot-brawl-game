@@ -4,6 +4,7 @@
  * the browser allows it, and the canvas follows window resizes.
  * It is the only module that touches the page at startup, including reading and clearing a shared link's query.
  */
+import { InputDevice } from './input/controlScheme';
 import { createGameRenderer } from '@utku/engine';
 import { GameAudio } from './audio/gameAudio';
 import { PlatformError } from './core/errors';
@@ -31,6 +32,10 @@ window.addEventListener('pointerdown', unlock);
 window.addEventListener('keydown', unlock);
 window.addEventListener('resize', () => renderer.resize());
 const TOUCH_POINTER = 'touch';
+/** Any touch on the page counts as using touch, so Auto controls can bring back hidden on-screen buttons. */
+window.addEventListener('pointerdown', (e: PointerEvent) => {
+  if (e.pointerType === TOUCH_POINTER) hub.noteDevice(InputDevice.Touch);
+});
 const firstTouch = (e: PointerEvent): void => {
   if (e.pointerType !== TOUCH_POINTER) return;
   window.removeEventListener('pointerup', firstTouch);

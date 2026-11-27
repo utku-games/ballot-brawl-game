@@ -1,8 +1,9 @@
 /**
  * The title screen: the game name, a one-line pitch, the parody disclaimer and the main menu.
  * Story, Rivalry Battles, Brawl, Party and Online start the modes; Credits lists every face image's author and licence; a toggle mutes sound.
- * A short controls hint (including how to trigger directional moves) adapts to touch screens, which also get a Full screen button until the game is full screen.
+ * A short controls hint (including how to trigger directional moves) and a Controls setting button adapt to touch screens, which also get a Full screen button until the game is full screen.
  */
+import { schemeLabel, type ControlScheme } from '../../input/controlScheme';
 import { make } from '@utku/engine';
 import { button, focusFirst, openScreen, type Screen } from '../screenKit';
 
@@ -15,6 +16,8 @@ export interface TitleActions {
   onTrophies: () => void;
   onCredits: () => void;
   onToggleMute: () => boolean;
+  /** Moves to the next Controls setting and returns it. */
+  onCycleControls: () => ControlScheme;
   onFullscreen: () => void;
 }
 
@@ -24,7 +27,7 @@ const BUTTONS_HINT = 'Or use the on-screen buttons: drag the left side to move; 
 const MOVES_HINT = 'Punch or Kick while moving toward your rival for a charge move (flying punch, dropkick...), or away for an evasive one (backflip kick, spin kick...). Special fires your signature move, then recharges.';
 
 /** offerFullscreen shows the Full screen button (touch devices not yet full screen). */
-export function titleScreen(parent: HTMLElement, actions: TitleActions, muted: boolean, touch: boolean, offerFullscreen: boolean): Screen {
+export function titleScreen(parent: HTMLElement, actions: TitleActions, muted: boolean, controls: ControlScheme, touch: boolean, offerFullscreen: boolean): Screen {
   const root = openScreen(parent, false);
   make('h1', '', 'BALLOT BRAWL', root);
   make('p', 'tagline', 'Politicians, tycoons and legends settle it the old-fashioned way.', root);
@@ -40,6 +43,9 @@ export function titleScreen(parent: HTMLElement, actions: TitleActions, muted: b
   if (offerFullscreen) button(extras, 'Full screen', actions.onFullscreen, 'small');
   const mute = button(extras, muted ? 'Sound: Off' : 'Sound: On', () => {
     mute.textContent = actions.onToggleMute() ? 'Sound: Off' : 'Sound: On';
+  }, 'small');
+  const scheme = button(extras, schemeLabel(controls), () => {
+    scheme.textContent = schemeLabel(actions.onCycleControls());
   }, 'small');
   if (!touch) make('p', 'controls-hint', KEYS_HINT, root);
   make('p', 'controls-hint', BUTTONS_HINT, root);
