@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-11-27
+
 ### Added
 
 - Signature specials: every fighter has a named special on the Special button (the old Finisher button, key I,
