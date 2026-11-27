@@ -9,7 +9,7 @@ import { combatProfile } from '../fight/combatProfile';
 import type { TeamIndex } from '../fight/fightTypes';
 import type { MatchSetup, TeamEntry } from '../fight/matchSetup';
 import { slotIdFor } from '../fight/matchSetup';
-import type { PlayerId } from '../input/controlFrame';
+import { PlayerId } from '../input/controlFrame';
 import { fighterById } from '../roster/roster';
 import { Twist } from '../rivalry/rivalryTypes';
 import { twistModifiers } from '../rivalry/twists';
@@ -69,6 +69,11 @@ export function initialAssignment(plan: Readonly<MatchPlan>): Map<PlayerId, stri
     });
   });
   return out;
+}
+
+/** True when Player 2 controls a slot; in a local match that means two people share this device. */
+export function usesPlayerTwo(plan: Readonly<MatchPlan>): boolean {
+  return plan.teams.some((slots) => slots.some((slot) => slot.player === PlayerId.Two));
 }
 
 /** CPU skill per slot id. */

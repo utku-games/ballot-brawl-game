@@ -1,7 +1,7 @@
 /**
  * The player's Controls setting (Auto, Touch, Keyboard or Gamepad) and which device it resolves to right now.
  * Auto follows the device last used (a touch anywhere, a key, a gamepad button), starting from touch on phones and keyboard elsewhere; the fixed settings ignore it.
- * Pure rules with the matching key legends; the controls presenter shows or hides the on-screen buttons and the legend from them.
+ * Pure rules with the matching key legends (both players' keys in a local two-player match); the controls presenter shows or hides the on-screen buttons and the legend from them.
  */
 import type { ControlFrame } from './controlFrame';
 
@@ -35,6 +35,20 @@ export const CONTROL_LEGENDS: Readonly<Record<InputDevice, string | null>> = {
   [InputDevice.Keyboard]: 'WASD move · J punch · K kick · L defend · I special · H taunt · U swap',
   [InputDevice.Gamepad]: 'Stick move · X punch · A kick · RB defend · Y special · B taunt · LB swap',
 };
+
+/** Player 2's keys, added to the keyboard legend when two players share the keyboard. */
+export const PLAYER_TWO_KEYS = 'Arrows move · , punch · . kick · / defend · R-Shift special · ; taunt · \' swap';
+
+/**
+ * The legend for a device: Player 1's controls alone, or with two local players each player's line (keyboard) or a note
+ * that the second pad drives Player 2 (gamepad). Touch shows the on-screen buttons instead, so it has none.
+ */
+export function controlLegend(device: InputDevice, twoLocalPlayers: boolean): string | null {
+  const one = CONTROL_LEGENDS[device];
+  if (one === null || !twoLocalPlayers) return one;
+  if (device === InputDevice.Keyboard) return `P1  ${one}\nP2  ${PLAYER_TWO_KEYS}`;
+  return `P1 pad 1 · P2 pad 2 or arrow keys\n${one}`;
+}
 
 /** A stick pushed less than this does not count as using the device. */
 const STICK_ACTIVE = 0.3;

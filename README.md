@@ -82,7 +82,7 @@ with those two fighters (bosses cannot be linked, so they stay unlocked only thr
 
 The title screen's **Controls** button picks Auto, Touch, Keyboard or Gamepad (saved). Auto shows the on-screen buttons
 on phones and a small key legend on desktop, and follows whichever device was used last (a tap anywhere brings the
-buttons back); Keyboard and Gamepad hide the on-screen buttons and show that device's legend; Touch always shows them.
+buttons back); Keyboard and Gamepad hide the on-screen buttons and show that device's legend (both players' keys in a local two-player match); Touch always shows them.
 
 Punch or Kick while moving toward the opponent performs a charge move; while moving away, an evasive move; standing
 still (or moving sideways), the plain punch or kick. Each fighter's kit comes from their stats
