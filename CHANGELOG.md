@@ -5,6 +5,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-11-27
+
+### Added
+
+- Signature specials: every fighter has a named special on the Special button (the old Finisher button, key I,
+  gamepad Y), recharging for 6 seconds after use. Seven mechanics play differently: a guard-draining bite, a knockdown
+  bull rush, a leap slam that lands all around, a multi-hit tornado, a counter stance that turns an attack back on the
+  attacker, a push-back shockwave and a grab that goes through a block. The special's name is announced when used, and
+  the CPU uses specials too.
+
+### Changed
+
+- The Finisher button is now the Special button: it fires the signature special, and with a full meter the Finisher as
+  before (the touch button then reads FINISH).
+- Online play needs both players on this version (protocol 6).
+
 ## [0.20.0] - 2026-11-27
 
 ### Added

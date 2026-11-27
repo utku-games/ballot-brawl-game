@@ -8,8 +8,9 @@ import { combatProfile, NO_MODIFIERS } from './combatProfile';
 import { IDLE_INPUT, type FighterInput, type MatchState } from './fightTypes';
 import { createMatch, type TeamEntry } from './matchSetup';
 import { stepMatch } from './matchStep';
+import { MoveKind } from './moveTypes';
 
-export const NEUTRAL_PROFILE = combatProfile({ power: 3, speed: 3, toughness: 3 }, NO_MODIFIERS, FinisherStyle.Smash);
+export const NEUTRAL_PROFILE = combatProfile({ power: 3, speed: 3, toughness: 3 }, NO_MODIFIERS, FinisherStyle.Smash, MoveKind.Bullrush);
 
 /** The neutral profile with another finisher style. */
 export function styled(style: FinisherStyle): typeof NEUTRAL_PROFILE {

@@ -76,7 +76,7 @@ with those two fighters (bosses cannot be linked, so they stay unlocked only thr
 | Punch | J | , | X | Punch button |
 | Kick | K | . | A | Kick button |
 | Defend (hold) | L | / | RB | Defend button |
-| Finisher (meter full) | I | Right Shift | Y | Finisher button |
+| Special (Finisher when the meter is full) | I | Right Shift | Y | Special button (reads FINISH when full) |
 | Taunt | H | ; | B | Taunt button |
 | Swap teammate | U | ' | LB | Swap button |
 
@@ -90,6 +90,20 @@ still (or moving sideways), the plain punch or kick. Each fighter's kit comes fr
 | Acrobat | speed 4+ | Flying punch | Spinning backfist | Bicycle kick | Backflip kick |
 | Brawler | toughness 4+ | Flying punch | Uppercut | Dropkick (knocks down) | Spin kick |
 | Trickster | everyone else | Flying punch | Spinning backfist | Slide kick (knocks down) | Backflip kick |
+
+Every fighter also has a named signature special on the Special button (`src/roster/signatureSpecials.ts`), which
+recharges for 6 seconds after use. With a full meter the same button fires the Finisher instead. Specials use one of
+seven mechanics (`src/fight/specialLibrary.ts`):
+
+| Mechanic | How it plays | For example |
+|---|---|---|
+| Bite | Quick, close, drains a lot of guard | Cleopatra's Asp Strike, the Chicken's Peck Attack |
+| Bullrush | Long charge that knocks down | Boris Johnson's Rugby Tackle |
+| Leap slam | Leaps in and lands hitting all around, knocks down | Elon Musk's Rocket Landing |
+| Tornado | Spins, hitting everyone nearby several times | Nikola Tesla's Tesla Coil |
+| Counter | A stance: an attack landing on it is turned back on the attacker | Keanu Reeves's Bullet Dodge |
+| Shockwave | Pushes everyone nearby far back | Winston Churchill's We Shall Fight |
+| Grab | Goes through a block and throws | Gordon Ramsay's Idiot Sandwich |
 
 ## Setup
 

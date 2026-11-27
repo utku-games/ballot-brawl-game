@@ -23,7 +23,8 @@ export const TOUCH_CSS = `
 .touch-btn.punch { background: rgba(255,90,60,0.55); }
 .touch-btn.kick { background: rgba(255,170,40,0.55); }
 .touch-btn.defend { background: rgba(70,150,255,0.55); }
-.touch-btn.finisher { background: rgba(80,80,80,0.5); opacity: 0.5; }
+.touch-btn.finisher { background: rgba(80,80,80,0.5); opacity: 0.5; font-size: 13px; }
+.touch-btn.finisher.special-ready { background: rgba(70,170,230,0.8); opacity: 1; }
 .touch-btn.finisher.ready { background: rgba(255,210,58,0.85); color: #3a2a00; opacity: 1; box-shadow: 0 0 18px ${THEME.gold};
   animation: hud-pulse 0.6s ease-in-out infinite alternate; }
 .touch-small { position: absolute; width: 56px; height: 56px; }

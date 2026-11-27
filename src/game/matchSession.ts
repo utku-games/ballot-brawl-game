@@ -4,6 +4,8 @@
  * knockout in slow motion, then reports the outcome.
  * Pausing stops the clock offline; online, the host streams the fight through a MatchNet and the guest shows it.
  */
+import { signatureSpecialOf } from '../roster/signatureSpecials';
+import type { MoveKind } from '../fight/moves';
 import { createRng, FixedStepClock, type GameRenderer, type Rng } from '@utku/engine';
 import { type AiMemory, FRESH_MEMORY, thinkAi } from '../ai/aiBrain';
 import { profileForLevel, type AiProfile } from '../ai/aiProfile';
@@ -28,6 +30,11 @@ import { playerSlots, updateAssignment } from './controlAssignment';
 import { NetRole, type MatchNet } from './matchNet';
 import { buildMatchSetup, cpuLevels, initialAssignment, type MatchPlan } from './matchPlan';
 import { pushCapped, REPLAY_SPEED, REPLAY_TICKS, replayIndex } from './replayBuffer';
+
+/** Adds an exclamation mark unless the name already ends with one. */
+function exclaim(name: string): string {
+  return name.endsWith('!') ? name : `${name}!`;
+}
 
 export interface MatchOutcome {
   winner: TeamIndex | null;
@@ -142,12 +149,20 @@ export class MatchSession {
     }
   }
 
+  /** True when the move is the attacker's own signature special. */
+  private isSpecialOf(state: Readonly<MatchState>, attacker: string, move: MoveKind): boolean {
+    return state.fighters.some((x) => x.slotId === attacker && x.profile.special === move);
+  }
+
   private announceEvents(state: Readonly<MatchState>): void {
     const ringOut = state.events.some((e) => e.kind === 'ringOut');
     for (const e of state.events) {
       if (e.kind === 'swing' && e.move === 'finisher') {
         const f = state.fighters.find((x) => x.slotId === e.attacker);
         if (f) this.hud.announce(`${fighterById(f.fighterId).finisher}!`, true, false);
+      } else if (e.kind === 'swing' && this.isSpecialOf(state, e.attacker, e.move)) {
+        const f = state.fighters.find((x) => x.slotId === e.attacker);
+        if (f) this.hud.announce(exclaim(signatureSpecialOf(f.fighterId).name), true, false);
       } else if (e.kind === 'hit' && e.move === 'finisher') {
         this.slowmo = SLOWMO_SECONDS;
       } else if (e.kind === 'tauntDone' && playerSlots(this.assignment).has(e.fighter) && e.meter > 0) {
@@ -303,7 +318,7 @@ export class MatchSession {
     this.hud.update(shown, focus);
     const f = shown.fighters.find((x) => x.slotId === focus);
     const mates = f ? shown.fighters.filter((x) => x.team === f.team && isAlive(x)).length : 0;
-    this.deps.touch?.setState(!!f && f.meter >= METER_MAX, mates > 1);
+    this.deps.touch?.setState(!!f && f.meter >= METER_MAX, !!f && f.specialCooldown === 0, mates > 1);
   }
 
   private finish(): void {

@@ -4,6 +4,7 @@
  * Events describe what happened during the last tick so the view, audio and HUD can react without diffing states.
  */
 import type { MoveKit } from './moveKits';
+import type { SpecialMove } from './specialLibrary';
 import type { FinisherStyle } from '../roster/signatureTypes';
 import type { MoveKind } from './moves';
 
@@ -58,6 +59,8 @@ export interface CombatProfile {
   finisher: FinisherStyle;
   /** Which directional moves Punch and Kick become when walking toward or away. */
   kit: MoveKit;
+  /** The fighter's signature special on the SPECIAL button. */
+  special: SpecialMove;
 }
 
 export interface FighterState {
@@ -80,6 +83,8 @@ export interface FighterState {
   health: number;
   guard: number;
   meter: number;
+  /** Ticks until the signature special can be used again; 0 when ready. */
+  specialCooldown: number;
   action: FighterAction;
   /** Hits taken in the current combo (reset when stun ends). */
   combo: number;

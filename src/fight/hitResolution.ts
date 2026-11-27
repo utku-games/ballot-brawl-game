@@ -54,6 +54,7 @@ function collectContacts(fighters: readonly FighterState[]): Contact[] {
     if (attacker.action.kind !== ActionKind.Attack || move === null) continue;
     if (hitsByProjectile(move, attacker.profile.finisher)) continue;
     const data = moveData(move, attacker.profile.finisher);
+    if (data.counter) continue;
     if (!isActiveFrame(data, attacker.action.frame)) continue;
     for (const target of fighters) {
       const contact = contactWith(attacker, target, move, data);
@@ -109,9 +110,31 @@ function applyHit(c: Contact, events: FightEvent[]): void {
   t.pushZ += c.dirZ * knock;
 }
 
-/** Applies one contact as a block or a hit, as melee and projectiles both do. */
+/** True while the fighter holds an active counter stance. */
+function countering(f: Readonly<FighterState>): boolean {
+  const move = f.action.move;
+  if (f.action.kind !== ActionKind.Attack || move === null) return false;
+  const data = moveData(move, f.profile.finisher);
+  return data.counter && isActiveFrame(data, f.action.frame);
+}
+
+/**
+ * Turns an attack that landed on a counter stance back on its attacker, with the counter's own damage and knockdown.
+ * The stance always absorbs the hit; it only strikes back when the attacker can be hit, since a projectile's thrower
+ * may already be knocked out, down or invulnerable while getting up.
+ */
+function applyCounter(c: Contact, events: FightEvent[]): void {
+  if (!canBeHit(c.attacker)) return;
+  const counter = c.target.action.move as MoveKind;
+  c.target.action.hitIds.push(c.attacker.slotId);
+  events.push({ kind: 'swing', attacker: c.target.slotId, move: counter });
+  applyHit({ attacker: c.target, target: c.attacker, move: counter, dirX: -c.dirX, dirZ: -c.dirZ }, events);
+}
+
+/** Applies one contact as a counter, a block or a hit, as melee and projectiles both do; grabs go through a block. */
 export function applyContact(c: Contact, events: FightEvent[]): void {
-  if (c.target.action.kind === ActionKind.Defend) applyBlock(c, events);
+  if (countering(c.target)) applyCounter(c, events);
+  else if (c.target.action.kind === ActionKind.Defend && !moveData(c.move, c.attacker.profile.finisher).beatsGuard) applyBlock(c, events);
   else applyHit(c, events);
 }
 

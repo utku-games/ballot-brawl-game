@@ -4,10 +4,10 @@
  * It is pure apart from the seeded engine Rng it is given, so a match with the same seed replays identically.
  */
 import type { Rng } from '@utku/engine';
-import { BODY_RADIUS, GUARD_MAX, METER_MAX } from '../fight/fightConstants';
+import { BODY_RADIUS, GUARD_MAX, METER_MAX, TICK_SECONDS } from '../fight/fightConstants';
 import { ActionKind, IDLE_INPUT, type FighterInput, type FighterState, type MatchState } from '../fight/fightTypes';
 import { distanceBetween, isAlive, nearestEnemy } from '../fight/matchQueries';
-import { MoveKind, moveData } from '../fight/moves';
+import { DashPhase, MoveKind, moveData } from '../fight/moves';
 import { FinisherStyle } from '../roster/signatureTypes';
 import type { AiProfile } from './aiProfile';
 
@@ -93,6 +93,27 @@ function approach(self: Readonly<FighterState>, target: Readonly<FighterState>):
   return { x: x / len, z: z / len };
 }
 
+/** How far a move reaches including the ground its dash covers, meters. */
+function reachWithDash(self: Readonly<FighterState>, target: Readonly<FighterState>, move: MoveKind): number {
+  const data = moveData(move, self.profile.finisher);
+  const dashTicks = data.dashPhase === DashPhase.Startup ? data.startup : data.active;
+  return reachTo(self, target, move) + Math.max(0, data.dash) * dashTicks * TICK_SECONDS;
+}
+
+/**
+ * True when the CPU should fire its recharged signature special: a counter when an attack is coming, any other special
+ * when it would reach the target. A full meter is left for the finisher branch, since the same button fires it.
+ */
+function wantsSpecial(
+  state: Readonly<MatchState>, self: Readonly<FighterState>, target: Readonly<FighterState>, dist: number,
+  profile: Readonly<AiProfile>, rng: Rng,
+): boolean {
+  if (self.specialCooldown > 0 || self.meter >= METER_MAX) return false;
+  const special = self.profile.special;
+  const ready = moveData(special, self.profile.finisher).counter ? underThreat(state, self) : dist <= reachWithDash(self, target, special);
+  return ready && rng() < profile.specialChance;
+}
+
 /** Extra distance a charge move covers with its dash, meters, so the CPU starts one from a little outside reach. */
 const CHARGE_EXTRA_REACH = 1.4;
 
@@ -119,6 +140,7 @@ function decide(state: Readonly<MatchState>, self: Readonly<FighterState>, profi
   if (!target) return { input: { ...IDLE_INPUT }, memory };
   const dist = distanceBetween(self, target);
   const guardLow = self.guard / GUARD_MAX < profile.retreatGuard;
+  if (wantsSpecial(state, self, target, dist, profile, rng)) return { input: { ...IDLE_INPUT, special: true }, memory };
   if (underThreat(state, self) && !guardLow && rng() < profile.defendChance) {
     return { input: { ...IDLE_INPUT, defend: true }, memory: { ...memory, defending: true } };
   }

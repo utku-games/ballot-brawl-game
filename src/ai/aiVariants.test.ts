@@ -7,9 +7,11 @@ import { describe, expect, it } from 'vitest';
 import { duel } from '../fight/testFight';
 import { FRESH_MEMORY, thinkAi } from './aiBrain';
 import { profileForLevel } from './aiProfile';
+import { MoveKind } from '../fight/moves';
 
 const ALWAYS = (): number => 0;
-const HARD = profileForLevel(1);
+/** The hardest CPU with its signature special switched off, so only directional moves are in play. */
+const HARD = { ...profileForLevel(1), specialChance: 0 };
 
 describe('CPU directional moves', () => {
   it('lunges toward a target just outside reach', () => {
@@ -31,5 +33,25 @@ describe('CPU directional moves', () => {
     const s = duel(2.5);
     const { input } = thinkAi(s, s.fighters[0]!, { ...HARD, variantChance: 0 }, FRESH_MEMORY, ALWAYS);
     expect(input.kick || input.punch).toBe(false);
+  });
+});
+
+describe('CPU signature specials', () => {
+  it('fires a ready special that would reach', () => {
+    const s = duel(2);
+    s.fighters[0]!.profile = { ...s.fighters[0]!.profile, special: MoveKind.Bullrush };
+    expect(thinkAi(s, s.fighters[0]!, profileForLevel(1), FRESH_MEMORY, ALWAYS).input.special).toBe(true);
+  });
+
+  it('keeps a counter for when an attack is coming', () => {
+    const s = duel(1.2);
+    s.fighters[0]!.profile = { ...s.fighters[0]!.profile, special: MoveKind.Counter };
+    expect(thinkAi(s, s.fighters[0]!, profileForLevel(1), FRESH_MEMORY, ALWAYS).input.special).toBe(false);
+  });
+
+  it('waits while the special recharges', () => {
+    const s = duel(2);
+    s.fighters[0]!.specialCooldown = 10;
+    expect(thinkAi(s, s.fighters[0]!, { ...profileForLevel(1), variantChance: 0 }, FRESH_MEMORY, ALWAYS).input.special).toBe(false);
   });
 });

@@ -1,15 +1,17 @@
 /**
- * Frame data for every attack: punch, kick, the directional moves (moveLibrary.ts), throwing a picked-up item, and the meter-powered finisher in four styles.
+ * Frame data for every attack: punch, kick, the directional moves (moveLibrary.ts), the signature specials (specialLibrary.ts), throwing a picked-up item, and the meter-powered finisher in four styles.
  * Startup, active and recovery are counted in 60 Hz ticks; reach is measured from the body edge.
  * Smash is a heavy close hit in a wide arc, Rush dashes through enemies, Quake hits all around and Throw hits at range
  * through a projectile (so it has no melee reach of its own).
  */
 import { FinisherStyle } from '../roster/signatureTypes';
 import { DIRECTIONAL_MOVES } from './moveLibrary';
-import { ARC_FINISHER, ARC_FULL, ARC_NARROW, ARC_WIDE, DashPhase, MoveFamily, MoveKind, STILL, type MoveData } from './moveTypes';
+import { ARC_FINISHER, ARC_FULL, ARC_NARROW, ARC_WIDE, DashPhase, MoveFamily, MoveKind, PLAIN_HIT, STILL, type MoveData } from './moveTypes';
+import { SPECIAL_MOVES } from './specialLibrary';
 
 export { ARC_FULL, ARC_NARROW, ARC_WIDE, DashPhase, MoveFamily, MoveKind, type MoveData } from './moveTypes';
 export { DIRECTIONAL_MOVES, type DirectionalMove } from './moveLibrary';
+export { SPECIAL_MOVES, SPECIAL_COOLDOWN_TICKS, type SpecialMove } from './specialLibrary';
 
 /** Rush finisher dash speed during its active frames, m/s. */
 export const RUSH_SPEED = 15;
@@ -33,14 +35,14 @@ const BASE_MOVES = {
   },
 } as const satisfies Readonly<Record<string, MoveData>>;
 
-export const MOVES: Readonly<Record<MoveKind, MoveData>> = { ...BASE_MOVES, ...DIRECTIONAL_MOVES };
+export const MOVES: Readonly<Record<MoveKind, MoveData>> = { ...BASE_MOVES, ...DIRECTIONAL_MOVES, ...SPECIAL_MOVES };
 
 /** The finisher's frame data per style; Smash is the original finisher. Every finisher knocks down. */
 export const FINISHERS: Readonly<Record<FinisherStyle, MoveData>> = {
   [FinisherStyle.Smash]: MOVES[MoveKind.Finisher],
   [FinisherStyle.Rush]: {
     startup: 14, active: 12, recovery: 26, damage: 32, reach: 0.8, arcCos: ARC_FULL,
-    knockback: 8, hitstun: 40, guardDamage: 1000, family: MoveFamily.Finisher, dash: RUSH_SPEED, dashPhase: DashPhase.Active, knockdown: true,
+    knockback: 8, hitstun: 40, guardDamage: 1000, family: MoveFamily.Finisher, dash: RUSH_SPEED, dashPhase: DashPhase.Active, knockdown: true, ...PLAIN_HIT,
   },
   [FinisherStyle.Throw]: {
     startup: 16, active: 1, recovery: 24, damage: 34, reach: 0, arcCos: ARC_FULL,
