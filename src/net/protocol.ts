@@ -10,8 +10,7 @@ import type { ControlFrame } from '../input/controlFrame';
 import { ROSTER } from '../roster/roster';
 import { ArenaKind } from '../view/arenaKinds';
 
-/** Bumped whenever a message or the match state changes shape; both sides must match. */
-/** 5: snapshots carry the directional move kinds (charge and evasive moves). */
+/** Bumped whenever a message or the match state changes shape; both sides must match. 5: snapshots carry the directional move kinds. */
 export const PROTOCOL_VERSION = 5;
 
 export enum MsgKind {
