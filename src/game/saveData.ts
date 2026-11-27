@@ -4,6 +4,7 @@
  * Reading tolerates missing or corrupt data by falling back to empty records, so a private window still plays.
  * Writes go through the engine storage helpers, which swallow quota and access errors.
  */
+import { DEFAULT_SCHEME, parseScheme, type ControlScheme } from '../input/controlScheme';
 import { browserStorage, readJson, writeJson } from '@utku/engine';
 import { Category } from '../roster/rosterTypes';
 import type { ScoreBreakdown } from '../story/scoring';
@@ -25,15 +26,17 @@ export interface SaveData {
   /** Story leagues the player has won; each unlocks its boss. */
   leaguesWon: Category[];
   muted: boolean;
+  /** The Controls setting; Auto for saves from before it existed. */
+  controls: ControlScheme;
 }
 
-const EMPTY_SAVE: Readonly<SaveData> = { best: {}, rivalriesWon: [], leaguesWon: [], muted: false };
+const EMPTY_SAVE: Readonly<SaveData> = { best: {}, rivalriesWon: [], leaguesWon: [], muted: false, controls: DEFAULT_SCHEME };
 
 export function loadSave(): SaveData {
   const data = readJson<SaveData>(browserStorage(), SAVE_KEY, EMPTY_SAVE);
   const won = Array.isArray(data.rivalriesWon) ? data.rivalriesWon.filter((id) => typeof id === 'string') : [];
   const leagues = Array.isArray(data.leaguesWon) ? data.leaguesWon.filter((c) => STORY_CATEGORIES.has(c)) : [];
-  return { best: { ...(data.best ?? {}) }, rivalriesWon: won, leaguesWon: leagues, muted: data.muted === true };
+  return { best: { ...(data.best ?? {}) }, rivalriesWon: won, leaguesWon: leagues, muted: data.muted === true, controls: parseScheme(data.controls) };
 }
 
 export function storeSave(data: Readonly<SaveData>): void {
