@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.22.1] - 2026-11-27
+
 ### Fixed
 
 - The controls legend shows both players' keys in local two-player matches (Player 2: arrows with comma, period,
