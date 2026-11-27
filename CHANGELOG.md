@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-11-27
+
 ### Added
 
 - Controls setting on the title screen: Auto, Touch, Keyboard or Gamepad, remembered between visits. On desktop the
