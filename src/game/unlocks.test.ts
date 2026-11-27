@@ -3,6 +3,7 @@
  * A league win unlocks its boss only once, and the trophy counts follow the saved progress.
  * Saved league wins load from storage and ignore anything that is not a story league.
  */
+import { ControlScheme } from '../input/controlScheme';
 import { describe, expect, it } from 'vitest';
 import { RIVALRIES } from '../rivalry/rivalries';
 import { bossOf, CATEGORY_ORDER, fighterById, fightersIn } from '../roster/roster';
@@ -13,7 +14,7 @@ import { lockReason, newlyUnlocked, trophies } from './unlocks';
 const NONE = { leaguesWon: [], rivalriesWon: [] };
 
 function save(): SaveData {
-  return { best: {}, rivalriesWon: [], leaguesWon: [], muted: false };
+  return { best: {}, rivalriesWon: [], leaguesWon: [], muted: false, controls: ControlScheme.Auto };
 }
 
 describe('unlocks', () => {

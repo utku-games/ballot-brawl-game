@@ -4,6 +4,8 @@
  * It owns the current screen or match session, the menu backdrop and the save data, and routes each frame to whichever is active.
  * Menus are navigable by mouse, touch, keyboard arrows and gamepad; touch fight buttons appear only during matches.
  */
+import { ControlsPresenter } from '../ui/controlsPresenter';
+import { nextScheme, type ControlScheme } from '../input/controlScheme';
 import { createRng, MusicIntensity, type GameRenderer, type Rng } from '@utku/engine';
 import type { GameAudio } from '../audio/gameAudio';
 import { Sfx } from '../audio/sfxTable';
@@ -88,11 +90,13 @@ export class GameApp {
   private navCooldown = 0;
   private confirmLock = 0;
   private readonly online: OnlineFlow;
+  /** Shows the touch buttons or a key legend during matches, per the Controls setting. */
+  private readonly controls: ControlsPresenter;
 
   constructor(private readonly deps: AppDeps) {
     this.backdrop = new MenuBackdrop(deps.renderer);
     deps.audio.muted = this.save.muted;
-    this.setTouchVisible(false);
+    this.controls = new ControlsPresenter(deps.container, deps.touch?.root ?? null, window.matchMedia(COARSE_POINTER).matches);
     this.online = new OnlineFlow({
       show: (make, arena) => this.show(make, arena),
       showOverlay: (make) => this.showOverlay(make),
@@ -122,6 +126,7 @@ export class GameApp {
 
   frame(dt: number): void {
     const frames = this.deps.hub.poll();
+    this.controls.update(this.save.controls, this.deps.hub.lastDevice);
     if (this.session && !this.overlay) this.session.frame(dt, frames);
     else if (this.session?.online) this.session.frame(dt, IDLE_FRAMES);
     else if (this.session) this.session.frame(0, frames);
@@ -194,7 +199,7 @@ export class GameApp {
   }
 
   private setTouchVisible(visible: boolean): void {
-    if (this.deps.touch) this.deps.touch.root.style.display = visible ? '' : 'none';
+    this.controls.setInMatch(visible);
   }
 
   private startMatch(plan: MatchPlan, onEnd: (o: MatchOutcome) => void): void {
@@ -236,14 +241,22 @@ export class GameApp {
       onCredits: () => this.show((q) => creditsScreen(q, () => this.showTitle()), null),
       onTrophies: () => this.show((q) => trophiesScreen(q, this.save, () => this.showTitle()), ArenaKind.Museum),
       onToggleMute: () => this.toggleMute(),
+      onCycleControls: () => this.cycleControls(),
       onFullscreen: () => void this.goFullscreen(),
-    }, this.save.muted, touch, touch && !isFullscreen() && !isInstalledApp()), ArenaKind.Parliament);
+    }, this.save.muted, this.save.controls, touch, touch && !isFullscreen() && !isInstalledApp()), ArenaKind.Parliament);
   }
 
   /** Goes full screen where the browser can, otherwise explains how (Add to Home Screen on iPhone). */
   private async goFullscreen(): Promise<void> {
     if (await enterFullscreen()) return this.showTitle();
     this.show((q) => fullscreenHelpScreen(q, () => this.showTitle()), null);
+  }
+
+  /** Moves the Controls setting to the next scheme, saves it and returns it. */
+  private cycleControls(): ControlScheme {
+    this.save.controls = nextScheme(this.save.controls);
+    storeSave(this.save);
+    return this.save.controls;
   }
 
   private toggleMute(): boolean {

@@ -3,6 +3,7 @@
  * The player must get the chosen side on the left team and the CPU the other fighter, and the twist must reach the
  * combat profiles. A win is saved once, and old saves without the field still load.
  */
+import { ControlScheme } from '../input/controlScheme';
 import { describe, expect, it } from 'vitest';
 import { Difficulty } from '../ai/aiProfile';
 import { RosterDataError } from '../core/errors';
@@ -47,7 +48,7 @@ describe('rivalryMatchPlan', () => {
 
 describe('rivalry wins', () => {
   it('records a win once', () => {
-    const save = { best: {}, rivalriesWon: [], leaguesWon: [], muted: false };
+    const save = { best: {}, rivalriesWon: [], leaguesWon: [], muted: false, controls: ControlScheme.Auto };
     expect(recordRivalryWin(save, 'currents')).toBe(true);
     expect(recordRivalryWin(save, 'currents')).toBe(false);
     expect(save.rivalriesWon).toEqual(['currents']);
