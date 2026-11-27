@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-27
+
 ### Added
 
 - The Chamber is a full room: a seated crowd of members on the benches (drawn as two instanced meshes, so it costs two
